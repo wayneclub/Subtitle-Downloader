@@ -24,7 +24,7 @@ def download_subtitle(driver, output):
                 episode_num = info['originalTotal']
                 region_allow = info['regionsAllowed'].split(',')
                 if not get_ip_location()['countryCode'].lower() in region_allow:
-                    print(f'你所在的地區無法下載，可用VPN換區到以下地區試看看：\n{region_allow}')
+                    print(f"你所在的地區無法下載，可用VPN換區到以下地區試看看：\n{region_allow}")
                     driver.quit()
                     exit()
                 if 'maxOrder' in info:
@@ -67,8 +67,8 @@ def download_subtitle(driver, output):
                     if 'order' in episode:
                         episode_name = str(episode['order']).zfill(2)
                     if 'albumPlayUrl' in episode:
-                        episode_url = episode['albumPlayUrl'].replace(
-                            '//', 'https://').replace('lang=en_us', 'lang=zh_tw').replace('lang=zh_cn', 'lang=zh_tw').strip()
+                        episode_url = re.sub(
+                            '^//', 'https://', episode['albumPlayUrl']).replace('lang=en_us', 'lang=zh_tw').replace('lang=zh_cn', 'lang=zh_tw').strip()
                         # print(episode_url)
 
                         driver.get(episode_url)

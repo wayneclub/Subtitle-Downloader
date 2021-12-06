@@ -57,10 +57,10 @@ def download_subtitle(driver, url, email="", password="", output="", download_se
                 season_start = int(download_season)-1
             else:
                 print(
-                    f'\n該劇只有{len(season_buttons)}季，沒有第{int(download_season)}季')
+                    f"\n該劇只有{len(season_buttons)}季，沒有第 {int(download_season)} 季")
                 exit(1)
 
-        print(f'\n{drama_name} 共有：{len(season_buttons)} 季')
+        print(f"\n{drama_name} 共有：{len(season_buttons)} 季")
 
         if not language:
             language = 'zh-Hant'
@@ -101,7 +101,7 @@ def download_subtitle(driver, url, email="", password="", output="", download_se
                 shutil.rmtree(folder_path)
 
             print(
-                f'\n第 {int(season_num)} 季 共有：{len(season)} 集\t下載全集\n---------------------------------------------------------------')
+                f"\n第 {int(season_num)} 季 共有：{len(season)} 集\t下載全集\n---------------------------------------------------------------")
 
             for index, episode in enumerate(season, start=1):
                 time.sleep(1)
