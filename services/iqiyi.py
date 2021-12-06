@@ -7,7 +7,7 @@ import os
 import time
 import shutil
 import json
-from common.utils import get_season_number, find_present_element_by_xpath, download_file, convert_subtitle
+from common.utils import get_ip_location, get_season_number, find_present_element_by_xpath, download_file, convert_subtitle
 
 
 def download_subtitle(driver, output):
@@ -22,6 +22,11 @@ def download_subtitle(driver, output):
             if info:
                 title = info['name'].strip()
                 episode_num = info['originalTotal']
+                region_allow = info['regionsAllowed'].split(',')
+                if not get_ip_location()['countryCode'].lower() in region_allow:
+                    print(f'你所在的地區無法下載，可用VPN換區到以下地區試看看：\n{region_allow}')
+                    driver.quit()
+                    exit()
                 if 'maxOrder' in info:
                     current_eps = info['maxOrder']
                 else:
@@ -39,10 +44,10 @@ def download_subtitle(driver, output):
 
                 if current_eps == episode_num:
                     print(
-                        f"\n第{season_name}季 共有：{episode_num} 集\t下載全集\n---------------------------------------------------------------")
+                        f"\n第 {int(season_name)} 季 共有：{episode_num} 集\t下載全集\n---------------------------------------------------------------")
                 else:
                     print(
-                        f"\n第{season_name}季 共有：{episode_num} 集\t更新至 第{current_eps}集\t下載全集\n---------------------------------------------------------------")
+                        f"\n第 {int(season_name)} 季 共有：{episode_num} 集\t更新至 第 {current_eps} 集\t下載全集\n---------------------------------------------------------------")
 
             episode_list = []
             if 'cacheAlbumList' in drama['album'] and '1' in drama['album']['cacheAlbumList'] and len(drama['album']['cacheAlbumList']['1']) > 0:
@@ -82,7 +87,7 @@ def download_subtitle(driver, output):
                                         if re.search(r'\.xml', log['name'])), None)
                             delay += 1
                             if delay > 60:
-                                print("找不到可下載的字幕，可用VPN換區到新加坡試看看")
+                                print("找不到可下載的字幕，請確認影片是否為硬字幕")
                                 driver.quit()
                                 exit(1)
 

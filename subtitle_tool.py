@@ -88,9 +88,9 @@ def convert_utf8(srcfile):
             print(srcfile)
 
     except UnicodeDecodeError:
-        print('Decode Error')
+        print("Decode Error")
     except UnicodeEncodeError:
-        print('Encode Error')
+        print("Encode Error")
 
 
 def convert_list_to_subtitle(subs):
@@ -1277,11 +1277,10 @@ def archive_subtitle(path, platform=""):
                  {'id': 'disney', 'name': 'Disney+'}]
 
     if platform:
-        if platform is True:
-            platform = ''
-        else:
-            platform = next(item for item in platforms if item['id'] == platform)[
-                'name']
+        platform = next(item for item in platforms if item['id'] == platform)[
+            'name']
+    else:
+        platform = ''
 
     print("\n將字幕封裝打包：\n---------------------------------------------------------------")
 
@@ -1295,7 +1294,7 @@ def archive_subtitle(path, platform=""):
     path = path.replace(' ', '\\ ').replace(
         '(', '\\(').replace(')', '\\)') + '/'
     print(zipname)
-    command = f'cd {path} && zip -r {zipname} ../{path} .'
+    command = f'cd {path} && zip -r {zipname} {path} .'
     os.system(command)
 
 

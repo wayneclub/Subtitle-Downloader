@@ -47,12 +47,12 @@ def check_url_exist(url, print_error=False):
     except HTTPError as exception:
         # Return code error (e.g. 404, 501, ...)
         if print_error:
-            print('HTTPError: {}'.format(exception.code))
+            print(f"HTTPError: {exception.code}")
         return False
     except URLError as exception:
         # Not an HTTP-specific error (e.g. connection refused)
         if print_error:
-            print('URLError: {}'.format(exception.reason))
+            print(f"URLError: {exception.reason}")
         return False
     else:
         return True
@@ -151,8 +151,7 @@ def kill_process():
 def get_ip_location():
     response = request.urlopen(request.Request(
         'http://ip-api.com/json/')).read()
-    print(
-        f"目前位置：{json.loads(response.decode('utf-8'))['country']}（能下載的字幕可能因不同國家而限制）\n")
+    return json.loads(response.decode('utf-8'))
 
 
 def save_html(html_source, file='test.html'):

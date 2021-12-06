@@ -36,11 +36,12 @@ def download_subtitle(web_content, output, drama_id, download_season, download_e
                     print(f"{drama_name} 第 {season_name} 季")
 
                 if download_season and int(download_season) != int(season_name):
-                    print(f"\n該劇只有第{season_name}季，沒有第{download_season}季")
+                    print(
+                        f"\n該劇只有第{int(season_name)}季，沒有第 {download_season} 季")
                     exit()
 
                 if from_season and int(from_season) != int(season_name):
-                    print(f"\n該劇只有第{season_name}季，沒有第{from_season}季")
+                    print(f"\n該劇只有第{int(season_name)}季，沒有第 {from_season} 季")
                     exit()
 
                 if 'current_eps' in drama:
@@ -50,12 +51,12 @@ def download_subtitle(web_content, output, drama_id, download_season, download_e
                     if download_episode:
                         if int(download_episode) > episode_num:
                             print(
-                                f"\n該劇只有{str(episode_num)}集，沒有第{download_episode}集")
+                                f"\n該劇只有{episode_num}集，沒有第 {download_episode} 集")
                             exit()
                         episode_start = int(download_episode)-1
                         episode_end = int(download_episode)
                         print(
-                            f"\n第{season_name}季 共有：{str(episode_num)} 集\t下載第{download_season}季 第{str(episode_end).zfill(2)}集\n---------------------------------------------------------------")
+                            f"\n第 {season_name} 季 共有：{episode_num} 集\t下載第 {download_season} 季 第 {str(episode_end).zfill(2)} 集\n---------------------------------------------------------------")
                     elif last_episode:
                         episode_start = episode_num-1
                         episode_end = episode_num
@@ -70,11 +71,11 @@ def download_subtitle(web_content, output, drama_id, download_season, download_e
                         #             break
 
                         print(
-                            f"\n第{season_name}季 共有：{str(episode_num)} 集\t下載第{season_name.zfill(2)}季 最後一集\n---------------------------------------------------------------")
+                            f"\n第 {season_name} 季 共有：{episode_num} 集\t下載第{season_name.zfill(2)}季 最後一集\n---------------------------------------------------------------")
                     elif from_episode:
                         if int(from_episode) > episode_num:
                             print(
-                                f"\n該劇只有{str(episode_num)}集，沒有第{from_episode}集")
+                                f"\n該劇只有{episode_num}集，沒有第 {from_episode} 集")
                             exit()
                         folder_path = f'{output + drama_name}.S{season_name}'
                         if os.path.exists(folder_path):
@@ -82,17 +83,17 @@ def download_subtitle(web_content, output, drama_id, download_season, download_e
                         episode_start = int(from_episode)-1
                         episode_end = episode_num
                         print(
-                            f"\n第{season_name}季 共有：{str(episode_num)} 集\t下載第{from_season}季 第{from_episode}集 至 最後一集\n---------------------------------------------------------------")
+                            f"\n第 {season_name} 季 共有：{episode_num} 集\t下載第 {from_season} 季 第 {from_episode} 集 至 最後一集\n---------------------------------------------------------------")
                     else:
                         folder_path = f'{output + drama_name}.S{season_name}'
                         episode_start = 0
                         episode_end = episode_num
                         if drama['current_eps'] != drama['total_eps']:
                             print(
-                                f"\n第{season_name}季 共有：{str(drama['total_eps'])} 集\t更新至 第{str(episode_num)}集\t下載全集\n---------------------------------------------------------------")
+                                f"\n第 {season_name} 季 共有：{drama['total_eps']} 集\t更新至 第 {episode_num} 集\t下載全集\n---------------------------------------------------------------")
                         else:
                             print(
-                                f"\n第{season_name}季 共有：{str(episode_num)} 集\t下載全集\n---------------------------------------------------------------")
+                                f"\n第 {season_name} 季 共有：{episode_num} 集\t下載全集\n---------------------------------------------------------------")
 
                     if 'eps_info' in drama:
                         for episode in drama['eps_info'][episode_start: episode_end]:

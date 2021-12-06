@@ -51,7 +51,7 @@ def download_subtitle(driver, output, genre, download_season, download_episode, 
 
             season_num = len(season_set)
             if season_num > 1:
-                print(f"{drama_name} 共有：{str(season_num)}季")
+                print(f"{drama_name} 共有：{season_num}季")
             else:
                 print(f"{drama_name} 第{season_name}季")
 
@@ -59,48 +59,34 @@ def download_subtitle(driver, output, genre, download_season, download_episode, 
             episode_list_end = episode_list[-1]
 
             if download_season and download_season not in season_set:
-                print(f"\n該劇只有第{season_name}季，沒有第{download_season}季")
+                print(f"\n該劇只有第 {season_name} 季，沒有第 {download_season} 季")
                 exit(1)
 
             if from_season and from_season not in season_set:
-                print(f"\n該劇只有第{season_name}季，沒有第{from_season}季")
+                print(f"\n該劇只有第 {season_name} 季，沒有第 {from_season} 季")
                 exit()
 
             if download_episode:
                 if f'S{download_season}E{download_episode}' not in episode_list:
                     print(
-                        f"\n該劇只有從 {episode_list_start} - {episode_list_end}，沒有第{download_season}季 第{download_episode}集\n---------------------------------------------------------------")
+                        f"\n該劇只有從 {episode_list_start} - {episode_list_end}，沒有第{ download_season }季 第 {download_episode} 集\n---------------------------------------------------------------")
                     exit(1)
 
                 episode_start = episode_list.index(
                     f'S{download_season}E{download_episode}')
                 episode_end = episode_list.index(
                     f'S{download_season}E{download_episode}') + 1
-                print('\n第' + download_season + '季 共有：'
-                      + str(len([s for s in episode_list if 'S' + download_season in s]))
-                      + ' 集\t下載第'
-                      + download_season
-                      + '季 第'
-                      + download_episode
-                      + '集\n---------------------------------------------------------------')
+                print(
+                    f"\n第 {download_season} 季 共有：{str(len([s for s in episode_list if 'S' + download_season in s]))} 集\t下載第 {download_season} 季 第 {download_episode} 集\n---------------------------------------------------------------")
             elif last_episode:
                 episode_start = episode_num-1
                 episode_end = episode_num
-                print('\n第' + season_name + '季 共有：' + str(len([s for s in episode_list if 'S' + season_name in s]))
-                      + ' 集\t下載第'
-                      + season_name.zfill(2)
-                      + '季 最後一集\n---------------------------------------------------------------')
+                print(
+                    f"\n第 {season_name} 季 共有：{str(len([s for s in episode_list if 'S' + season_name in s]))} 集\t下載第 {season_name.zfill(2)} 季 最後一集\n---------------------------------------------------------------")
             elif from_episode:
-                if 'S' + from_season + 'E' + from_episode not in episode_list:
-                    print('\n該劇只有從 '
-                          + episode_list_start
-                          + ' - '
-                          + episode_list_end
-                          + '，沒有第'
-                          + from_season
-                          + '季 第'
-                          + from_episode
-                          + '集\n---------------------------------------------------------------')
+                if f'S{from_season}E{from_episode}' not in episode_list:
+                    print(
+                        f"\n該劇只有從 {episode_list_start} - {episode_list_end}，沒有第 {from_season} 季 第 {from_episode} 集\n---------------------------------------------------------------")
                     exit(1)
 
                 folder_path = f'{output}{drama_name}.S{season_name}'
@@ -108,26 +94,21 @@ def download_subtitle(driver, output, genre, download_season, download_episode, 
                     shutil.rmtree(folder_path)
                 episode_start = int(from_episode)-1
                 episode_end = episode_num
-                print('\n第' + from_season + '季 共有：'
-                      + str(len([s for s in episode_list if 'S' + from_season in s]))
-                      + ' 集\t下載第'
-                      + from_season
-                      + '季 第'
-                      + from_episode
-                      + '集\n---------------------------------------------------------------')
+                print(
+                    f"\n第 {from_season} 季 共有：{str(len([s for s in episode_list if 'S' + from_season in s]))} 集\t下載第 {from_season} 季 第 {from_episode} 集\n---------------------------------------------------------------")
             else:
                 if season_num > 1:
                     folder_path = output + drama_name
                 else:
-                    folder_path = output + drama_name + '.S' + season_name
+                    folder_path = f'{output + drama_name}.S{season_name}'
                 episode_start = 0
                 episode_end = episode_num
                 if re.search(r'S\d+E01', episode_list[0]):
-                    print('\n共有：' + str(episode_num)
-                          + ' 集\t下載全集\n---------------------------------------------------------------')
+                    print(
+                        f"\n共有：{episode_num} 集\t下載全集\n---------------------------------------------------------------")
                 else:
-                    print('\n第' + season_name + '季 共有：' + str(episode_list[0].split('E')[1]) + '-' + str(episode_list[-1].split('E')[1])
-                          + ' 集\t下載全集\n---------------------------------------------------------------')
+                    print(
+                        f"\n第 {season_name} 季 共有：{episode_list[0].split('E')[1]}-{episode_list[-1].split('E')[1]} 集\t下載全集\n---------------------------------------------------------------")
 
             for episode in drama.findAll('li')[episode_start:episode_end]:
 
@@ -189,14 +170,14 @@ def download_subtitle(driver, output, genre, download_season, download_episode, 
                         if check_url_exist(get_dual_subtitle_link(subtitle_link)):
                             dual_lang = True
                     else:
-                        print('抱歉，此劇只有硬字幕，可去其他串流平台查看')
+                        print("抱歉，此劇只有硬字幕，可去其他串流平台查看")
                         exit(0)
 
                     if jp_lang and episode_name == 1:
-                        print('（有提供日語字幕）')
+                        print("（有提供日語字幕）")
 
                     if dual_lang and episode_name == 1:
-                        print('（有提供雙語字幕）')
+                        print("（有提供雙語字幕）")
 
                     if not download_episode:
                         os.makedirs(os.path.dirname(

@@ -16,7 +16,7 @@ from common.utils import find_visible_element_by_id, find_visible_element_by_xpa
 
 def download_subtitle(driver, url, email="", password="", output="", download_season="", language=""):
 
-    print('登入Disney+...')
+    print("登入Disney+...")
 
     email_input = find_visible_element_by_id(driver, 'email')
     email_input.send_keys(email)
@@ -101,7 +101,7 @@ def download_subtitle(driver, url, email="", password="", output="", download_se
                 shutil.rmtree(folder_path)
 
             print(
-                f'\n第{int(season_num)}季 共有：{len(season)} 集\t下載全集\n---------------------------------------------------------------')
+                f'\n第 {int(season_num)} 季 共有：{len(season)} 集\t下載全集\n---------------------------------------------------------------')
 
             for index, episode in enumerate(season, start=1):
                 time.sleep(1)

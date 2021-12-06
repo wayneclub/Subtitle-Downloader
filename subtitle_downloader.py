@@ -105,7 +105,9 @@ if __name__ == "__main__":
     password = args.password
     language = args.language
 
-    get_ip_location()
+    ip = get_ip_location()
+    print(
+        f"目前位置：{ip['country']}（IP: {ip['query']}）\n")
 
     kktv_id_search = re.search(
         r'https:\/\/www\.kktv\.me\/titles\/(.+)', query_url)
@@ -120,7 +122,7 @@ if __name__ == "__main__":
     if kktv_id_search:
         drama_id = kktv_id_search.group(1)
         if drama_id:
-            query_url = 'https://www.kktv.me/play/' + drama_id + '010001'
+            query_url = f'https://www.kktv.me/play/{drama_id}010001'
             kktv.download_subtitle(get_dynamic_html(query_url),
                                    output,
                                    drama_id,
