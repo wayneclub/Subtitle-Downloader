@@ -91,6 +91,7 @@ def get_dynamic_html(url, headless=True):
     driver = webdriver.Chrome('chromedriver', options=options)
     driver.execute_cdp_cmd('Network.setUserAgentOverride', {
         "userAgent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.53 Safari/537.36'})
+    driver.get('chrome://settings/clearBrowserData')
     driver.get(url)
     driver.set_page_load_timeout(110)
     return driver
@@ -102,6 +103,10 @@ def find_visible_element_by_id(driver, id_text):
 
 def find_visible_element_by_xpath(driver, xpath):
     return WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.XPATH, xpath)))
+
+
+def find_visible_elements_by_xpath(driver, xpath):
+    return WebDriverWait(driver, 10).until(EC.visibility_of_all_elements_located((By.XPATH, xpath)))
 
 
 def find_visible_element_clickable_by_xpath(driver, xpath):
@@ -135,6 +140,11 @@ def convert_subtitle(folder_path, platform=''):
 
 def merge_subtitle(folder_path, file_name):
     os.system(f'python3 subtitle_tool.py "{folder_path}" -m {file_name}')
+
+
+def kill_process():
+    os.system('killall -KILL "Google Chrome"')
+    os.system('killall -KILL chromedriver')
 
 
 def save_html(html_source, file='test.html'):
