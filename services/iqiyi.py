@@ -7,15 +7,17 @@ import os
 import time
 import shutil
 import json
-from bs4 import BeautifulSoup
-from common.utils import get_season_number, find_present_element_by_xpath, download_file, convert_subtitle
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.common.by import By
+from common.utils import find_visible_element_by_xpath, get_season_number, find_present_element_by_xpath, download_file, convert_subtitle, save_html
 
 
 def download_subtitle(driver, output):
-    web_content = BeautifulSoup(driver.page_source, 'lxml')
+    web_content = find_present_element_by_xpath(
+        driver, "//script[@id='__NEXT_DATA__']")
     try:
-        data = json.loads(web_content.find(
-            'script', id='__NEXT_DATA__').string)
+        data = json.loads(web_content.get_attribute('innerHTML'))
         drama = data['props']['initialState']
 
         if drama and 'album' in drama:
@@ -64,32 +66,25 @@ def download_subtitle(driver, output):
                         episode_name = str(episode['order']).zfill(2)
                     if 'albumPlayUrl' in episode:
                         episode_url = episode['albumPlayUrl'].replace(
-                            '//', 'https://').replace('lang=en_us', 'lang=zh_tw').strip()
+                            '//', 'https://').replace('lang=en_us', 'lang=zh_tw').replace('lang=zh_cn', 'lang=zh_tw').strip()
                         # print(episode_url)
 
                         driver.get(episode_url)
                         time.sleep(2)
 
-                        if find_present_element_by_xpath(driver, "//iqp[text()='預設字幕']"):
-                            print("很抱歉此劇只有硬字幕，可去其他平台找找")
-                            driver.quit()
-                            exit()
-
                         xml = ''
                         delay = 0
                         print(
                             f"尋找第 {int(season_name)} 季 第 {int(episode_name)} 集字幕中...")
+                        logs = []
                         while not xml:
-                            logs = driver.execute_script(
+                            logs += driver.execute_script(
                                 "return window.performance.getEntries();")
                             time.sleep(2)
                             xml = next((log for log in logs
                                         if re.search(r'\.xml', log['name'])), None)
                             delay += 1
-                            if delay % 10 == 0:
-                                driver.refresh()
-                                time.sleep(2)
-                            elif delay > 60:
+                            if delay > 60:
                                 print("找不到可下載的字幕，可用VPN換區到新加坡試看看")
                                 driver.quit()
                                 exit(1)
