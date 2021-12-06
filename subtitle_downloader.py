@@ -7,7 +7,7 @@ import re
 import os
 import argparse
 from services import kktv, linetv, friday, iqiyi, disney
-from common.utils import get_static_html, get_dynamic_html
+from common.utils import get_static_html, get_dynamic_html, get_ip_location
 
 
 def season_episode_type(arg_value, pat=re.compile(r'[sS]\d{1,}([eE]\d{1,})*')):
@@ -104,6 +104,8 @@ if __name__ == "__main__":
     email = args.email
     password = args.password
     language = args.language
+
+    get_ip_location()
 
     kktv_id_search = re.search(
         r'https:\/\/www\.kktv\.me\/titles\/(.+)', query_url)

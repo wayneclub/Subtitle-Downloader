@@ -2,6 +2,7 @@
 This module is for common tool.
 """
 import os
+import json
 from urllib import request
 from urllib.error import HTTPError, URLError
 from bs4 import BeautifulSoup
@@ -75,6 +76,7 @@ def get_static_html(url):
 
 def get_dynamic_html(url, headless=True):
     """Get html render by js"""
+    kill_process()
     options = webdriver.ChromeOptions()
     if headless:
         options.add_argument('--headless')
@@ -145,6 +147,13 @@ def merge_subtitle(folder_path, file_name):
 def kill_process():
     os.system('killall -KILL "Google Chrome"')
     os.system('killall -KILL chromedriver')
+
+
+def get_ip_location():
+    response = request.urlopen(request.Request(
+        'http://ip-api.com/json/')).read()
+    print(
+        f"目前位置：{json.loads(response.decode('utf-8'))['country']}（能下載的字幕可能因不同國家而限制）")
 
 
 def save_html(html_source, file='test.html'):
