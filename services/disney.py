@@ -64,6 +64,8 @@ def download_subtitle(driver, url, email="", password="", output="", download_se
 
         if not language:
             language = 'zh-Hant'
+        elif language = 'all'
+            language = 'en,zh-Hant,zh-HK'
         if ',' not in language:
             lang_list = list(language)
         lang_list = language.split(',')
