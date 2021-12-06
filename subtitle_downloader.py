@@ -53,11 +53,11 @@ if __name__ == "__main__":
                         '--output',
                         dest='output',
                         help='下載路徑')
-    parser.add_argument('-a',
-                        '--account',
-                        dest='account',
+    parser.add_argument('-email',
+                        '--email',
+                        dest='email',
                         help='串流平台帳號')
-    parser.add_argument('-p',
+    parser.add_argument('-password',
                         '--password',
                         dest='password',
                         help='串流平台密碼')
@@ -101,7 +101,7 @@ if __name__ == "__main__":
             from_episode = re.search(
                 r'[eE](\d{1,})', args.from_episode).group(1).zfill(2)
 
-    account = args.account
+    email = args.email
     password = args.password
     language = args.language
 
@@ -151,9 +151,9 @@ if __name__ == "__main__":
         iqiyi.download_subtitle(
             get_dynamic_html(query_url), output)
     elif disney_plus_search:
-        if account and password:
+        if email and password:
             disney.download_subtitle(get_dynamic_html('https://www.disneyplus.com/zh-hant/login'), query_url,
-                                     account.strip(), password.strip(), output, download_season, language)
+                                     email.strip(), password.strip(), output, download_season, language)
         else:
             print("Disney+需要帳號密碼登入")
             exit(1)

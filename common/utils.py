@@ -76,8 +76,8 @@ def get_static_html(url):
 def get_dynamic_html(url, headless=True):
     """Get html render by js"""
     options = webdriver.ChromeOptions()
-    # if headless:
-    #     options.add_argument('--headless')
+    if headless:
+        options.add_argument('--headless')
     options.add_argument('window-size=1920,1080')
     options.add_argument('--no-sandbox')
     options.add_argument('--disable-dev-shm-usage')
