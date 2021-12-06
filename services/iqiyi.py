@@ -7,10 +7,7 @@ import os
 import time
 import shutil
 import json
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.common.by import By
-from common.utils import find_visible_element_by_xpath, get_season_number, find_present_element_by_xpath, download_file, convert_subtitle
+from common.utils import get_season_number, find_present_element_by_xpath, download_file, convert_subtitle
 
 
 def download_subtitle(driver, output):
