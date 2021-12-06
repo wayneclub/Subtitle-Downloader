@@ -18,6 +18,7 @@ def download_subtitle(driver, output):
         driver, "//script[@id='__NEXT_DATA__']")
     try:
         data = json.loads(web_content.get_attribute('innerHTML'))
+        save_html(data, 'test.js')
         drama = data['props']['initialState']
 
         if drama and 'album' in drama:
