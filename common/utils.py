@@ -145,15 +145,14 @@ def merge_subtitle(folder_path, file_name):
 
 
 def kill_process():
-    os.system('killall -KILL "Google Chrome"')
-    os.system('killall -KILL chromedriver')
+    os.system('killall -KILL chromedriver > /dev/null 2>&1')
 
 
 def get_ip_location():
     response = request.urlopen(request.Request(
         'http://ip-api.com/json/')).read()
     print(
-        f"目前位置：{json.loads(response.decode('utf-8'))['country']}（能下載的字幕可能因不同國家而限制）")
+        f"目前位置：{json.loads(response.decode('utf-8'))['country']}（能下載的字幕可能因不同國家而限制）\n")
 
 
 def save_html(html_source, file='test.html'):
