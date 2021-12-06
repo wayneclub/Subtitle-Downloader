@@ -16,9 +16,9 @@ def season_episode_type(arg_value, pat=re.compile(r'[sS]\d{1,}([eE]\d{1,})*')):
     return arg_value
 
 
-def language_type(arg_value, pat=re.compile(r'en|zh-Hant|zh-HK')):
+def language_type(arg_value, pat=re.compile(r'en|zh-Hant|zh-HK|all')):
     if not pat.match(arg_value):
-        raise argparse.ArgumentTypeError('目前只提供英語、台繁、港繁的字幕')
+        raise argparse.ArgumentTypeError('目前只提供英語、台繁、港繁和全部的字幕')
     return arg_value
 
 
@@ -65,7 +65,7 @@ if __name__ == "__main__":
                         '--language',
                         dest='language',
                         type=language_type,
-                        help='語言（英語、繁中、粵語）')
+                        help='語言（英語、台繁、港繁）')
     args = parser.parse_args()
 
     if (args.from_episode and args.last_episode):
