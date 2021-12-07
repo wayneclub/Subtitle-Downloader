@@ -9,7 +9,7 @@ import argparse
 import sys
 import io
 import os
-import pathlib
+from pathlib import Path
 import re
 import unicodedata
 import pysubs2
@@ -192,7 +192,7 @@ def merge_subtitle(first_file, second_file):
         if audio_info_result:
             audio_track = audio_info_result.group(1)
             audio_extension = '.' + audio_info_result.group(2).lower()
-            audio = video.replace(pathlib.Path(
+            audio = video.replace(Path(
                 video).suffix, '_tmp' + audio_extension)
             tmp_file = audio.replace(audio_extension, '.srt')
 
@@ -796,8 +796,8 @@ def print_overlap(file_name, overlap_list):
     # 印出重疊字幕
 
     if len(overlap_list) > 0:
-        text_file = os.path.join(pathlib.Path(file_name).parent, os.path.basename(
-            file_name).replace(pathlib.Path(file_name).suffix, '-字幕重疊.txt'))
+        text_file = os.path.join(Path(file_name).parent, os.path.basename(
+            file_name).replace(Path(file_name).suffix, '-字幕重疊.txt'))
         overlap_file = open(text_file, 'w')
         for sub in overlap_list:
             overlap_file.write(pysubs2.subrip.ms_to_timestamp(sub.start) +
@@ -810,8 +810,8 @@ def print_overlength(file_name, overlength_list):
 
     if len(overlength_list) > 0:
 
-        text_file = os.path.join(pathlib.Path(file_name).parent, os.path.basename(
-            file_name).replace(pathlib.Path(file_name).suffix, '-過長字幕.txt'))
+        text_file = os.path.join(Path(file_name).parent, os.path.basename(
+            file_name).replace(Path(file_name).suffix, '-過長字幕.txt'))
         overlength_file = open(text_file, 'w')
         for sub in overlength_list:
             overlength_file.write(pysubs2.subrip.ms_to_timestamp(sub.start) +
@@ -862,8 +862,8 @@ def output_typo_compare(file_name, typo_compare_list):
     # 印出錯字
 
     if len(typo_compare_list) > 0:
-        text_file = os.path.join(pathlib.Path(file_name).parent, os.path.basename(
-            file_name).replace(pathlib.Path(file_name).suffix, '-修正錯字.txt'))
+        text_file = os.path.join(Path(file_name).parent, os.path.basename(
+            file_name).replace(Path(file_name).suffix, '-修正錯字.txt'))
         typo_compare_file = open(text_file, 'w')
         for typo_compare in typo_compare_list:
             typo_compare_file.write(str(typo_compare['index']) + '\n')
@@ -906,7 +906,7 @@ def output_typo_compare(file_name, typo_compare_list):
 
 
 def convert_subtitle(original_file, sub_type, prettify=False, print_log=True):
-    extension = pathlib.Path(original_file).suffix
+    extension = Path(original_file).suffix
 
     if not sub_type or sub_type == True:
         sub_type = '.srt'
@@ -1099,12 +1099,12 @@ def ass_to_srt(str_name_file):
     """Convert vtt file to a srt file"""
     file_contents: str = read_text_file(str_name_file)
     str_data: str = ""
-    if pathlib.Path(str_name_file).suffix == '.ssa':
+    if Path(str_name_file).suffix == '.ssa':
         str_data = str_data + convert_ass_content(file_contents, '.ssa')
     else:
         str_data = str_data + convert_ass_content(file_contents, '.ass')
     os.remove(str_name_file)
-    str_name_file: str = str(pathlib.Path(
+    str_name_file: str = str(Path(
         str_name_file).parent) + '/' + rename_subtitle(str_name_file)
     file_create(str_name_file, str_data)
     format_subtitle(str_name_file)
@@ -1122,7 +1122,7 @@ def vtt_to_srt(str_name_file):
     str_data: str = ""
     str_data = str_data + convert_vtt_content(file_contents)
     os.remove(str_name_file)
-    str_name_file: str = str(pathlib.Path(
+    str_name_file: str = str(Path(
         str_name_file).parent) + '/' + rename_subtitle(str_name_file)
     file_create(str_name_file, str_data)
     subs = pysubs2.load(str_name_file)
@@ -1241,7 +1241,7 @@ def xml_to_srt(str_name_file):
     str_data: str = ""
     subs = convert_list_to_subtitle(convert_xml_content(file_contents))
     os.remove(str_name_file)
-    str_name_file: str = str(pathlib.Path(
+    str_name_file: str = str(Path(
         str_name_file).parent) + '/' + rename_subtitle(str_name_file)
     subs.save(str_name_file)
     print(os.path.basename(str_name_file) + "\t...轉檔完成\n")
@@ -1257,7 +1257,7 @@ def json_to_srt(str_name_file):
     str_data: str = ""
     subs = convert_json_content(file_contents)
     os.remove(str_name_file)
-    str_name_file: str = str(pathlib.Path(
+    str_name_file: str = str(Path(
         str_name_file).parent) + '/' + rename_subtitle(str_name_file)
     subs.save(str_name_file)
     print(os.path.basename(str_name_file) + "\t...轉檔完成")
@@ -1276,7 +1276,7 @@ def archive_subtitle(path, platform=""):
                  {'id': 'iqiyi', 'name': 'iQIYI'},
                  {'id': 'disney', 'name': 'Disney+'}]
 
-    if platform:
+    if platform and platform != True:
         platform = next(item for item in platforms if item['id'] == platform)[
             'name']
     else:
@@ -1285,16 +1285,17 @@ def archive_subtitle(path, platform=""):
     print("\n將字幕封裝打包：\n---------------------------------------------------------------")
 
     if platform:
-        zipname = f'{path}.WEB-DL.{platform}.zip'
+        zipname = os.path.basename(f'{path}.WEB-DL.{platform}.zip')
     else:
-        zipname = f'{path}.WEB-DL.zip'
+        zipname = os.path.basename(f'{path}.WEB-DL.zip')
 
     zipname = zipname.replace(' ', '\\ ').replace(
         '(', '\\(').replace(')', '\\)')
     path = path.replace(' ', '\\ ').replace(
         '(', '\\(').replace(')', '\\)') + '/'
     print(zipname)
-    command = f'cd {path} && zip -r {zipname} {path} .'
+    command = f'cd {path} && zip -r ../../{zipname} {path} .'
+    print(command)
     os.system(command)
 
 
@@ -1338,7 +1339,7 @@ def walk_dir(top_most_path, args):
     if args.merge and args.merge != True:
         print(
             f'\n合併所有字幕片段：\n---------------------------------------------------------------\n{args.merge}\n')
-        fila_path = f'{pathlib.Path(top_most_path).parent.absolute()}/{args.merge}'
+        fila_path = f'{Path(top_most_path).parent.absolute()}/{args.merge}'
         with open(fila_path, 'wb') as merge_file:
             for segment in sorted(os.listdir(top_most_path)):
                 with open(os.path.join(top_most_path, segment), 'rb') as tmp:
@@ -1351,7 +1352,7 @@ def walk_dir(top_most_path, args):
         pathname = os.path.join(top_most_path, file)
         filename = os.path.basename(pathname)
 
-        if pathlib.Path(filename).suffix in SUBTITLE_FORMAT:
+        if Path(filename).suffix in SUBTITLE_FORMAT:
             if args.merge:
                 episode = re.search(
                     r'(.*?)([sS][0-9]{2})*([eE])*([0-9]+)(.+)', filename)
@@ -1361,13 +1362,13 @@ def walk_dir(top_most_path, args):
                     episode_num = int(episode.group(4))
 
                     if episode.group(1) and episode.group(2) and episode.group(3) and episode.group(5):
-                        next_file = str(pathlib.Path(pathname).parent) + '/' + episode.group(1) + episode.group(
+                        next_file = str(Path(pathname).parent) + '/' + episode.group(1) + episode.group(
                             2) + episode.group(3) + str(episode_num+1).zfill(length) + episode.group(5)
                     else:
-                        next_file = str(pathlib.Path(pathname).parent) + '/' + episode.group(
+                        next_file = str(Path(pathname).parent) + '/' + episode.group(
                             1) + str(episode_num+1).zfill(length) + episode.group(5)
 
-                    if episode_num % 2 != 0 and os.path.exists(next_file) and pathlib.Path(next_file).suffix == '.srt':
+                    if episode_num % 2 != 0 and os.path.exists(next_file) and Path(next_file).suffix == '.srt':
                         print(episode_num, next_file)
                         merge_subtitle(pathname, next_file)
             else:
@@ -1403,7 +1404,7 @@ def handle_subtitle(args, subtitle, print_log=True):
         if not os.path.exists(second_subtitle):
             raise argparse.ArgumentTypeError(second_subtitle + " 檔案不存在\n")
 
-        if pathlib.Path(second_subtitle).suffix == '.srt':
+        if Path(second_subtitle).suffix == '.srt':
             merge_subtitle(subtitle, second_subtitle)
         else:
             raise argparse.ArgumentTypeError("只提供.srt檔案合併\n")
@@ -1479,10 +1480,10 @@ def main():
     if os.path.isdir(path):
         walk_dir(path, args)
     elif os.path.isfile(path):
-        if pathlib.Path(path).suffix in ARCHIVE_FORMAT:
+        if Path(path).suffix in ARCHIVE_FORMAT:
 
             extract_command = 'unar \'' + path + \
-                '\' -o ' + str(pathlib.Path(path).parent)
+                '\' -o ' + str(Path(path).parent)
             result = re.search(r'Successfully extracted to "(.+?)"',
                                subprocess.getoutput(extract_command))
             if result:
@@ -1491,7 +1492,7 @@ def main():
                     walk_dir(output_path, args)
                 else:
                     handle_subtitle(args, output_path)
-        elif pathlib.Path(path).suffix in SUBTITLE_FORMAT:
+        elif Path(path).suffix in SUBTITLE_FORMAT:
             handle_subtitle(args, path)
         else:
             raise argparse.ArgumentTypeError(
