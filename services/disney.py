@@ -29,10 +29,11 @@ def download_subtitle(driver, url, email="", password="", output="", download_se
     find_visible_element_clickable_by_xpath(
         driver, "//button[@data-testid='password-continue-login']").click()
     password = ''
+    time.sleep(5)
 
-    # if EC.url_changes('https://www.disneyplus.com/zh-hant/select-profile')(driver):
-    #     find_visible_element_clickable_by_xpath(
-    #         driver, "//div[@data-testid='profile-avatar-0']").click()
+    if driver.current_url == 'https://www.disneyplus.com/zh-hant/select-profile':
+        find_visible_element_clickable_by_xpath(
+            driver, "//div[@data-testid='profile-avatar-0']").click()
 
     if WebDriverWait(driver, 10).until(EC.url_matches('https://www.disneyplus.com/zh-hant/home')):
         print("登入成功...")

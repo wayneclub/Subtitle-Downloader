@@ -145,7 +145,7 @@ def merge_subtitle(folder_path, file_name):
 
 
 def kill_process():
-    os.system('killall -KILL chromedriver > /dev/null 2>&1')
+    os.system('killall chromedriver > /dev/null 2>&1')
 
 
 def get_ip_location():
