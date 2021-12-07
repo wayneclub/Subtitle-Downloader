@@ -31,10 +31,12 @@ def download_subtitle(driver, url, email="", password="", output="", download_se
     password = ''
     time.sleep(5)
 
+    driver.get('https://www.disneyplus.com/zh-hant/select-profile')
+
     if driver.current_url == 'https://www.disneyplus.com/zh-hant/select-profile':
         find_visible_element_clickable_by_xpath(
             driver, "//div[@data-testid='profile-avatar-0']").click()
-        time.sleep(2)
+        time.sleep(3)
 
     if WebDriverWait(driver, 10).until(EC.url_matches('https://www.disneyplus.com/zh-hant/home')):
         print("登入成功...")
