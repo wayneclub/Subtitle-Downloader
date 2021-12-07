@@ -33,13 +33,17 @@ def download_subtitle(driver, url, email="", password="", output="", download_se
 
     driver.get('https://www.disneyplus.com/zh-hant/select-profile')
 
+    username = ''
     if driver.current_url == 'https://www.disneyplus.com/zh-hant/select-profile':
-        find_visible_element_clickable_by_xpath(
-            driver, "//div[@data-testid='profile-avatar-0']").click()
+        user = find_visible_element_clickable_by_xpath(
+            driver, "//div[@data-testid='profile-avatar-0']")
+        username = user.text
+        user.click()
         time.sleep(3)
 
     if WebDriverWait(driver, 10).until(EC.url_matches('https://www.disneyplus.com/zh-hant/home')):
-        print("登入成功...")
+        print(
+            f"登入成功...\n歡迎 {username} 使用Disney+\n---------------------------------------------------------------")
 
     driver.get(url)
 
@@ -61,7 +65,7 @@ def download_subtitle(driver, url, email="", password="", output="", download_se
                 season_start = int(download_season)-1
             else:
                 print(
-                    f"\n該劇只有{len(season_buttons)}季，沒有第 {int(download_season)} 季")
+                    f"\n{drama_name} 只有{len(season_buttons)}季，沒有第 {int(download_season)} 季")
                 exit(1)
 
         print(f"\n{drama_name} 共有：{len(season_buttons)} 季")
