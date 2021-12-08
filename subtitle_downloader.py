@@ -110,6 +110,7 @@ if __name__ == "__main__":
     email = args.email
     password = args.password
     language = args.language
+    download_audio = args.audio
 
     ip = get_ip_location()
     print(
@@ -164,7 +165,7 @@ if __name__ == "__main__":
         genre = disney_genre_search.group(1)
         if email and password:
             disney.download_subtitle(disney.login(
-                email.strip(), password.strip()), query_url, genre, output, download_season, language)
+                email.strip(), password.strip()), query_url, genre, output, download_season, language, download_audio)
         else:
             print("Disney+需要帳號密碼登入")
             exit(1)
