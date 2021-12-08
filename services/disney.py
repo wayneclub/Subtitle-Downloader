@@ -54,7 +54,7 @@ def login(email="", password=""):
     return driver
 
 
-def download_subtitle(driver, url, genre, output="", download_season="", language=""):
+def download_subtitle(driver, url, genre, output="", download_season="", language="", audio=""):
     driver.get(url)
 
     if WebDriverWait(driver, 10).until(EC.url_to_be(url)):
@@ -141,6 +141,8 @@ def download_subtitle(driver, url, genre, output="", download_season="", languag
                     subtitle_list, audio_list = parse_m3u(m3u_url)
                     get_subtitle(subtitle_list, genre,
                                  folder_path, file_name, lang_list)
+                    if audio:
+                        get_audio(audio_list, folder_path, file_name)
                 print(folder_path)
                 convert_subtitle(folder_path, 'disney')
         elif genre == 'movies':
@@ -156,7 +158,8 @@ def download_subtitle(driver, url, genre, output="", download_season="", languag
             subtitle_list, audio_list = parse_m3u(m3u_url)
             get_subtitle(subtitle_list, genre,
                          folder_path, file_name, lang_list)
-            # get_audio(audio_list, folder_path, file_name)
+            if audio:
+                get_audio(audio_list, folder_path, file_name)
         driver.quit()
 
 

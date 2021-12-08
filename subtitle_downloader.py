@@ -66,6 +66,12 @@ if __name__ == "__main__":
                         dest='language',
                         type=language_type,
                         help='語言（英語、台繁、港繁）')
+    parser.add_argument('-a',
+                        '--audio',
+                        dest='audio',
+                        nargs='?',
+                        const=True,
+                        help='下載（台配、港配）音軌')
     args = parser.parse_args()
 
     if (args.from_episode and args.last_episode):
