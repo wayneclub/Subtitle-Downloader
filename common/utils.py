@@ -87,13 +87,14 @@ def get_dynamic_html(url, headless=True):
     options.add_argument("--mute-audio")
     options.add_argument('--autoplay-policy=no-user-gesture-required')
     options.add_argument('--lang=zh-TW')
-    options.add_experimental_option(
-        'prefs', {'intl.accept_languages': 'zh,zh_TW'})
+    prefs = {'intl.accept_languages': 'zh,zh_TW',
+             'credentials_enable_service': False, 'profile.password_manager_enabled': False}
+    options.add_experimental_option('prefs', prefs)
     options.add_experimental_option('excludeSwitches', ['enable-automation'])
     driver = webdriver.Chrome('chromedriver', options=options)
     driver.execute_cdp_cmd('Network.setUserAgentOverride', {
         "userAgent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.53 Safari/537.36'})
-    driver.get('chrome://settings/clearBrowserData')
+    # driver.get('chrome://settings/clearBrowserData')
     driver.get(url)
     driver.set_page_load_timeout(110)
     return driver
@@ -141,7 +142,12 @@ def convert_subtitle(folder_path, platform=''):
 
 
 def merge_subtitle(folder_path, file_name):
-    os.system(f'python3 subtitle_tool.py "{folder_path}" -m {file_name}')
+    os.system(f'python3 subtitle_tool.py "{folder_path}" -m "{file_name}"')
+
+
+def download_audio(m3u8_url, output):
+    os.system(
+        f'ffmpeg -protocol_whitelist file,http,https,tcp,tls,crypto -i "{m3u8_url}" -c copy "{output}"')
 
 
 def kill_process():

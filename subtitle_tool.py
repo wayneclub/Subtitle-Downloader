@@ -1294,8 +1294,7 @@ def archive_subtitle(path, platform=""):
     path = path.replace(' ', '\\ ').replace(
         '(', '\\(').replace(')', '\\)') + '/'
     print(zipname)
-    command = f'cd {path} && zip -r ../../{zipname} {path} .'
-    print(command)
+    command = f'cd {path} && zip -r ../{zipname} {os.path.basename(path)} . && cd ..'
     os.system(command)
 
 
@@ -1335,7 +1334,6 @@ def walk_dir(top_most_path, args):
     """
     Walk a directory
     """
-
     if args.merge and args.merge != True:
         print(
             f'\n合併所有字幕片段：\n---------------------------------------------------------------\n{args.merge}\n')

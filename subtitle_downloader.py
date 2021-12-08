@@ -113,11 +113,11 @@ if __name__ == "__main__":
         r'https:\/\/www\.kktv\.me\/titles\/(.+)', query_url)
     linetv_id_search = re.search(
         r'https:\/\/www\.linetv\.tw\/drama\/(.+?)\/eps\/1', query_url)
-    friday_id_search = re.search(
-        r'https:\/\/video\.friday\.tw\/(drama|anime|movie|show)\/detail\/(.+?)', query_url)
+    friday_genre_search = re.search(
+        r'https:\/\/video\.friday\.tw\/(drama|anime|movie|show)\/detail\/.+', query_url)
     iqiyi_search = re.search(r'https:\/\/www\.iq\.com', query_url)
-    disney_plus_search = re.search(
-        r'https:\/\/www\.disneyplus\.com', query_url)
+    disney_genre_search = re.search(
+        r'https:\/\/www\.disneyplus\.com\/.*(series|movies)\/.+', query_url)
 
     if kktv_id_search:
         drama_id = kktv_id_search.group(1)
@@ -141,11 +141,11 @@ if __name__ == "__main__":
                                  last_episode,
                                  from_season,
                                  from_episode)
-    elif friday_id_search:
-        drama_id = friday_id_search.group(1)
+    elif friday_genre_search:
+        genre = friday_genre_search.group(1)
         friday.download_subtitle(get_dynamic_html(query_url),
                                  output,
-                                 drama_id,
+                                 genre,
                                  download_season,
                                  download_episode,
                                  last_episode,
@@ -154,10 +154,11 @@ if __name__ == "__main__":
     elif iqiyi_search:
         iqiyi.download_subtitle(
             get_dynamic_html(query_url), output)
-    elif disney_plus_search:
+    elif disney_genre_search:
+        genre = disney_genre_search.group(1)
         if email and password:
-            disney.download_subtitle(get_dynamic_html('https://www.disneyplus.com/zh-hant/login'), query_url,
-                                     email.strip(), password.strip(), output, download_season, language)
+            disney.download_subtitle(disney.login(
+                email.strip(), password.strip()), query_url, genre, output, download_season, language)
         else:
             print("Disney+需要帳號密碼登入")
             exit(1)
