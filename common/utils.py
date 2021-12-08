@@ -147,7 +147,7 @@ def merge_subtitle(folder_path, file_name):
 
 def download_audio(m3u8_url, output):
     os.system(
-        f'ffmpeg -protocol_whitelist file,http,https,tcp,tls,crypto -i "{m3u8_url}" -c copy "{output}"')
+        f'ffmpeg -protocol_whitelist file,http,https,tcp,tls,crypto -i "{m3u8_url}" -c copy "{output}" quiet -stats')
 
 
 def kill_process():
