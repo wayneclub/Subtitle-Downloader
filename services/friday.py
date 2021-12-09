@@ -224,13 +224,17 @@ def download_subtitle(driver, output, genre, download_season, download_episode, 
 
                     folder_path = output
 
-                    if not download_episode:
-                        os.makedirs(os.path.dirname(
-                            f'{folder_path}/'), exist_ok=True)
+                    if check_url_exist(subtitle_link):
+                        if not download_episode:
+                            os.makedirs(os.path.dirname(
+                                f'{folder_path}/'), exist_ok=True)
 
-                    download_file(subtitle_link, os.path.join(
-                        folder_path, file_name))
-                    convert_subtitle(folder_path + file_name)
+                        download_file(subtitle_link, os.path.join(
+                            folder_path, file_name))
+                        convert_subtitle(folder_path + file_name)
+                    else:
+                        print("找不到外掛字幕，請去其他平台尋找")
+                        exit()
 
     except json.decoder.JSONDecodeError:
         print("String could not be converted to JSON")
