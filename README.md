@@ -4,6 +4,6 @@
 <img src="https://colab.research.google.com/assets/colab-badge.svg" 
      title="Open this file in Google Colab" alt="Colab"/>
 </a>
-_
-使用方式：
+
+\使用方式：
 ![alt text](https://github.com/wayneclub/Subtitle-Downloader/blob/main/guide.png?raw=true)
