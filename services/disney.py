@@ -94,6 +94,8 @@ def download_subtitle(driver, url, genre, output="", download_season="", languag
 
             season_list = []
             for season_button in season_buttons[season_start:season_end]:
+                print(season_button.get_attribute(
+                    'aria-label').replace('。', '').replace('，', '：'))
                 time.sleep(1)
                 if season_button.is_enabled():
                     season_button.click()
@@ -101,6 +103,7 @@ def download_subtitle(driver, url, genre, output="", download_season="", languag
 
                 click = True
                 while click and len(driver.find_elements(By.XPATH, "//div[@data-program-type='episode']")) > 4:
+                    time.sleep(1)
                     next_button = find_present_element_by_xpath(
                         driver, "//button[@data-testid='arrow-right']")
                     if int(next_button.get_attribute('tabindex')) == 0:
