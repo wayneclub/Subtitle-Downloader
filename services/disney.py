@@ -104,7 +104,7 @@ def download_subtitle(driver, url, genre, output="", download_season="", languag
 
                 click = True
                 while click and len(driver.find_elements(By.XPATH, "//div[@data-program-type='episode']")) > 4:
-                    time.sleep(1)
+                    # time.sleep(1)
                     next_button = find_present_element_by_xpath(
                         driver, "//button[@data-testid='arrow-right']")
 
