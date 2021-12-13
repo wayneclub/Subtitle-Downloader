@@ -11,6 +11,7 @@ from bs4 import BeautifulSoup
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.action_chains import ActionChains
 from common.utils import get_dynamic_html, download_audio, find_visible_element_by_id, find_visible_element_by_xpath, find_visible_element_clickable_by_xpath, find_present_element_by_xpath, download_file, convert_subtitle, merge_subtitle
 
 BASE_URL = "https://www.disneyplus.com"
@@ -106,8 +107,10 @@ def download_subtitle(driver, url, genre, output="", download_season="", languag
                     time.sleep(1)
                     next_button = find_present_element_by_xpath(
                         driver, "//button[@data-testid='arrow-right']")
+
                     if int(next_button.get_attribute('tabindex')) == 0:
-                        next_button.click()
+                        ActionChains(driver).move_to_element(
+                            next_button).click(next_button).perform()
                     else:
                         click = False
 
