@@ -95,7 +95,7 @@ def download_subtitle(driver, url, genre, output="", download_season="", languag
             season_list = []
             for season_button in season_buttons[season_start:season_end]:
                 time.sleep(1)
-                if len(season_buttons) > 1:
+                if season_button.is_enabled():
                     season_button.click()
                     time.sleep(1)
 
