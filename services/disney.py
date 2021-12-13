@@ -183,9 +183,7 @@ def get_m3u8(driver):
         # print(m3u_file)
         delay += 1
 
-        if delay % 10 == 0:
-            driver.refresh()
-        elif delay > 60:
+        if delay > 60:
             print("找不到m3u8，請重新執行")
             exit(1)
 
