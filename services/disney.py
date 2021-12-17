@@ -40,7 +40,7 @@ def login(email="", password=""):
     time.sleep(3)
 
     username = ''
-    if driver.current_url == SELECT_PROFILE_URL:
+    if '/select-profile' in driver.current_url:
         user = find_visible_element_clickable_by_xpath(
             driver, "//div[@data-testid='profile-avatar-0']")
         username = user.text
