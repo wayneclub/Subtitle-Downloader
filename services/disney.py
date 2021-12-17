@@ -20,7 +20,7 @@ SELECT_PROFILE_URL = f"{BASE_URL}/select-profile"
 
 
 def login(email="", password=""):
-    driver = get_dynamic_html(LOGIN_URL, False)
+    driver = get_dynamic_html(LOGIN_URL)
     print("登入Disney+...")
 
     email_input = find_visible_element_by_id(driver, 'email')
