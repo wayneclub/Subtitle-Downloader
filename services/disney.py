@@ -39,14 +39,12 @@ def login(email="", password=""):
 
     time.sleep(3)
 
-    if driver.current_url != SELECT_PROFILE_URL:
-        driver.get(SELECT_PROFILE_URL)
-
     username = ''
-    user = find_visible_element_clickable_by_xpath(
-        driver, "//div[@data-testid='profile-avatar-0']")
-    username = user.text
-    user.click()
+    if driver.current_url == SELECT_PROFILE_URL:
+        user = find_visible_element_clickable_by_xpath(
+            driver, "//div[@data-testid='profile-avatar-0']")
+        username = user.text
+        user.click()
 
     if WebDriverWait(driver, 10).until(EC.url_matches(f'{BASE_URL}/zh-hant/home')):
         print(
