@@ -78,6 +78,7 @@ def get_static_html(url):
 def get_dynamic_html(url, headless=True):
     """Get html render by js"""
     kill_process()
+    ChromeDriverManager(log_level=0).install()
     options = webdriver.ChromeOptions()
     if headless:
         options.add_argument('--headless')
@@ -94,8 +95,7 @@ def get_dynamic_html(url, headless=True):
     options.add_experimental_option('prefs', prefs)
     options.add_experimental_option('excludeSwitches', ['enable-automation'])
     # driver = webdriver.Chrome('chromedriver', options=options)
-    driver = webdriver.Chrome(ChromeDriverManager(
-        log_level=0).install(), options=options)
+    driver = webdriver.Chrome('chromedriver', options=options)
     driver.execute_cdp_cmd('Network.setUserAgentOverride', {
         "userAgent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.53 Safari/537.36'})
     # driver.get('chrome://settings/clearBrowserData')
@@ -139,14 +139,14 @@ def download_file(url, path):
 def convert_subtitle(folder_path, platform=''):
     if platform:
         os.system(
-            f'python3 subtitle_tool.py "{folder_path}" -c -z {platform}')
+            f'python subtitle_tool.py "{folder_path}" -c -z {platform}')
     else:
         os.system(
-            f'python3 subtitle_tool.py "{folder_path}" -c')
+            f'python subtitle_tool.py "{folder_path}" -c')
 
 
 def merge_subtitle(folder_path, file_name):
-    os.system(f'python3 subtitle_tool.py "{folder_path}" -m "{file_name}"')
+    os.system(f'python subtitle_tool.py "{folder_path}" -m "{file_name}"')
 
 
 def download_audio(m3u8_url, output):

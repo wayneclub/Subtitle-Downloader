@@ -77,15 +77,15 @@ def download_subtitle(web_content, output, drama_id, download_season, download_e
                             print(
                                 f"\n該劇只有{episode_num}集，沒有第 {from_episode} 集")
                             exit()
-                        folder_path = f'{output + drama_name}.S{season_name}'
-                        if os.path.exists(folder_path):
-                            shutil.rmtree(folder_path)
+                        folder_path = os.path.join(
+                            output, f'{drama_name}.S{season_name}')
                         episode_start = int(from_episode)-1
                         episode_end = episode_num
                         print(
                             f"\n第 {season_name} 季 共有：{episode_num} 集\t下載第 {from_season} 季 第 {from_episode} 集 至 最後一集\n---------------------------------------------------------------")
                     else:
-                        folder_path = f'{output + drama_name}.S{season_name}'
+                        folder_path = os.path.join(
+                            output, f'{drama_name}.S{season_name}')
                         episode_start = 0
                         episode_end = episode_num
                         if drama['current_eps'] != drama['total_eps']:
@@ -94,6 +94,9 @@ def download_subtitle(web_content, output, drama_id, download_season, download_e
                         else:
                             print(
                                 f"\n第 {season_name} 季 共有：{episode_num} 集\t下載全集\n---------------------------------------------------------------")
+
+                    if os.path.exists(folder_path):
+                        shutil.rmtree(folder_path)
 
                     if 'eps_info' in drama:
                         for episode in drama['eps_info'][episode_start: episode_end]:
@@ -117,8 +120,7 @@ def download_subtitle(web_content, output, drama_id, download_season, download_e
                                                     f"{file_name}\t...一般用戶於{free_date}開啟")
 
                                 if not download_episode:
-                                    os.makedirs(os.path.dirname(
-                                        f'{folder_path}/'), exist_ok=True)
+                                    os.makedirs(folder_path, exist_ok=True)
 
                                 download_file(subtitle_link, os.path.join(
                                     folder_path, file_name))

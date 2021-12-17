@@ -147,7 +147,8 @@ def download_subtitle(driver, url, genre, output="", download_season="", languag
                 if download_season:
                     season_num = download_season
                 season_name = str(season_num).zfill(2)
-                folder_path = f'{output}{drama_name}.S{season_name}'
+                folder_path = os.path.join(
+                    output, f'{drama_name}.S{season_name}')
 
                 if os.path.exists(folder_path):
                     shutil.rmtree(folder_path)
@@ -177,7 +178,7 @@ def download_subtitle(driver, url, genre, output="", download_season="", languag
                 convert_subtitle(folder_path, 'disney')
         elif genre == 'movies':
             print(drama_name)
-            folder_path = f'{output}{drama_name}'
+            folder_path = os.path.join(output, drama_name)
             file_name = f'{drama_name}.WEB-DL.Disney+'
             find_visible_element_clickable_by_xpath(
                 driver, "//button[@data-testid='play-button']").click()
@@ -255,7 +256,8 @@ def get_subtitle(subtitle_list, genre, folder_path, sub_name, lang_list):
     for sub in subtitle_list:
         if sub['lang'] in lang_list:
             file_name = f"{sub_name}.{sub['lang']}.srt"
-            tmp_folder_path = os.path.join(folder_path, f"{sub['lang']}/tmp")
+            tmp_folder_path = os.path.join(
+                os.path.join(folder_path, sub['lang']), 'tmp')
             print(f"下載：{file_name}")
 
             if genre == 'movies' or len(lang_list) == 1:
@@ -263,8 +265,7 @@ def get_subtitle(subtitle_list, genre, folder_path, sub_name, lang_list):
 
             if os.path.exists(tmp_folder_path):
                 shutil.rmtree(tmp_folder_path)
-            os.makedirs(os.path.dirname(
-                tmp_folder_path + '/'), exist_ok=True)
+            os.makedirs(tmp_folder_path, exist_ok=True)
             for segement_url in sub['urls']:
                 download_file(segement_url, os.path.join(
                     tmp_folder_path, os.path.basename(segement_url)))

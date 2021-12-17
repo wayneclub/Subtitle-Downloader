@@ -55,7 +55,7 @@ def download_subtitle(driver, output):
             elif 'play' in drama and 'cachePlayList' in drama['play'] and '1' in drama['play']['cachePlayList'] and len(drama['play']['cachePlayList']['1']) > 0:
                 episode_list = drama['play']['cachePlayList']['1']
 
-            folder_path = f'{output + drama_name}.S{season_name}'
+            folder_path = os.path.join(output, f'{drama_name}.S{season_name}')
             if os.path.exists(folder_path):
                 shutil.rmtree(folder_path)
 
@@ -95,8 +95,7 @@ def download_subtitle(driver, output):
                             subtitle_link = xml['name']
                             # print(subtitle_link)
                             file_name = f'{drama_name}.S{season_name}E{episode_name}.WEB-DL.iQiyi.zh-Hant.xml'
-                            os.makedirs(os.path.dirname(
-                                        f'{folder_path}/'), exist_ok=True)
+                            os.makedirs(folder_path, exist_ok=True)
                             download_file(subtitle_link, os.path.join(
                                 folder_path, file_name))
                 print()

@@ -24,7 +24,7 @@ def language_type(arg_value, pat=re.compile(r'en|zh-Hant|zh-HK|all')):
 
 def print_usage():
     """Show a info message about the usage"""
-    print("\n使用方式：\tpython3 download_subtitle.py url [S01][E01]\n")
+    print("\n使用方式：\tpython download_subtitle.py url [S01][E01]\n")
     print("\t\turl\t\t- 欲下載的劇集字幕的網站")
     print("\t\tS[0-9]E[0-9]\t- 下載第[0-9]季 第[0-9]集\n")
 
@@ -83,9 +83,7 @@ if __name__ == "__main__":
     query_url = args.url.strip()
     output = args.output
     if not output:
-        output = str(os.getcwd()) + '/'
-    else:
-        output += '/'
+        output = os.getcwd()
 
     download_season = ''
     download_episode = ''

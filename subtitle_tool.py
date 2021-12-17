@@ -1285,15 +1285,15 @@ def archive_subtitle(path, platform=""):
     print("\n將字幕封裝打包：\n---------------------------------------------------------------")
 
     if platform:
-        zipname = os.path.basename(f'{path}.WEB-DL.{platform}.zip')
+        zipname = os.path.basename(f'{path}.WEB-DL.{platform}')
     else:
-        zipname = os.path.basename(f'{path}.WEB-DL.zip')
+        zipname = os.path.basename(f'{path}.WEB-DL')
 
     zipname = zipname.replace(' ', '\\ ').replace(
         '(', '\\(').replace(')', '\\)')
     path = path.replace(' ', '\\ ').replace(
         '(', '\\(').replace(')', '\\)') + '/'
-    print(zipname)
+    print(f'{zipname}.zip')
     shutil.make_archive(zipname, 'zip', path)
 
 

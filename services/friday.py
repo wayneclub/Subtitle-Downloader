@@ -89,18 +89,18 @@ def download_subtitle(driver, output, genre, download_season, download_episode, 
                         f"\n該劇只有從 {episode_list_start} - {episode_list_end}，沒有第 {from_season} 季 第 {from_episode} 集\n---------------------------------------------------------------")
                     exit(1)
 
-                folder_path = f'{output}{drama_name}.S{season_name}'
-                if os.path.exists(folder_path):
-                    shutil.rmtree(folder_path)
+                folder_path = os.path.join(
+                    output, f'{drama_name}.S{season_name}')
                 episode_start = int(from_episode)-1
                 episode_end = episode_num
                 print(
                     f"\n第 {from_season} 季 共有：{str(len([s for s in episode_list if 'S' + from_season in s]))} 集\t下載第 {from_season} 季 第 {from_episode} 集\n---------------------------------------------------------------")
             else:
                 if season_num > 1:
-                    folder_path = output + drama_name
+                    folder_path = os.path.join(output, drama_name)
                 else:
-                    folder_path = f'{output + drama_name}.S{season_name}'
+                    folder_path = os.path.join(
+                        output, f'{drama_name}.S{season_name}')
                 episode_start = 0
                 episode_end = episode_num
                 if re.search(r'S\d+E01', episode_list[0]):
@@ -110,6 +110,11 @@ def download_subtitle(driver, output, genre, download_season, download_episode, 
                     print(
                         f"\n第 {season_name} 季 共有：{episode_list[0].split('E')[1]}-{episode_list[-1].split('E')[1]} 集\t下載全集\n---------------------------------------------------------------")
 
+            if os.path.exists(folder_path):
+                shutil.rmtree(folder_path)
+
+            jp_lang = False
+            dual_lang = False
             for episode in drama.findAll('li')[episode_start:episode_end]:
 
                 sub_search = re.search(
@@ -136,9 +141,6 @@ def download_subtitle(driver, output, genre, download_season, download_episode, 
                     dual_file_name = file_name.replace('.zh-Hant.vtt', '.vtt')
                     ja_folder_path = os.path.join(folder_path, '日語')
                     dual_folder_path = os.path.join(folder_path, '雙語')
-
-                    jp_lang = False
-                    dual_lang = False
 
                     if check_url_exist(subtitle_link):
                         ja_subtitle_link = get_ja_subtitle_link(
@@ -180,15 +182,12 @@ def download_subtitle(driver, output, genre, download_season, download_episode, 
                         print("（有提供雙語字幕）")
 
                     if not download_episode:
-                        os.makedirs(os.path.dirname(
-                            f'{folder_path}/'), exist_ok=True)
+                        os.makedirs(folder_path, exist_ok=True)
 
                         if jp_lang:
-                            os.makedirs(os.path.dirname(
-                                f'{ja_folder_path}/'), exist_ok=True)
+                            os.makedirs(ja_folder_path, exist_ok=True)
                         if dual_lang:
-                            os.makedirs(os.path.dirname(
-                                f'{dual_folder_path}/'), exist_ok=True)
+                            os.makedirs(dual_folder_path, exist_ok=True)
 
                     download_file(subtitle_link, os.path.join(
                         folder_path, file_name))
@@ -226,12 +225,11 @@ def download_subtitle(driver, output, genre, download_season, download_episode, 
 
                     if check_url_exist(subtitle_link):
                         if not download_episode:
-                            os.makedirs(os.path.dirname(
-                                f'{folder_path}/'), exist_ok=True)
+                            os.makedirs(folder_path, exist_ok=True)
 
                         download_file(subtitle_link, os.path.join(
                             folder_path, file_name))
-                        convert_subtitle(folder_path + file_name)
+                        convert_subtitle(os.path.join(folder_path, file_name))
                     else:
                         print("找不到外掛字幕，請去其他平台尋找")
                         exit()
