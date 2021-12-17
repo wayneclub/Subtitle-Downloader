@@ -10,6 +10,7 @@ from selenium import webdriver
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
+from webdriver_manager.chrome import ChromeDriverManager
 import wget
 
 
@@ -91,7 +92,8 @@ def get_dynamic_html(url, headless=True):
              'credentials_enable_service': False, 'profile.password_manager_enabled': False}
     options.add_experimental_option('prefs', prefs)
     options.add_experimental_option('excludeSwitches', ['enable-automation'])
-    driver = webdriver.Chrome('chromedriver', options=options)
+    # driver = webdriver.Chrome('chromedriver', options=options)
+    driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
     driver.execute_cdp_cmd('Network.setUserAgentOverride', {
         "userAgent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.53 Safari/537.36'})
     # driver.get('chrome://settings/clearBrowserData')
