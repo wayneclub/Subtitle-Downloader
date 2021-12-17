@@ -1091,7 +1091,7 @@ def file_create(str_name_file, str_data):
 
 def read_text_file(str_name_file):
     """Read a file text"""
-    with open(str_name_file, 'r') as f:
+    with open(str_name_file, 'r', encoding='utf-8') as f:
         return f.read()
 
 
