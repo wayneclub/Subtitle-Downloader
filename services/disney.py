@@ -51,6 +51,8 @@ def login(email="", password=""):
     if '/home' in driver.current_url:
         print(
             f"登入成功...\n歡迎 {username} 使用Disney+\n---------------------------------------------------------------")
+    else:
+        print(driver.current_url)
 
     return driver
 
