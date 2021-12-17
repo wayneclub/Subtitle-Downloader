@@ -12,7 +12,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
-from common.utils import get_dynamic_html, download_audio, find_visible_element_by_id, find_visible_element_by_xpath, find_visible_element_clickable_by_xpath, find_present_element_by_xpath, download_file, convert_subtitle, merge_subtitle
+from common.utils import get_dynamic_html, download_audio, find_visible_element_by_id, find_visible_element_by_xpath, find_visible_element_clickable_by_xpath, find_present_element_by_xpath, download_file, convert_subtitle, merge_subtitle, save_html
 
 BASE_URL = "https://www.disneyplus.com"
 LOGIN_URL = f"{BASE_URL}/zh-hant/login"
@@ -105,6 +105,8 @@ def download_subtitle(driver, url, genre, output="", download_season="", languag
                 if season_button.is_enabled():
                     season_button.click()
                     time.sleep(1)
+
+                save_html(driver.page_source)
 
                 click = True
                 while click and len(driver.find_elements(By.XPATH, "//div[@data-program-type='episode']")) > 4:
