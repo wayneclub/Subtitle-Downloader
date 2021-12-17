@@ -85,6 +85,7 @@ def get_dynamic_html(url, headless=True):
     options.add_argument('--no-sandbox')
     options.add_argument('--disable-dev-shm-usage')
     options.add_argument('--disable-gpu')
+    options.add_argument('log-level=3')
     options.add_argument("--mute-audio")
     options.add_argument('--autoplay-policy=no-user-gesture-required')
     options.add_argument('--lang=zh-TW')
