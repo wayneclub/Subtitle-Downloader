@@ -101,28 +101,45 @@ def download_subtitle(driver, url, genre, output="", download_season="", languag
             for season_button in season_buttons[season_start:season_end]:
                 total_episode = season_button.get_attribute(
                     'aria-label').replace('。', '').replace('，', '：')
+                episode_num = int(
+                    re.sub(r'第\d+季：共(\d+)集', '\\1', total_episode))
                 time.sleep(1)
                 if season_button.is_enabled():
                     season_button.click()
                     time.sleep(1)
+                episode_list = driver.find_elements(
+                    By.XPATH, "//div[@data-program-type='episode']")
 
-                save_html(driver.page_source)
+                while len(episode_list) != episode_num:
+                    time.sleep(1)
+                    print('enter')
+                    next_button = find_present_element_by_xpath(
+                        driver, "//button[@data-testid='arrow-right']")
 
-                if len(driver.find_elements(By.XPATH, "//div[@data-program-type='episode']")) != int(re.sub(r'第\d+季：共(\d+)集', '\\1', total_episode)):
-                    click = True
-                    while click and len(driver.find_elements(By.XPATH, "//div[@data-program-type='episode']")) > 4:
-                        time.sleep(1)
-                        print('enter')
-                        next_button = find_present_element_by_xpath(
-                            driver, "//button[@data-testid='arrow-right']")
+                    if int(next_button.get_attribute('tabindex')) == 0:
+                        print('moving')
+                        ActionChains(driver).move_to_element(
+                            next_button).click(next_button).perform()
+                        print(next_button.get_attribute('class'))
 
-                        if int(next_button.get_attribute('tabindex')) == 0:
-                            print('moving')
-                            ActionChains(driver).move_to_element(
-                                next_button).click(next_button).perform()
-                            print(next_button.get_attribute('class'))
-                        else:
-                            click = False
+                    episode_list = driver.find_elements(
+                        By.XPATH, "//div[@data-program-type='episode']")
+                    print(len(episode_list))
+                # if len(driver.find_elements(By.XPATH, "//div[@data-program-type='episode']")) !=:
+                #     click = True
+                #     while click and len(driver.find_elements(By.XPATH, "//div[@data-program-type='episode']")) > 4:
+                #         time.sleep(1)
+                #         print('enter')
+                #         next_button = find_present_element_by_xpath(
+                #             driver, "//button[@data-testid='arrow-right']")
+
+                #         if int(next_button.get_attribute('tabindex')) == 0:
+                #             print('moving')
+                #             ActionChains(driver).move_to_element(
+                #                 next_button).click(next_button).perform()
+                #             print(next_button.get_attribute('class'))
+                #         else:
+                #             click = False
 
                 web_content = BeautifulSoup(driver.page_source, 'lxml')
                 episode_list = web_content.find_all(
