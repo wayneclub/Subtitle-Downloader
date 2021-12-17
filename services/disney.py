@@ -111,10 +111,12 @@ def download_subtitle(driver, url, genre, output="", download_season="", languag
                 click = True
                 while click and len(driver.find_elements(By.XPATH, "//div[@data-program-type='episode']")) > 4:
                     # time.sleep(1)
+                    print('enter')
                     next_button = find_present_element_by_xpath(
                         driver, "//button[@data-testid='arrow-right']")
 
                     if int(next_button.get_attribute('tabindex')) == 0:
+                        print('moving')
                         ActionChains(driver).move_to_element(
                             next_button).click(next_button).perform()
                     else:
