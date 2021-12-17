@@ -123,6 +123,7 @@ def download_subtitle(driver, url, genre, output="", download_season="", languag
                 web_content = BeautifulSoup(driver.page_source, 'lxml')
                 episode_list = web_content.find_all(
                     'div', {'data-program-type': 'episode'})
+                print(episode_list)
                 season_list.append(episode_list)
 
             for season_num, season in enumerate(season_list, start=1):
