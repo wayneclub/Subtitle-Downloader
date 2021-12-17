@@ -101,23 +101,23 @@ def get_dynamic_html(url, headless=True):
 
 
 def find_visible_element_by_id(driver, id_text):
-    return WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.ID, id_text)))
+    return WebDriverWait(driver, 20).until(EC.visibility_of_element_located((By.ID, id_text)))
 
 
 def find_visible_element_by_xpath(driver, xpath):
-    return WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.XPATH, xpath)))
+    return WebDriverWait(driver, 20).until(EC.visibility_of_element_located((By.XPATH, xpath)))
 
 
 def find_visible_elements_by_xpath(driver, xpath):
-    return WebDriverWait(driver, 10).until(EC.visibility_of_all_elements_located((By.XPATH, xpath)))
+    return WebDriverWait(driver, 20).until(EC.visibility_of_all_elements_located((By.XPATH, xpath)))
 
 
 def find_visible_element_clickable_by_xpath(driver, xpath):
-    return WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, xpath)))
+    return WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.XPATH, xpath)))
 
 
 def find_present_element_by_xpath(driver, xpath):
-    return WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, xpath)))
+    return WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.XPATH, xpath)))
 
 
 def get_locale(driver):

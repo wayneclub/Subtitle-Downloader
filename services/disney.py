@@ -15,12 +15,12 @@ from selenium.webdriver.common.action_chains import ActionChains
 from common.utils import get_dynamic_html, download_audio, find_visible_element_by_id, find_visible_element_by_xpath, find_visible_element_clickable_by_xpath, find_present_element_by_xpath, download_file, convert_subtitle, merge_subtitle, save_html
 
 BASE_URL = "https://www.disneyplus.com"
-LOGIN_URL = f"{BASE_URL}/zh-hant/login"
-SELECT_PROFILE_URL = f"{BASE_URL}/zh-hant/select-profile"
+LOGIN_URL = f"{BASE_URL}/login"
+SELECT_PROFILE_URL = f"{BASE_URL}/select-profile"
 
 
 def login(email="", password=""):
-    driver = get_dynamic_html(LOGIN_URL)
+    driver = get_dynamic_html(LOGIN_URL, False)
     print("登入Disney+...")
 
     email_input = find_visible_element_by_id(driver, 'email')
@@ -32,12 +32,18 @@ def login(email="", password=""):
     time.sleep(1)
 
     password_input = find_visible_element_by_id(driver, 'password')
+    cookie_button = driver.find_elements(
+        By.XPATH, "//button[@id='onetrust-accept-btn-handler']")
+    if cookie_button:
+        cookie_button[0].click()
     password_input.send_keys(password)
     find_visible_element_clickable_by_xpath(
         driver, "//button[@data-testid='password-continue-login']").click()
     password = ''
 
     time.sleep(3)
+
+    driver.refresh()
 
     username = ''
     if '/select-profile' in driver.current_url:
@@ -67,6 +73,7 @@ def download_subtitle(driver, url, genre, output="", download_season="", languag
             #                     '\\2', driver.title).strip()
             drama_name = find_present_element_by_xpath(
                 driver, '//h1').text.strip()
+
         # drama_name = re.sub(r'Watch (.+) \| Disney\+', '\\1', driver.title)
         if not language:
             language = 'zh-Hant'
@@ -75,8 +82,6 @@ def download_subtitle(driver, url, genre, output="", download_season="", languag
         if ',' not in language:
             lang_list = list(language)
         lang_list = language.split(',')
-
-        time.sleep(1)
 
         if genre == 'series':
             if find_visible_element_by_xpath(driver, "//button[contains(@data-testid, 'season')]"):
@@ -95,7 +100,11 @@ def download_subtitle(driver, url, genre, output="", download_season="", languag
                     exit(1)
 
             print(f"\n{drama_name} 共有：{len(season_buttons)} 季")
-            print(season_buttons)
+
+            travel_button = driver.find_elements(
+                By.XPATH, "//button[@data-testid='modal-primary-button']")
+            if travel_button:
+                travel_button[0].click()
 
             season_list = []
             for season_button in season_buttons[season_start:season_end]:
@@ -111,40 +120,19 @@ def download_subtitle(driver, url, genre, output="", download_season="", languag
                     By.XPATH, "//div[@data-program-type='episode']")
 
                 while len(episode_list) != episode_num:
-                    time.sleep(1)
-                    print('enter')
                     next_button = find_present_element_by_xpath(
                         driver, "//button[@data-testid='arrow-right']")
 
                     if int(next_button.get_attribute('tabindex')) == 0:
-                        print('moving')
                         ActionChains(driver).move_to_element(
                             next_button).click(next_button).perform()
-                        print(next_button.get_attribute('class'))
 
                     episode_list = driver.find_elements(
                         By.XPATH, "//div[@data-program-type='episode']")
-                    print(len(episode_list))
-                # if len(driver.find_elements(By.XPATH, "//div[@data-program-type='episode']")) !=:
-                #     click = True
-                #     while click and len(driver.find_elements(By.XPATH, "//div[@data-program-type='episode']")) > 4:
-                #         time.sleep(1)
-                #         print('enter')
-                #         next_button = find_present_element_by_xpath(
-                #             driver, "//button[@data-testid='arrow-right']")
-
-                #         if int(next_button.get_attribute('tabindex')) == 0:
-                #             print('moving')
-                #             ActionChains(driver).move_to_element(
-                #                 next_button).click(next_button).perform()
-                #             print(next_button.get_attribute('class'))
-                #         else:
-                #             click = False
 
                 web_content = BeautifulSoup(driver.page_source, 'lxml')
                 episode_list = web_content.find_all(
                     'div', {'data-program-type': 'episode'})
-                print(episode_list)
                 season_list.append(episode_list)
 
             for season_num, season in enumerate(season_list, start=1):
