@@ -119,6 +119,7 @@ def download_subtitle(driver, url, genre, output="", download_season="", languag
                         print('moving')
                         ActionChains(driver).move_to_element(
                             next_button).click(next_button).perform()
+                        print(next_button.get_attribute('class'))
                     else:
                         click = False
 
