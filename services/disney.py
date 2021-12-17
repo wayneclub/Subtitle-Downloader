@@ -94,6 +94,7 @@ def download_subtitle(driver, url, genre, output="", download_season="", languag
                     exit(1)
 
             print(f"\n{drama_name} 共有：{len(season_buttons)} 季")
+            print(season_buttons)
 
             season_list = []
             for season_button in season_buttons[season_start:season_end]:
