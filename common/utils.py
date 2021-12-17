@@ -93,7 +93,8 @@ def get_dynamic_html(url, headless=True):
     options.add_experimental_option('prefs', prefs)
     options.add_experimental_option('excludeSwitches', ['enable-automation'])
     # driver = webdriver.Chrome('chromedriver', options=options)
-    driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
+    driver = webdriver.Chrome(ChromeDriverManager(
+        log_level=0).install(), options=options)
     driver.execute_cdp_cmd('Network.setUserAgentOverride', {
         "userAgent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.53 Safari/537.36'})
     # driver.get('chrome://settings/clearBrowserData')

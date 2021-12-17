@@ -1294,8 +1294,7 @@ def archive_subtitle(path, platform=""):
     path = path.replace(' ', '\\ ').replace(
         '(', '\\(').replace(')', '\\)') + '/'
     print(zipname)
-    command = f'cd {path} && zip -r ../{zipname} {os.path.basename(path)} . && cd ..'
-    os.system(command)
+    shutil.make_archive(zipname, 'zip', path)
 
 
 def calculate_duartion(text_time):
