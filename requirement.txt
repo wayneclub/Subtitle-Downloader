@@ -1,3 +1,4 @@
+webdriver-manager
 selenium
 pysubs2
 opencc
