@@ -68,7 +68,6 @@ def download_subtitle(driver, url, genre, output="", download_season="", languag
             drama_name = find_present_element_by_xpath(
                 driver, '//h1').text.strip()
         # drama_name = re.sub(r'Watch (.+) \| Disney\+', '\\1', driver.title)
-
         if not language:
             language = 'zh-Hant'
         elif language == 'all':
@@ -76,6 +75,8 @@ def download_subtitle(driver, url, genre, output="", download_season="", languag
         if ',' not in language:
             lang_list = list(language)
         lang_list = language.split(',')
+
+        time.sleep(1)
 
         if genre == 'series':
             if find_visible_element_by_xpath(driver, "//button[contains(@data-testid, 'season')]"):
