@@ -46,7 +46,9 @@ def login(email="", password=""):
         username = user.text
         user.click()
 
-    if WebDriverWait(driver, 10).until(EC.url_matches(f'{BASE_URL}/zh-hant/home')):
+    time.sleep(3)
+
+    if '/home' in driver.current_url:
         print(
             f"登入成功...\n歡迎 {username} 使用Disney+\n---------------------------------------------------------------")
 
