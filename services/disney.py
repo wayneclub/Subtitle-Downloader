@@ -108,7 +108,7 @@ def download_subtitle(driver, url, genre, output="", download_season="", languag
 
                 save_html(driver.page_source)
 
-                if len(driver.find_elements(By.XPATH, "//div[@data-program-type='episode']")) != int(re.sub(r'第\d+季：(\d+)集', '\\1', total_episode)):
+                if len(driver.find_elements(By.XPATH, "//div[@data-program-type='episode']")) != int(re.sub(r'第\d+季：共(\d+)集', '\\1', total_episode)):
                     click = True
                     while click and len(driver.find_elements(By.XPATH, "//div[@data-program-type='episode']")) > 4:
                         time.sleep(1)
