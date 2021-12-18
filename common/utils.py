@@ -3,6 +3,7 @@ This module is for common tool.
 """
 import os
 import json
+import platform
 from urllib import request
 from urllib.error import HTTPError, URLError
 from bs4 import BeautifulSoup
@@ -93,9 +94,11 @@ def get_dynamic_html(url, headless=True):
              'credentials_enable_service': False, 'profile.password_manager_enabled': False}
     options.add_experimental_option('prefs', prefs)
     options.add_experimental_option('excludeSwitches', ['enable-automation'])
-    # driver = webdriver.Chrome('chromedriver', options=options)
-    driver = webdriver.Chrome(ChromeDriverManager(
-        log_level=0).install(), options=options)
+    if platform.system() == 'Windows':
+        driver = webdriver.Chrome(ChromeDriverManager(
+            log_level=0).install(), options=options)
+    else:
+        driver = webdriver.Chrome('chromedriver', options=options)
     driver.execute_cdp_cmd('Network.setUserAgentOverride', {
         "userAgent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.53 Safari/537.36'})
     # driver.get('chrome://settings/clearBrowserData')
