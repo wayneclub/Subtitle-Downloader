@@ -1295,6 +1295,7 @@ def archive_subtitle(path, platform=""):
         '(', '\\(').replace(')', '\\)') + '/'
     print(f'{zipname}.zip')
     shutil.make_archive(zipname, 'zip', path)
+    shutil.move(f'{zipname}.zip', Path(path).parent.absolute())
 
 
 def calculate_duartion(text_time):
@@ -1500,7 +1501,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    # print(get_encoding_type(
-    #     '/Volumes/GoogleDrive/我的雲端硬碟/影片/日劇/拜託請愛我/第一季/拜託請愛我 (2016).S01E01.zh.srt'))
-    # print(get_line_width('就現銀波區警察署長趙甲洙的性侵害嫌疑的第一次審判中'))
-    # print(fix_overlength('明明很想留在 研究室裡 結果卻只有我留下來了'))
