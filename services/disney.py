@@ -78,12 +78,10 @@ def download_subtitle(driver, url, genre, output="", download_season="", languag
         lang_list = list(language)
     lang_list = language.split(',')
 
-    series_url = f'https://disney.content.edge.bamgrid.com/svc/content/DmcSeriesBundle/version/5.1/region/TW/audience/false/maturity/1850/language/zh-Hant/encodedSeriesId/{os.path.basename(url)}'
-
-    data = get_static_html(series_url, True)['data']['DmcSeriesBundle']
-    drama_name = data['series']['text']['title']['full']['series']['default']['content']
-
     if genre == 'series':
+        series_url = f'https://disney.content.edge.bamgrid.com/svc/content/DmcSeriesBundle/version/5.1/region/TW/audience/false/maturity/1850/language/zh-Hant/encodedSeriesId/{os.path.basename(url)}'
+        data = get_static_html(series_url, True)['data']['DmcSeriesBundle']
+        drama_name = data['series']['text']['title']['full']['series']['default']['content']
         seasons = data['seasons']['seasons']
 
         season_start = 0
@@ -139,14 +137,17 @@ def download_subtitle(driver, url, genre, output="", download_season="", languag
             print(folder_path)
             convert_subtitle(folder_path, 'disney')
     elif genre == 'movies':
-        print(drama_name)
-        folder_path = os.path.join(output, drama_name)
-        file_name = f'{drama_name}.WEB-DL.Disney+'
-        find_visible_element_clickable_by_xpath(
-            driver, "//button[@data-testid='play-button']").click()
-
+        movie_url = f'https://disney.content.edge.bamgrid.com/svc/content/DmcVideoBundle/version/5.1/region/TW/audience/false/maturity/1850/language/zh-Hant/encodedFamilyId/{os.path.basename(url)}'
+        data = get_static_html(movie_url, True)[
+            'data']['DmcVideoBundle']['video']
+        movie_name = data['text']['title']['full']['program']['default']['content']
+        print(movie_name)
+        folder_path = os.path.join(output, movie_name)
+        file_name = f'{movie_name}.WEB-DL.Disney+'
+        movie_url = f"https://www.disneyplus.com/zh-hant/video/{data['contentId']}"
+        driver.get(movie_url)
         print(
-            f"尋找{drama_name}字幕中...")
+            f"尋找{movie_name}字幕中...")
         m3u_url = get_network_url(driver, r'ctr-all.+\.m3u')
         subtitle_list, audio_list = parse_m3u(m3u_url)
         get_subtitle(subtitle_list, genre,
