@@ -4,15 +4,12 @@ This module is to download subtitle from Disney+
 
 import re
 import os
+import math
 import shutil
 import time
 import m3u8
-from bs4 import BeautifulSoup
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.action_chains import ActionChains
-from common.utils import get_dynamic_html, download_audio, find_visible_element_by_id, find_visible_element_by_xpath, find_visible_element_clickable_by_xpath, find_present_element_by_xpath, download_file, convert_subtitle, merge_subtitle, save_html
+from common.utils import get_dynamic_html, get_network_url, get_static_html, download_audio, find_visible_element_by_id,  find_visible_element_clickable_by_xpath, download_file, convert_subtitle, merge_subtitle
 
 BASE_URL = "https://www.disneyplus.com"
 LOGIN_URL = f"{BASE_URL}/login"
@@ -72,184 +69,141 @@ def login(email="", password=""):
 
 
 def download_subtitle(driver, url, genre, output="", download_season="", language="", audio=""):
-    driver.get(url)
 
-    if WebDriverWait(driver, 10).until(EC.url_to_be(url)):
+    if not language:
+        language = 'zh-Hant'
+    elif language == 'all':
+        language = 'en,zh-Hant,zh-HK'
+    if ',' not in language:
+        lang_list = list(language)
+    lang_list = language.split(',')
 
-        if WebDriverWait(driver, 10, 0.5).until(EC.title_contains('觀看')):
-            # drama_name = re.sub(r'(觀看|Watch )(.+) \|.+',
-            #                     '\\2', driver.title).strip()
-            drama_name = find_present_element_by_xpath(
-                driver, '//h1').text.strip()
+    series_url = f'https://disney.content.edge.bamgrid.com/svc/content/DmcSeriesBundle/version/5.1/region/TW/audience/false/maturity/1850/language/zh-Hant/encodedSeriesId/{os.path.basename(url)}'
 
-        # drama_name = re.sub(r'Watch (.+) \| Disney\+', '\\1', driver.title)
-        if not language:
-            language = 'zh-Hant'
-        elif language == 'all':
-            language = 'en,zh-Hant,zh-HK'
-        if ',' not in language:
-            lang_list = list(language)
-        lang_list = language.split(',')
+    data = get_static_html(series_url, True)['data']['DmcSeriesBundle']
+    drama_name = data['series']['text']['title']['full']['series']['default']['content']
 
-        if genre == 'series':
-            if find_visible_element_by_xpath(driver, "//button[contains(@data-testid, 'season')]"):
-                season_buttons = driver.find_elements_by_xpath(
-                    "//button[contains(@data-testid, 'season')]")
+    if genre == 'series':
+        seasons = data['seasons']['seasons']
 
-                season_start = 0
-                season_end = len(season_buttons)
+        season_start = 0
+        season_end = len(seasons)
 
-            if download_season:
-                if int(download_season) > 0 and int(download_season) <= len(season_buttons):
-                    season_start = int(download_season)-1
-                else:
-                    print(
-                        f"\n{drama_name} 只有{len(season_buttons)}季，沒有第 {int(download_season)} 季")
-                    exit(1)
-
-            print(f"\n{drama_name} 共有：{len(season_buttons)} 季")
-
-            travel_button = driver.find_elements(
-                By.XPATH, "//button[@data-testid='modal-primary-button']")
-            if travel_button:
-                travel_button[0].click()
-
-            season_list = []
-            for season_button in season_buttons[season_start:season_end]:
-                total_episode = season_button.get_attribute(
-                    'aria-label').replace('。', '').replace('，', '：')
-                episode_num = int(
-                    re.sub(r'第\d+季：共(\d+)集', '\\1', total_episode))
-                time.sleep(1)
-                if season_button.is_enabled():
-                    season_button.click()
-                    time.sleep(1)
-                episode_list = driver.find_elements(
-                    By.XPATH, "//div[@data-program-type='episode']")
-
-                while len(episode_list) != episode_num:
-                    next_button = find_present_element_by_xpath(
-                        driver, "//button[@data-testid='arrow-right']")
-
-                    if int(next_button.get_attribute('tabindex')) == 0:
-                        ActionChains(driver).move_to_element(
-                            next_button).click(next_button).perform()
-
-                    episode_list = driver.find_elements(
-                        By.XPATH, "//div[@data-program-type='episode']")
-
-                web_content = BeautifulSoup(driver.page_source, 'lxml')
-                episode_list = web_content.find_all(
-                    'div', {'data-program-type': 'episode'})
-                season_list.append(episode_list)
-
-            for season_num, season in enumerate(season_list, start=1):
-                if download_season:
-                    season_num = download_season
-                season_name = str(season_num).zfill(2)
-                folder_path = os.path.join(
-                    output, f'{drama_name}.S{season_name}')
-
-                if os.path.exists(folder_path):
-                    shutil.rmtree(folder_path)
-
+        if download_season:
+            if int(download_season) > 0 and int(download_season) <= len(seasons):
+                season_start = int(download_season)-1
+            else:
                 print(
-                    f"\n第 {int(season_num)} 季 共有：{len(season)} 集\t下載全集\n---------------------------------------------------------------")
+                    f"\n{drama_name} 只有{len(seasons)}季，沒有第 {int(download_season)} 季")
+                exit(1)
 
-                for index, episode in enumerate(season, start=1):
-                    time.sleep(1)
-                    episode_name = str(index).zfill(2)
+        print(f"\n{drama_name} 共有：{len(seasons)} 季")
 
-                    episode_id = episode.find('a')['data-gv2elementvalue']
-                    episode_url = f'https://www.disneyplus.com/zh-hant/video/{episode_id}'
-                    driver.get(episode_url)
+        travel_button = driver.find_elements(
+            By.XPATH, "//button[@data-testid='modal-primary-button']")
+        if travel_button:
+            travel_button[0].click()
 
-                    print(
-                        f"尋找第 {int(season_name)} 季 第 {int(episode_name)} 集字幕中...")
+        for season in seasons[season_start:season_end]:
+            season_index = season['seasonSequenceNumber']
+            season_name = str(season_index).zfill(2)
+            episode_num = season['episodes_meta']['hits']
+            episode_list = check_episodes(season, series_url)
 
-                    m3u_url = get_m3u8(driver)
-                    file_name = f'{drama_name}.S{season_name}E{episode_name}.WEB-DL.Disney+'
-                    subtitle_list, audio_list = parse_m3u(m3u_url)
-                    get_subtitle(subtitle_list, genre,
-                                 folder_path, file_name, lang_list)
-                    if audio:
-                        get_audio(audio_list, folder_path, file_name)
-                print(folder_path)
-                convert_subtitle(folder_path, 'disney')
-        elif genre == 'movies':
-            print(drama_name)
-            folder_path = os.path.join(output, drama_name)
-            file_name = f'{drama_name}.WEB-DL.Disney+'
-            find_visible_element_clickable_by_xpath(
-                driver, "//button[@data-testid='play-button']").click()
+            folder_path = os.path.join(
+                output, f'{drama_name}.S{season_name}')
+
+            if os.path.exists(folder_path):
+                shutil.rmtree(folder_path)
 
             print(
-                f"尋找{drama_name}字幕中...")
-            m3u_url = get_m3u8(driver)
-            subtitle_list, audio_list = parse_m3u(m3u_url)
-            get_subtitle(subtitle_list, genre,
-                         folder_path, file_name, lang_list)
-            if audio:
-                get_audio(audio_list, folder_path, file_name)
-        driver.quit()
+                f"\n第 {season_index} 季 共有：{episode_num} 集\t下載全集\n---------------------------------------------------------------")
+
+            for episode_index, episode_id in enumerate(episode_list, start=1):
+                time.sleep(1)
+                episode_name = str(episode_index).zfill(2)
+
+                episode_url = f'https://www.disneyplus.com/zh-hant/video/{episode_id}'
+                driver.get(episode_url)
+
+                print(
+                    f"尋找第 {season_index} 季 第 {episode_index} 集字幕中...")
+
+                m3u_url = get_network_url(driver, r'ctr-all.+\.m3u')
+                file_name = f'{drama_name}.S{season_name}E{episode_name}.WEB-DL.Disney+'
+                subtitle_list, audio_list = parse_m3u(m3u_url)
+                get_subtitle(subtitle_list, genre,
+                             folder_path, file_name, lang_list)
+                if audio:
+                    get_audio(audio_list, folder_path, file_name)
+            print(folder_path)
+            convert_subtitle(folder_path, 'disney')
+    elif genre == 'movies':
+        print(drama_name)
+        folder_path = os.path.join(output, drama_name)
+        file_name = f'{drama_name}.WEB-DL.Disney+'
+        find_visible_element_clickable_by_xpath(
+            driver, "//button[@data-testid='play-button']").click()
+
+        print(
+            f"尋找{drama_name}字幕中...")
+        m3u_url = get_network_url(driver, r'ctr-all.+\.m3u')
+        subtitle_list, audio_list = parse_m3u(m3u_url)
+        get_subtitle(subtitle_list, genre,
+                     folder_path, file_name, lang_list)
+        if audio:
+            get_audio(audio_list, folder_path, file_name)
+    driver.quit()
 
 
-def get_m3u8(driver):
-    m3u_file = ''
-    delay = 0
-    logs = []
-    while not m3u_file:
-        time.sleep(2)
-        logs += driver.execute_script(
-            "return window.performance.getEntries();")
-
-        m3u_file = next((log for log in logs
-                         if re.search(r'ctr-all.+\.m3u', log['name'])), None)
-        # print(m3u_file)
-        delay += 1
-
-        if delay > 60:
-            print("找不到m3u8，請重新執行")
-            exit(1)
-
-    return m3u_file
+def check_episodes(season, series_url):
+    episode_num = season['episodes_meta']['hits']
+    episodes = season['downloadableEpisodes']
+    if len(episodes) != episode_num:
+        season_id = season['seasonId']
+        page_size = math.ceil(len(episodes) / 15)
+        episodes = []
+        for page in range(1, page_size+1):
+            episode_page_url = re.sub(r'(.+)DmcSeriesBundle(.+)encodedSeriesId.+',
+                                      '\\1DmcEpisodes\\2seasonId/', series_url) + f'{season_id}/pageSize/15/page/{page}'
+            for episode in get_static_html(episode_page_url, True)['data']['DmcEpisodes']['videos']:
+                episodes.append(episode['contentId'])
+    return episodes
 
 
-def parse_m3u(m3u_file):
-    if m3u_file:
-        m3u_link = m3u_file['name']
-        base_url = os.path.dirname(m3u_link)
-        sub_url_list = []
-        audio_url_list = []
+def parse_m3u(m3u_link):
+    base_url = os.path.dirname(m3u_link)
+    sub_url_list = []
+    audio_url_list = []
 
-        playlists = m3u8.load(m3u_link).playlists
-        quality_list = [
-            playlist.stream_info.bandwidth for playlist in playlists]
-        best_quality = quality_list.index(max(quality_list))
+    playlists = m3u8.load(m3u_link).playlists
+    quality_list = [
+        playlist.stream_info.bandwidth for playlist in playlists]
+    best_quality = quality_list.index(max(quality_list))
 
-        # print(playlists[best_quality].stream_info)
+    # print(playlists[best_quality].stream_info)
 
-        for media in playlists[best_quality].media:
-            if media.type == 'SUBTITLES' and media.group_id == 'sub-main' and not 'forced' in media.name:
-                sub = {}
-                sub['lang'] = media.language
-                m3u_sub = m3u8.load(os.path.join(base_url, media.uri))
-                sub['urls'] = []
-                for segement in re.findall(r'.+\-MAIN\/.+\.vtt', m3u_sub.dumps()):
-                    sub['urls'].append(os.path.join(
-                        f'{base_url}/r/', segement))
-                sub_url_list.append(sub)
-            if media.type == 'AUDIO' and not 'Audio Description' in media.name:
-                audio = {}
-                if media.group_id == 'eac-3':
-                    audio['url'] = os.path.join(base_url, media.uri)
-                    audio['extension'] = '.eac3'
-                elif media.group_id == 'aac-128k':
-                    audio['url'] = os.path.join(base_url, media.uri)
-                    audio['extension'] = '.aac'
-                audio['lang'] = media.language
-                audio_url_list.append(audio)
-        return sub_url_list, audio_url_list
+    for media in playlists[best_quality].media:
+        if media.type == 'SUBTITLES' and media.group_id == 'sub-main' and not 'forced' in media.name:
+            sub = {}
+            sub['lang'] = media.language
+            m3u_sub = m3u8.load(os.path.join(base_url, media.uri))
+            sub['urls'] = []
+            for segement in re.findall(r'.+\-MAIN\/.+\.vtt', m3u_sub.dumps()):
+                sub['urls'].append(os.path.join(
+                    f'{base_url}/r/', segement))
+            sub_url_list.append(sub)
+        if media.type == 'AUDIO' and not 'Audio Description' in media.name:
+            audio = {}
+            if media.group_id == 'eac-3':
+                audio['url'] = os.path.join(base_url, media.uri)
+                audio['extension'] = '.eac3'
+            elif media.group_id == 'aac-128k':
+                audio['url'] = os.path.join(base_url, media.uri)
+                audio['extension'] = '.aac'
+            audio['lang'] = media.language
+            audio_url_list.append(audio)
+    return sub_url_list, audio_url_list
 
 
 def get_subtitle(subtitle_list, genre, folder_path, sub_name, lang_list):

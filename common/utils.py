@@ -4,6 +4,8 @@ This module is for common tool.
 import os
 import json
 import platform
+import re
+import time
 from urllib import request
 from urllib.error import HTTPError, URLError
 from bs4 import BeautifulSoup
@@ -60,7 +62,7 @@ def check_url_exist(url, print_error=False):
         return True
 
 
-def get_static_html(url):
+def get_static_html(url, json_request=False):
     """Get static html"""
     try:
         headers = {
@@ -68,7 +70,14 @@ def get_static_html(url):
         }
         req = request.Request(url, headers=headers)
         response = request.urlopen(req)
-        return BeautifulSoup(response.read(), 'lxml')
+
+        if json_request:
+            try:
+                return json.loads(response.read())
+            except json.decoder.JSONDecodeError:
+                print("String could not be converted to JSON")
+        else:
+            return BeautifulSoup(response.read(), 'lxml')
 
     except HTTPError as exception:
         print(f"HTTPError: {exception.code}")
@@ -105,6 +114,26 @@ def get_dynamic_html(url, headless=True):
     driver.get(url)
     driver.set_page_load_timeout(110)
     return driver
+
+
+def get_network_url(driver, search_url):
+    url = ''
+    delay = 0
+    logs = []
+    while not url:
+        time.sleep(2)
+        logs += driver.execute_script(
+            "return window.performance.getEntries();")
+
+        url = next((log['name'] for log in logs
+                    if re.search(search_url, log['name'])), None)
+        # print(m3u_file)
+        delay += 1
+
+        if delay > 60:
+            print("找不到data，請重新執行")
+            exit(1)
+    return url
 
 
 def find_visible_element_by_id(driver, id_text):

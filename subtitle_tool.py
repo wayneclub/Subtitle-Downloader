@@ -19,7 +19,6 @@ from chardet import detect
 from bs4 import BeautifulSoup, CData
 import json
 import opencc
-import zipfile
 import subprocess
 
 SUBTITLE_FORMAT = ['.srt', '.ass', '.ssa', '.vtt', '.xml', '.json']
@@ -1295,7 +1294,8 @@ def archive_subtitle(path, platform=""):
         '(', '\\(').replace(')', '\\)') + '/'
     print(f'{zipname}.zip')
     shutil.make_archive(zipname, 'zip', path)
-    shutil.move(f'{zipname}.zip', Path(path).parent.absolute())
+    if not os.path.exists(os.path.join(Path(path).parent.absolute(), f'{zipname}.zip')):
+        shutil.move(f'{zipname}.zip', Path(path).parent.absolute())
 
 
 def calculate_duartion(text_time):
