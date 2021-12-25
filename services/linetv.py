@@ -11,7 +11,7 @@ from time import strftime, localtime
 from common.utils import get_season_number, check_url_exist, download_file, convert_subtitle
 
 
-def download_subtitle(web_content, output, drama_id, download_season, download_episode, last_episode):
+def download_subtitle(web_content, output, drama_id, last_episode):
     """Download subtitle from LineTV"""
 
     try:
@@ -32,50 +32,29 @@ def download_subtitle(web_content, output, drama_id, download_season, download_e
                         drama_name = drama['drama_name'].strip()
                         season_name = '01'
 
-                    print(f"{drama_name} 第 {season_name} 季")
+                    print(f"{drama_name} 第 {int(season_name)} 季")
 
                 if 'current_eps' in drama:
                     episode_num = drama['current_eps']
                     folder_path = output
 
-                    if download_episode:
-                        if int(download_episode) > episode_num:
-                            print(
-                                f"\n該劇只有{episode_num}集，沒有第 {download_episode} 集")
-                            exit()
-                        episode_start = int(download_episode)-1
-                        episode_end = int(download_episode)
-                        print(
-                            f"\n第 {season_name} 季 共有：{episode_num} 集\t下載第 {download_season} 季 第 {str(episode_end).zfill(2)} 集\n---------------------------------------------------------------")
-                    elif last_episode:
-                        episode_start = episode_num-1
-                        episode_end = episode_num
-
-                        # for episode in reversed(drama['eps_info']):
-                        #     if episode['free_date']:
-                        #         free_date = time.localtime(
-                        #             int(episode['free_date'])/1000)
-                        #         if free_date < time.localtime():
-                        #             episode_start = episode['number']-1
-                        #             episode_end = episode['number']
-                        #             break
+                    if last_episode:
+                        drama['eps_info'] = [list(drama['eps_info'])[-1]]
 
                         print(
-                            f"\n第 {season_name} 季 共有：{episode_num} 集\t下載第{season_name.zfill(2)}季 最後一集\n---------------------------------------------------------------")
+                            f"\n第 {int(season_name)} 季 共有：{episode_num} 集\t下載第 {int(season_name)} 季 最後一集\n---------------------------------------------------------------")
                     else:
                         folder_path = os.path.join(
                             output, f'{drama_name}.S{season_name}')
-                        episode_start = 0
-                        episode_end = episode_num
                         if drama['current_eps'] != drama['total_eps']:
                             print(
-                                f"\n第 {season_name} 季 共有：{drama['total_eps']} 集\t更新至 第 {episode_num} 集\t下載全集\n---------------------------------------------------------------")
+                                f"\n第 {int(season_name)} 季 共有：{drama['total_eps']} 集\t更新至 第 {episode_num} 集\t下載全集\n---------------------------------------------------------------")
                         else:
                             print(
-                                f"\n第 {season_name} 季 共有：{episode_num} 集\t下載全集\n---------------------------------------------------------------")
+                                f"\n第 {int(season_name)} 季 共有：{episode_num} 集\t下載全集\n---------------------------------------------------------------")
 
-                    if os.path.exists(folder_path):
-                        shutil.rmtree(folder_path)
+                        if os.path.exists(folder_path):
+                            shutil.rmtree(folder_path)
 
                     if 'eps_info' in drama:
                         for episode in drama['eps_info']:
@@ -98,14 +77,15 @@ def download_subtitle(web_content, output, drama_id, download_season, download_e
                                                 print(
                                                     f"{file_name}\t...一般用戶於{free_date}開啟")
 
-                                if not download_episode:
+                                if not last_episode:
                                     os.makedirs(folder_path, exist_ok=True)
 
                                 download_file(subtitle_link, os.path.join(
                                     folder_path, file_name))
 
-                        if download_episode or last_episode:
-                            convert_subtitle(folder_path + file_name)
+                        if last_episode:
+                            convert_subtitle(os.path.join(
+                                folder_path, file_name))
                         else:
                             convert_subtitle(folder_path, 'linetv')
 

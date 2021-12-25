@@ -129,8 +129,6 @@ if __name__ == "__main__":
         linetv.download_subtitle(get_static_html(query_url),
                                  output,
                                  drama_id,
-                                 download_season,
-                                 download_episode,
                                  last_episode)
     elif friday_genre_search:
         genre = friday_genre_search.group(1)

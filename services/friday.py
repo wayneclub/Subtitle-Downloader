@@ -182,7 +182,7 @@ def download_subtitle(driver, output, genre, download_season, download_episode, 
                         dual_folder_path, dual_file_name))
         print()
         if download_episode or last_episode:
-            convert_subtitle(folder_path + file_name)
+            convert_subtitle(os.path.join(folder_path, file_name))
         else:
             if jp_lang:
                 convert_subtitle(ja_folder_path)
