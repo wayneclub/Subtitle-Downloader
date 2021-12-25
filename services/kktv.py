@@ -10,7 +10,7 @@ from bs4 import BeautifulSoup
 from common.utils import check_url_exist, download_file, convert_subtitle
 
 
-def download_subtitle(driver, output, drama_id, download_season, download_episode, last_episode, from_season, from_episode):
+def download_subtitle(driver, output, drama_id, download_season, download_episode, last_episode):
     """Download subtitle from KKTV"""
     web_content = BeautifulSoup(driver.page_source, 'lxml')
     driver.quit()
@@ -48,143 +48,91 @@ def download_subtitle(driver, output, drama_id, download_season, download_episod
                     print(f"{drama_name} 共有：{season_num}季")
 
             if 'series' in drama:
-                if download_season and not film and not anime:
-                    if int(download_season) > season_num:
-                        print(
-                            f"\n該劇只有{season_num}季，沒有第 {download_season} 季")
-                        exit()
-                    season_start = int(download_season)-1
-                    season_end = int(download_season)
-                elif last_episode and not film and not anime:
-                    season_start = season_num-1
-                    season_end = season_num
-                elif from_season and not film and not anime:
-                    if int(from_season) > season_num:
-                        print(f"\n該劇只有{season_num}季，沒有第 {from_season} 季")
-                        exit()
-                    season_start = int(from_season)-1
-                    season_end = season_num
-                else:
-                    season_start = 0
-                    season_end = season_num
-
-                for series in drama['series'][season_start:season_end]:
-                    if 'title' in series:
-                        series_title = series['title']
-                    if 'id' in series:
-                        season_search = re.search(
-                            drama_id + '([0-9]{2})', series['id'])
-                        if season_search:
-                            season_name = season_search.group(1)
-
-                    if 'episodes' in series:
-                        episode_num = len(series['episodes'])
+                for season in drama['series']:
+                    season_index = int(season['title'][1])
+                    if not download_season or season_index in download_season:
+                        season_name = str(season_index).zfill(2)
+                        episode_num = len(season['episodes'])
 
                         folder_path = output
 
                         if film:
-                            episode_start = 0
-                            episode_end = episode_num
                             print(
                                 "\n下載電影\n---------------------------------------------------------------")
+                        elif last_episode:
+                            print(
+                                f"\n第 {season_index} 季 共有：{episode_num} 集\t下載第 {season_index} 季 最後一集\n---------------------------------------------------------------")
+
+                            season['episodes'] = [list(season['episodes'])[-1]]
                         elif anime:
                             folder_path = os.path.join(output, drama_name)
-                            episode_start = 0
-                            episode_end = episode_num
                             print(
                                 f"\n共有：{episode_num} 集\t下載全集\n---------------------------------------------------------------")
-                        elif download_episode:
-                            if int(download_episode) > episode_num:
+                        else:
+                            if download_episode:
                                 print(
-                                    f"\n該劇只有{episode_num}集，沒有第 {download_episode} 集")
-                                exit()
-
-                            episode_start = int(download_episode)-1
-                            episode_end = int(download_episode)
-
-                            print(
-                                f"\n{series_title} 共有：{episode_num} 集\t下載第 {download_season} 季 第{str(episode_end).zfill(2)}集\n---------------------------------------------------------------")
-                        elif last_episode:
-                            episode_start = episode_num-1
-                            episode_end = episode_num
-
-                            if download_season:
-                                print(
-                                    f"\n{series_title} 共有：{episode_num} 集\t下載第 {download_season} 季 最後一集\n---------------------------------------------------------------")
+                                    f"\n第 {season_index} 季 共有：{episode_num} 集\t下載第 {download_season} 季 第 {download_episode} 集\n---------------------------------------------------------------")
                             else:
                                 print(
-                                    f"\n{series_title} 共有：{episode_num} 集\t下載第 {str(season_num).zfill(2)} 季 最後一集\n---------------------------------------------------------------")
-                        elif from_episode:
-                            if int(from_episode) > episode_num:
-                                print(
-                                    f"\n該劇只有{episode_num}集，沒有第 {from_episode} 集")
-                                exit()
+                                    f"\n第 {season_index} 季 共有：{episode_num} 集\t下載全集\n---------------------------------------------------------------")
                             folder_path = os.path.join(
                                 output, f'{drama_name}.S{season_name}')
-
-                            episode_start = int(from_episode)-1
-                            episode_end = episode_num
-
-                            print(
-                                f"\n{series_title} 共有：{episode_num} 集\t下載第{str(from_season).zfill(2)}季 第{str(from_episode).zfill(2)}集 至 最後一集\n---------------------------------------------------------------")
-                        else:
-                            folder_path = os.path.join(
-                                output, f'{drama_name}.S{season_name}')
-                            episode_start = 0
-                            episode_end = episode_num
-                            print(
-                                f"\n{series_title} 共有：{episode_num} 集\t下載全集\n---------------------------------------------------------------")
-
-                        if os.path.exists(folder_path):
-                            shutil.rmtree(folder_path)
+                            if os.path.exists(folder_path):
+                                shutil.rmtree(folder_path)
 
                         jp_lang = False
                         ko_lang = False
-                        for episode in series['episodes'][episode_start:episode_end]:
-                            if not episode['subtitles']:
-                                print("\n無提供可下載的字幕\n")
-                                exit()
-                            if 'ja' in episode['subtitles']:
-                                jp_lang = True
-                            if 'ko' in episode['subtitles']:
-                                ko_lang = True
+                        for episode in season['episodes']:
+                            episode_index = int(
+                                episode['id'].replace(episode['seriesId'], ''))
+                            if len(season['episodes']) < 100:
+                                episode_name = str(episode_index).zfill(2)
+                            else:
+                                episode_name = str(episode_index).zfill(3)
 
-                            episode_uri = episode['mezzanines']['dash']['uri']
-                            if episode_uri:
-                                episode_link_search = re.search(
-                                    r'https:\/\/theater\.kktv\.com\.tw([^"]+)_dash\.mpd', episode_uri)
-                                if episode_link_search:
-                                    episode_link = episode_link_search.group(1)
-                                    epsiode_search = re.search(
-                                        drama_id + '[0-9]{2}([0-9]{4})_', episode_uri)
-                                    if epsiode_search:
-                                        episode_name = epsiode_search.group(
-                                            1)[-2:]
-                                        subtitle_link = f'https://theater-kktv.cdn.hinet.net{episode_link}_sub/zh-Hant.vtt'
+                            if not download_episode or episode_index in download_episode:
+                                if not episode['subtitles']:
+                                    print("\n無提供可下載的字幕\n")
+                                    exit()
+                                if 'ja' in episode['subtitles']:
+                                    jp_lang = True
+                                if 'ko' in episode['subtitles']:
+                                    ko_lang = True
 
-                                        ja_subtitle_link = subtitle_link.replace(
-                                            'zh-Hant.vtt', 'ja.vtt')
+                                episode_uri = episode['mezzanines']['dash']['uri']
+                                if episode_uri:
+                                    episode_link_search = re.search(
+                                        r'https:\/\/theater\.kktv\.com\.tw([^"]+)_dash\.mpd', episode_uri)
+                                    if episode_link_search:
+                                        episode_link = episode_link_search.group(
+                                            1)
+                                        epsiode_search = re.search(
+                                            drama_id + '[0-9]{2}([0-9]{4})_', episode_uri)
+                                        if epsiode_search:
+                                            subtitle_link = f'https://theater-kktv.cdn.hinet.net{episode_link}_sub/zh-Hant.vtt'
 
-                                        ko_subtitle_link = subtitle_link.replace(
-                                            'zh-Hant.vtt', 'ko.vtt')
-
-                                        if film:
-                                            file_name = f'{drama_name}.WEB-DL.KKTV.zh-Hant.vtt'
-                                        elif anime:
-                                            file_name = f'{drama_name}E{episode_name}.WEB-DL.KKTV.zh-Hant.vtt'
-                                        else:
-                                            file_name = f'{drama_name}.S{season_name}E{episode_name}.WEB-DL.KKTV.zh-Hant.vtt'
-                                            ja_file_name = file_name.replace(
+                                            ja_subtitle_link = subtitle_link.replace(
                                                 'zh-Hant.vtt', 'ja.vtt')
-                                            ko_file_name = file_name.replace(
+
+                                            ko_subtitle_link = subtitle_link.replace(
                                                 'zh-Hant.vtt', 'ko.vtt')
 
-                                            ja_folder_path = os.path.join(
-                                                folder_path, '日語')
-                                            ko_folder_path = os.path.join(
-                                                folder_path, '韓語')
+                                            if film:
+                                                file_name = f'{drama_name}.WEB-DL.KKTV.zh-Hant.vtt'
+                                            elif anime:
+                                                file_name = f'{drama_name}E{episode_name}.WEB-DL.KKTV.zh-Hant.vtt'
+                                            else:
+                                                file_name = f'{drama_name}.S{season_name}E{episode_name}.WEB-DL.KKTV.zh-Hant.vtt'
+                                                ja_file_name = file_name.replace(
+                                                    'zh-Hant.vtt', 'ja.vtt')
+                                                ko_file_name = file_name.replace(
+                                                    'zh-Hant.vtt', 'ko.vtt')
 
-                                        if not download_episode:
+                                                ja_folder_path = os.path.join(
+                                                    folder_path, '日語')
+                                                ko_folder_path = os.path.join(
+                                                    folder_path, '韓語')
+
                                             os.makedirs(
                                                 folder_path, exist_ok=True)
 
@@ -196,19 +144,19 @@ def download_subtitle(driver, output, drama_id, download_season, download_episod
                                                 os.makedirs(
                                                     ko_folder_path, exist_ok=True)
 
-                                        download_file(subtitle_link, os.path.join(
-                                            folder_path, os.path.basename(file_name)))
+                                            download_file(subtitle_link, os.path.join(
+                                                folder_path, os.path.basename(file_name)))
 
-                                        if jp_lang and check_url_exist(ja_subtitle_link):
-                                            download_file(ja_subtitle_link, os.path.join(
-                                                ja_folder_path, os.path.basename(ja_file_name)))
+                                            if jp_lang and check_url_exist(ja_subtitle_link):
+                                                download_file(ja_subtitle_link, os.path.join(
+                                                    ja_folder_path, os.path.basename(ja_file_name)))
 
-                                        if ko_lang and check_url_exist(ko_subtitle_link):
-                                            download_file(ko_subtitle_link, os.path.join(
-                                                ko_folder_path, os.path.basename(ko_file_name)))
+                                            if ko_lang and check_url_exist(ko_subtitle_link):
+                                                download_file(ko_subtitle_link, os.path.join(
+                                                    ko_folder_path, os.path.basename(ko_file_name)))
 
                         print()
-                        if download_episode or last_episode or film:
+                        if film or last_episode:
                             convert_subtitle(os.path.join(
                                 folder_path, file_name))
                         else:

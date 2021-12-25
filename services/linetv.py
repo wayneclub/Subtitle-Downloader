@@ -11,7 +11,7 @@ from time import strftime, localtime
 from common.utils import get_season_number, check_url_exist, download_file, convert_subtitle
 
 
-def download_subtitle(web_content, output, drama_id, download_season, download_episode, last_episode, from_season, from_episode):
+def download_subtitle(web_content, output, drama_id, download_season, download_episode, last_episode):
     """Download subtitle from LineTV"""
 
     try:
@@ -24,25 +24,15 @@ def download_subtitle(web_content, output, drama_id, download_season, download_e
             if drama:
                 if 'drama_name' in drama:
                     season_search = re.search(
-                        r'.+?第(.+?)季', drama['drama_name'])
+                        r'(.+?)第(.+?)季', drama['drama_name'])
                     if season_search:
-                        drama_name = (
-                            drama['drama_name'].split('第')[0]).strip()
-                        season_name = get_season_number(season_search.group(1))
+                        drama_name = season_search.group(1).strip()
+                        season_name = get_season_number(season_search.group(2))
                     else:
                         drama_name = drama['drama_name'].strip()
                         season_name = '01'
 
                     print(f"{drama_name} 第 {season_name} 季")
-
-                if download_season and int(download_season) != int(season_name):
-                    print(
-                        f"\n該劇只有第{int(season_name)}季，沒有第 {download_season} 季")
-                    exit()
-
-                if from_season and int(from_season) != int(season_name):
-                    print(f"\n該劇只有第{int(season_name)}季，沒有第 {from_season} 季")
-                    exit()
 
                 if 'current_eps' in drama:
                     episode_num = drama['current_eps']
@@ -72,17 +62,6 @@ def download_subtitle(web_content, output, drama_id, download_season, download_e
 
                         print(
                             f"\n第 {season_name} 季 共有：{episode_num} 集\t下載第{season_name.zfill(2)}季 最後一集\n---------------------------------------------------------------")
-                    elif from_episode:
-                        if int(from_episode) > episode_num:
-                            print(
-                                f"\n該劇只有{episode_num}集，沒有第 {from_episode} 集")
-                            exit()
-                        folder_path = os.path.join(
-                            output, f'{drama_name}.S{season_name}')
-                        episode_start = int(from_episode)-1
-                        episode_end = episode_num
-                        print(
-                            f"\n第 {season_name} 季 共有：{episode_num} 集\t下載第 {from_season} 季 第 {from_episode} 集 至 最後一集\n---------------------------------------------------------------")
                     else:
                         folder_path = os.path.join(
                             output, f'{drama_name}.S{season_name}')
@@ -99,7 +78,7 @@ def download_subtitle(web_content, output, drama_id, download_season, download_e
                         shutil.rmtree(folder_path)
 
                     if 'eps_info' in drama:
-                        for episode in drama['eps_info'][episode_start: episode_end]:
+                        for episode in drama['eps_info']:
                             if 'number' in episode:
                                 episode_name = str(episode['number'])
                                 subtitle_link = f'https://s3-ap-northeast-1.amazonaws.com/tv-aws-media-convert-input-tokyo/subtitles/{drama_id}/{drama_id}-eps-{episode_name}.vtt'

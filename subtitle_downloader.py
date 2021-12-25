@@ -7,7 +7,7 @@ import re
 import os
 import argparse
 from services import kktv, linetv, friday, iqiyi, disney
-from common.utils import get_static_html, get_dynamic_html, get_ip_location
+from common.utils import get_static_html, get_dynamic_html, get_ip_location, sort_numbers
 
 
 def season_episode_type(arg_value, pat=re.compile(r'[sS]\d{1,}([eE]\d{1,})*')):
@@ -34,21 +34,19 @@ if __name__ == "__main__":
         description='從 KKTV、LineTV、FriDay影音、愛奇藝 下載劇集、電影、綜藝、動漫等字幕')
     parser.add_argument('url',
                         help='欲下載的劇集字幕的網址')
+    parser.add_argument('-s',
+                        '--season',
+                        dest='season',
+                        help='下載 第[0-9]季')
     parser.add_argument('-e',
                         '--episode',
                         dest='episode',
-                        type=season_episode_type,
-                        help='下載 第[0-9]季 第[0-9]集')
+                        help='下載 第[0-9]集')
     parser.add_argument('-l',
                         '--last-episode',
                         dest='last_episode',
                         action='store_true',
                         help='下載 最新一集')
-    parser.add_argument('-f',
-                        '--from-episode',
-                        dest='from_episode',
-                        type=season_episode_type,
-                        help='下載 第[0-9]季 第[0-9]集 到 該季最後一集')
     parser.add_argument('-o',
                         '--output',
                         dest='output',
@@ -74,11 +72,14 @@ if __name__ == "__main__":
                         help='下載（台配、港配）音軌')
     args = parser.parse_args()
 
-    if (args.from_episode and args.last_episode):
-        parser.error("-l 與 -f 不能共用")
+    if (args.season and args.last_episode):
+        parser.error("-l 與 -s 不能共用")
 
-    if (args.episode and args.from_episode):
-        parser.error("-e 與 -f 不能共用")
+    if (args.episode and args.last_episode):
+        parser.error("-l 與 -e 不能共用")
+
+    if (args.episode and not args.season):
+        parser.error("未指定下載季數")
 
     query_url = args.url.strip()
     output = args.output
@@ -87,23 +88,12 @@ if __name__ == "__main__":
 
     download_season = ''
     download_episode = ''
+    if args.season:
+        download_season = sort_numbers(args.season)
     if args.episode:
-        download_season = re.search(
-            r'[sS](\d{1,})', args.episode).group(1).zfill(2)
-        if re.search(r'[eE]\d{1,}', args.episode):
-            download_episode = re.search(
-                r'[eE](\d{1,})', args.episode).group(1).zfill(2)
+        download_episode = sort_numbers(args.episode)
 
     last_episode = args.last_episode
-
-    from_season = ''
-    from_episode = ''
-    if args.from_episode:
-        from_season = re.search(
-            r'[sS](\d{1,})', args.from_episode).group(1).zfill(2)
-        if re.search(r'[eE]\d{1,}', args.from_episode):
-            from_episode = re.search(
-                r'[eE](\d{1,})', args.from_episode).group(1).zfill(2)
 
     email = args.email
     password = args.password
@@ -133,9 +123,7 @@ if __name__ == "__main__":
                                    drama_id,
                                    download_season,
                                    download_episode,
-                                   last_episode,
-                                   from_season,
-                                   from_episode)
+                                   last_episode)
     elif linetv_id_search:
         drama_id = linetv_id_search.group(1)
         linetv.download_subtitle(get_static_html(query_url),
@@ -143,9 +131,7 @@ if __name__ == "__main__":
                                  drama_id,
                                  download_season,
                                  download_episode,
-                                 last_episode,
-                                 from_season,
-                                 from_episode)
+                                 last_episode)
     elif friday_genre_search:
         genre = friday_genre_search.group(1)
         friday.download_subtitle(get_dynamic_html(query_url),
@@ -153,9 +139,7 @@ if __name__ == "__main__":
                                  genre,
                                  download_season,
                                  download_episode,
-                                 last_episode,
-                                 from_season,
-                                 from_episode)
+                                 last_episode)
     elif iqiyi_search:
         iqiyi.download_subtitle(
             get_dynamic_html(query_url), output)

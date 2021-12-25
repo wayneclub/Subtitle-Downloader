@@ -8,8 +8,10 @@ import math
 import shutil
 import time
 import m3u8
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
-from common.utils import get_dynamic_html, get_network_url, get_static_html, download_audio, find_visible_element_by_id,  find_visible_element_clickable_by_xpath, download_file, convert_subtitle, merge_subtitle
+from common.utils import get_dynamic_html, get_network_url, get_static_html, download_audio, find_visible_element_by_id, find_visible_element_clickable_by_xpath, find_visible_element_by_xpath, download_file, convert_subtitle, merge_subtitle, get_ip_location
 
 BASE_URL = "https://www.disneyplus.com"
 LOGIN_URL = f"{BASE_URL}/login"
@@ -78,83 +80,84 @@ def download_subtitle(driver, url, genre, output="", download_season="", languag
         lang_list = list(language)
     lang_list = language.split(',')
 
-    if genre == 'series':
-        series_url = f'https://disney.content.edge.bamgrid.com/svc/content/DmcSeriesBundle/version/5.1/region/TW/audience/false/maturity/1850/language/zh-Hant/encodedSeriesId/{os.path.basename(url)}'
-        data = get_static_html(series_url, True)['data']['DmcSeriesBundle']
-        drama_name = data['series']['text']['title']['full']['series']['default']['content']
-        seasons = data['seasons']['seasons']
+    driver.get(url)
 
-        season_start = 0
-        season_end = len(seasons)
+    if WebDriverWait(driver, 15).until(EC.url_to_be(url)):
+        time.sleep(2)
+        if WebDriverWait(driver, 15, 0.5).until(EC.title_contains('觀看')):
 
-        if download_season:
-            if int(download_season) > 0 and int(download_season) <= len(seasons):
-                season_start = int(download_season)-1
-            else:
+            if get_ip_location()['countryCode'].lower() != 'tw':
+                travel_button = find_visible_element_by_xpath(
+                    driver, "//button[@data-testid='modal-primary-button']")
+                travel_button.click()
+
+            if genre == 'series':
+                series_url = f'https://disney.content.edge.bamgrid.com/svc/content/DmcSeriesBundle/version/5.1/region/TW/audience/false/maturity/1850/language/zh-Hant/encodedSeriesId/{os.path.basename(url)}'
+                data = get_static_html(series_url, True)[
+                    'data']['DmcSeriesBundle']
+                drama_name = data['series']['text']['title']['full']['series']['default']['content'].strip(
+                )
+                seasons = data['seasons']['seasons']
+
+                print(f"\n{drama_name} 共有：{len(seasons)} 季")
+
+                for season in seasons:
+                    season_index = season['seasonSequenceNumber']
+                    if not download_season or season_index in download_season:
+                        season_name = str(season_index).zfill(2)
+                        episode_num = season['episodes_meta']['hits']
+                        episode_list = check_episodes(season, series_url)
+
+                        folder_path = os.path.join(
+                            output, f'{drama_name}.S{season_name}')
+
+                        if os.path.exists(folder_path):
+                            shutil.rmtree(folder_path)
+
+                        print(
+                            f"\n第 {season_index} 季 共有：{episode_num} 集\t下載全集\n---------------------------------------------------------------")
+
+                        for episode_index, episode_id in enumerate(episode_list, start=1):
+                            time.sleep(1)
+                            episode_name = str(episode_index).zfill(2)
+
+                            episode_url = f'https://www.disneyplus.com/zh-hant/video/{episode_id}'
+                            # print(episode_url)
+                            driver.get(episode_url)
+
+                            print(
+                                f"尋找第 {season_index} 季 第 {episode_index} 集字幕中...")
+
+                            m3u_url = get_network_url(
+                                driver, r'ctr-all.+\.m3u')
+                            file_name = f'{drama_name}.S{season_name}E{episode_name}.WEB-DL.Disney+'
+                            subtitle_list, audio_list = parse_m3u(m3u_url)
+                            get_subtitle(subtitle_list, genre,
+                                         folder_path, file_name, lang_list)
+                            if audio:
+                                get_audio(audio_list, folder_path, file_name)
+                        print(folder_path)
+                        convert_subtitle(folder_path, 'disney')
+            elif genre == 'movies':
+                movie_url = f'https://disney.content.edge.bamgrid.com/svc/content/DmcVideoBundle/version/5.1/region/TW/audience/false/maturity/1850/language/zh-Hant/encodedFamilyId/{os.path.basename(url)}'
+                data = get_static_html(movie_url, True)[
+                    'data']['DmcVideoBundle']['video']
+                movie_name = data['text']['title']['full']['program']['default']['content'].strip(
+                )
+                print(movie_name)
+                folder_path = os.path.join(output, movie_name)
+                file_name = f'{movie_name}.WEB-DL.Disney+'
+                find_visible_element_clickable_by_xpath(
+                    driver, "//button[@data-testid='play-button']").click()
                 print(
-                    f"\n{drama_name} 只有{len(seasons)}季，沒有第 {int(download_season)} 季")
-                exit(1)
-
-        print(f"\n{drama_name} 共有：{len(seasons)} 季")
-
-        travel_button = driver.find_elements(
-            By.XPATH, "//button[@data-testid='modal-primary-button']")
-        if travel_button:
-            travel_button[0].click()
-
-        for season in seasons[season_start:season_end]:
-            season_index = season['seasonSequenceNumber']
-            season_name = str(season_index).zfill(2)
-            episode_num = season['episodes_meta']['hits']
-            episode_list = check_episodes(season, series_url)
-
-            folder_path = os.path.join(
-                output, f'{drama_name}.S{season_name}')
-
-            if os.path.exists(folder_path):
-                shutil.rmtree(folder_path)
-
-            print(
-                f"\n第 {season_index} 季 共有：{episode_num} 集\t下載全集\n---------------------------------------------------------------")
-
-            for episode_index, episode_id in enumerate(episode_list, start=1):
-                time.sleep(1)
-                episode_name = str(episode_index).zfill(2)
-
-                episode_url = f'https://www.disneyplus.com/zh-hant/video/{episode_id}'
-                driver.get(episode_url)
-
-                print(
-                    f"尋找第 {season_index} 季 第 {episode_index} 集字幕中...")
-
+                    f"尋找{movie_name}字幕中...")
                 m3u_url = get_network_url(driver, r'ctr-all.+\.m3u')
-                file_name = f'{drama_name}.S{season_name}E{episode_name}.WEB-DL.Disney+'
                 subtitle_list, audio_list = parse_m3u(m3u_url)
                 get_subtitle(subtitle_list, genre,
                              folder_path, file_name, lang_list)
                 if audio:
                     get_audio(audio_list, folder_path, file_name)
-            print(folder_path)
-            convert_subtitle(folder_path, 'disney')
-    elif genre == 'movies':
-        movie_url = f'https://disney.content.edge.bamgrid.com/svc/content/DmcVideoBundle/version/5.1/region/TW/audience/false/maturity/1850/language/zh-Hant/encodedFamilyId/{os.path.basename(url)}'
-        data = get_static_html(movie_url, True)[
-            'data']['DmcVideoBundle']['video']
-        movie_name = data['text']['title']['full']['program']['default']['content']
-        print(movie_name)
-        folder_path = os.path.join(output, movie_name)
-        file_name = f'{movie_name}.WEB-DL.Disney+'
-        movie_url = f"https://www.disneyplus.com/zh-hant/video/{data['contentId']}"
-        driver.get(movie_url)
-        print(
-            f"尋找{movie_name}字幕中...")
-        m3u_url = get_network_url(driver, r'ctr-all.+\.m3u')
-        subtitle_list, audio_list = parse_m3u(m3u_url)
-        get_subtitle(subtitle_list, genre,
-                     folder_path, file_name, lang_list)
-        if audio:
-            get_audio(audio_list, folder_path, file_name)
-    driver.quit()
+            driver.quit()
 
 
 def check_episodes(season, series_url):
