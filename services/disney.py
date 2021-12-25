@@ -103,7 +103,7 @@ def download_subtitle(driver, url, genre, output="", download_season="", languag
 
                 for season in seasons:
                     season_index = season['seasonSequenceNumber']
-                    if not download_season or season_index in download_season:
+                    if not download_season or season_index == download_season:
                         season_name = str(season_index).zfill(2)
                         episode_num = season['episodes_meta']['hits']
                         episode_list = check_episodes(season, series_url)

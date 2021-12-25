@@ -9,7 +9,6 @@ import time
 from urllib import request
 from urllib.error import HTTPError, URLError
 from bs4 import BeautifulSoup
-from natsort import natsorted
 from selenium import webdriver
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
@@ -211,31 +210,3 @@ def number_range(start: int, end: int):
         return list(range(end, start + 1))
 
     return [start]
-
-
-def list_number(number: str):
-    if number.isdigit():
-        return [int(number)]
-
-    if number.strip() == "~" or number.strip() == "":
-        return number_range(1, 999)
-
-    if "-" in number:
-        start, end = number.split("-")
-        if start.strip() == "" or end.strip() == "":
-            raise ValueError("wrong number: {}".format(number))
-        return number_range(int(start), int(end))
-
-    if "~" in number:
-        start, _ = number.split("~")
-        if start.strip() == "":
-            raise ValueError("wrong number: {}".format(number))
-        return number_range(int(start), 999)
-
-
-def sort_numbers(numbers):
-    sorted_numbers = []
-    for number in numbers.split(","):
-        sorted_numbers += list_number(number.strip())
-
-    return natsorted(list(set(sorted_numbers)))

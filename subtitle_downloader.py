@@ -7,7 +7,7 @@ import re
 import os
 import argparse
 from services import kktv, linetv, friday, iqiyi, disney
-from common.utils import get_static_html, get_dynamic_html, get_ip_location, sort_numbers
+from common.utils import get_static_html, get_dynamic_html, get_ip_location
 
 
 def season_episode_type(arg_value, pat=re.compile(r'[sS]\d{1,}([eE]\d{1,})*')):
@@ -38,10 +38,6 @@ if __name__ == "__main__":
                         '--season',
                         dest='season',
                         help='下載 第[0-9]季')
-    parser.add_argument('-e',
-                        '--episode',
-                        dest='episode',
-                        help='下載 第[0-9]集')
     parser.add_argument('-l',
                         '--last-episode',
                         dest='last_episode',
@@ -75,23 +71,14 @@ if __name__ == "__main__":
     if (args.season and args.last_episode):
         parser.error("-l 與 -s 不能共用")
 
-    if (args.episode and args.last_episode):
-        parser.error("-l 與 -e 不能共用")
-
-    if (args.episode and not args.season):
-        parser.error("未指定下載季數")
-
     query_url = args.url.strip()
     output = args.output
     if not output:
         output = os.getcwd()
 
     download_season = ''
-    download_episode = ''
     if args.season:
-        download_season = sort_numbers(args.season)
-    if args.episode:
-        download_episode = sort_numbers(args.episode)
+        download_season = int(args.season)
 
     last_episode = args.last_episode
 
@@ -122,7 +109,6 @@ if __name__ == "__main__":
                                    output,
                                    drama_id,
                                    download_season,
-                                   download_episode,
                                    last_episode)
     elif linetv_id_search:
         drama_id = linetv_id_search.group(1)
@@ -136,7 +122,6 @@ if __name__ == "__main__":
                                  output,
                                  genre,
                                  download_season,
-                                 download_episode,
                                  last_episode)
     elif iqiyi_search:
         iqiyi.download_subtitle(
