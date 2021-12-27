@@ -6,7 +6,8 @@ import re
 import shutil
 import os
 from bs4 import BeautifulSoup
-from common.utils import get_season_number, check_url_exist, download_file, convert_subtitle
+from common.utils import check_url_exist, download_file, convert_subtitle
+from common.dictionary import convert_chinese_number
 
 
 def download_subtitle(driver, output, genre, download_season, last_episode):
@@ -24,7 +25,7 @@ def download_subtitle(driver, output, genre, download_season, last_episode):
                 r'(.+?)第(.+?)季', title.text)
             if season_search:
                 drama_name = season_search.group(1).strip()
-                season_name = get_season_number(season_search.group(2))
+                season_name = convert_chinese_number(season_search.group(2))
             else:
                 drama_name = title.text.strip()
                 season_name = '01'
@@ -39,7 +40,7 @@ def download_subtitle(driver, output, genre, download_season, last_episode):
         for episode in drama.findAll('p'):
             season_search = re.search(r'第(.+?)季(.+)', episode.text)
             if season_search:
-                season_name = get_season_number(season_search.group(1))
+                season_name = convert_chinese_number(season_search.group(1))
                 season_set.add(season_name)
                 episode_name = f'S{season_name}E{season_search.group(2)}'
             else:
@@ -64,12 +65,12 @@ def download_subtitle(driver, output, genre, download_season, last_episode):
                     output, f'{drama_name}.S{str(download_season).zfill(2)}')
             else:
                 if season_num > 1:
-                    print('\n共有：' + str(episode_num)
-                          + ' 集\t下載全集\n---------------------------------------------------------------')
+                    print(
+                        f"\n共有：{episode_num} 集\t下載全集\n---------------------------------------------------------------")
                     folder_path = os.path.join(output, drama_name)
                 else:
                     print(
-                        f"\n第 {int(season_name)} 季 共有：{episode_list[0].split('E')[1]}-{episode_list[-1].split('E')[1]} 集\t下載全集\n---------------------------------------------------------------")
+                        f"\n第 {int(season_name)} 季 共有：{episode_num} 集\t下載全集\n---------------------------------------------------------------")
                     folder_path = os.path.join(
                         output, f'{drama_name}.S{season_name}')
             if os.path.exists(folder_path):
@@ -96,7 +97,8 @@ def download_subtitle(driver, output, genre, download_season, last_episode):
                 season_search = re.search(
                     r'第(.+?)季(.+)', sub_search.group(2))
                 if season_search:
-                    season_name = get_season_number(season_search.group(1))
+                    season_name = convert_chinese_number(
+                        season_search.group(1))
                     episode_name = season_search.group(2)
                 else:
                     episode_name = sub_search.group(2).zfill(2)

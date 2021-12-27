@@ -7,7 +7,8 @@ import os
 import time
 import shutil
 import json
-from common.utils import get_ip_location, get_season_number, find_present_element_by_xpath, download_file, convert_subtitle
+from common.utils import get_ip_location, find_present_element_by_xpath, download_file, convert_subtitle
+from common.dictionary import convert_chinese_number
 
 
 def download_subtitle(driver, output):
@@ -35,7 +36,8 @@ def download_subtitle(driver, output):
 
                 if season_search:
                     drama_name = season_search.group(1).strip()
-                    season_name = get_season_number(season_search.group(2))
+                    season_name = convert_chinese_number(
+                        season_search.group(2))
                 else:
                     drama_name = title
                     season_name = '01'

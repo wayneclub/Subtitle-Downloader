@@ -3,5 +3,5 @@ webdriver-manager
 selenium
 pysubs2
 opencc
-wget
 m3u8
+Pygments

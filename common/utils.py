@@ -1,11 +1,19 @@
+#!/usr/bin/python3
+# coding: utf-8
+
 """
 This module is for common tool.
 """
 import os
+from pathlib import Path
 import json
 import platform
 import re
 import time
+import requests
+from requests.adapters import HTTPAdapter
+import subprocess
+from tqdm import tqdm
 from urllib import request
 from urllib.error import HTTPError, URLError
 from bs4 import BeautifulSoup
@@ -14,34 +22,55 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 from webdriver_manager.chrome import ChromeDriverManager
-import wget
+from urllib3.util import Retry
+from pygments import highlight, lexers, formatters
+import subtitle_tool
 
 
-def get_season_number(string):
-    """Get season number"""
-    number = {
-        '一': '1',
-        '二': '2',
-        '三': '3',
-        '四': '4',
-        '五': '5',
-        '六': '6',
-        '七': '7',
-        '八': '8',
-        '九': '9',
-        '十': '10',
-        '十一': '11',
-        '十二': '12',
-        '十三': '13',
-        '十四': '14',
-        '十五': '15',
-        '十六': '16',
-        '十七': '17',
-        '十八': '18',
-        '十九': '19',
-        '二十': '20'
+class HTTPMethod:
+    GET = 'GET'
+    POST = 'POST'
+    DELETE = 'DELETE'
+
+
+class DownloadProgressBar(tqdm):
+    def update_to(self, b=1, bsize=1, tsize=None):
+        if tsize is not None:
+            self.total = tsize
+        self.update(b * bsize - self.n)
+
+
+def download_file(url, output_path):
+    if check_url_exist(url):
+        with DownloadProgressBar(unit='B', unit_scale=True,
+                                 miniters=1, desc=os.path.basename(output_path)) as t:
+            request.urlretrieve(
+                url, filename=output_path, reporthook=t.update_to)
+    else:
+        print("找不到檔案")
+
+
+def http_request(url="", method="", kwargs=""):
+    session = requests.Session()
+    session.headers = {
+        'User-Agent': 'User-Agent:Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36'
     }
-    return str(number.get(string)).zfill(2) if number.get(string) else string.zfill(2)
+    session.timeout = 5
+    adapter = HTTPAdapter(max_retries=Retry(total=5, backoff_factor=1))
+    session.mount('http://', adapter)
+    session.mount('https://', adapter)
+    if method == HTTPMethod.GET:
+        req = session.get(url)
+    elif method == HTTPMethod.POST:
+        req = session.post(url, **kwargs)
+    elif method == HTTPMethod.DELETE:
+        req = session.delete(url, **kwargs)
+
+    if req.status_code == 200:
+        return req.json()
+    else:
+        print(f'\n{pretty_print_json(json.loads(req.text))}')
+        exit(1)
 
 
 def check_url_exist(url, print_error=False):
@@ -160,21 +189,18 @@ def get_locale(driver):
     return driver.execute_script("return window.navigator.language")
 
 
-def download_file(url, path):
-    if check_url_exist(url):
-        wget.download(url, out=path)
-        print(f'\n{os.path.basename(path)}\t...下載完成')
-    else:
-        print("找不到檔案")
-
-
 def convert_subtitle(folder_path, ott=''):
-    if ott:
-        os.system(
-            f'python subtitle_tool.py "{folder_path}" -c -z {ott}')
-    else:
-        os.system(
-            f'python subtitle_tool.py "{folder_path}" -c')
+    if os.path.exists(folder_path):
+        for index, file in enumerate(sorted(os.listdir(folder_path))):
+            extenison = Path(file).suffix
+            if extenison != '.srt':
+                if index == 0:
+                    print(
+                        f"\n將{extenison}轉換成.srt：\n---------------------------------------------------------------")
+                subtitle = os.path.join(folder_path, file)
+                subtitle_tool.convert_subtitle(subtitle, '', True, False)
+        if ott:
+            subtitle_tool.archive_subtitle(os.path.normpath(folder_path), ott)
 
 
 def merge_subtitle(folder_path, file_name):
@@ -202,11 +228,7 @@ def save_html(html_source, file='test.html'):
         writter.write(str(html_source))
 
 
-def number_range(start: int, end: int):
-    if list(range(start, end + 1)) != []:
-        return list(range(start, end + 1))
-
-    if list(range(end, start + 1)) != []:
-        return list(range(end, start + 1))
-
-    return [start]
+def pretty_print_json(json_obj):
+    formatted_json = json.dumps(
+        json_obj, ensure_ascii=False, sort_keys=True, indent=4)
+    return highlight(formatted_json, lexers.JsonLexer(), formatters.TerminalFormatter())

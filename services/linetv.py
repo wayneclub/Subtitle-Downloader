@@ -8,7 +8,8 @@ import shutil
 import os
 from urllib.parse import quote
 from time import strftime, localtime
-from common.utils import get_season_number, check_url_exist, download_file, convert_subtitle
+from common.utils import check_url_exist, download_file, convert_subtitle
+from common.dictionary import convert_chinese_number
 
 
 def download_subtitle(web_content, output, drama_id, last_episode):
@@ -27,7 +28,8 @@ def download_subtitle(web_content, output, drama_id, last_episode):
                         r'(.+?)第(.+?)季', drama['drama_name'])
                     if season_search:
                         drama_name = season_search.group(1).strip()
-                        season_name = get_season_number(season_search.group(2))
+                        season_name = convert_chinese_number(
+                            season_search.group(2))
                     else:
                         drama_name = drama['drama_name'].strip()
                         season_name = '01'

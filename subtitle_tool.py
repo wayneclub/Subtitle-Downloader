@@ -76,8 +76,9 @@ def convert_utf8(srcfile):
             if from_codec == 'BIG5' or from_codec == 'GB2312' or from_codec == 'Windows-1252' or from_codec == 'ISO-8859-1':
                 from_codec = 'CP950'
 
-            print("\n將" + from_codec +
-                  " 轉換成 UTF-8：\n---------------------------------------------------------------")
+            if from_codec.lower() != 'utf-8-sig':
+                print("\n將" + from_codec +
+                      " 轉換成 UTF-8：\n---------------------------------------------------------------")
 
             with open(srcfile, 'r', encoding=from_codec, errors='replace') as input_src:
                 data = input_src.read()
@@ -353,6 +354,7 @@ def translate_subtitle(file_name, language, remove_cast):
         text = text.replace('`', '')
         text = text.replace('ˊ', '')
         text = text.replace('∕', '/')
+        text = re.sub(r'^＂.+＂$', '（\\1）', text)
         text = text.replace('＂', '"')
         text = text.replace('➚', '')
         text = text.replace('...', '…')
@@ -904,11 +906,8 @@ def output_typo_compare(file_name, typo_compare_list):
             typo_compare_file.write('\n')
 
 
-def convert_subtitle(original_file, sub_type, prettify=False, print_log=True):
+def convert_subtitle(original_file, sub_type='.srt', prettify=False, print_log=True):
     extension = Path(original_file).suffix
-
-    if not sub_type or sub_type == True:
-        sub_type = '.srt'
 
     if sub_type != extension:
         if print_log:
@@ -1273,7 +1272,8 @@ def archive_subtitle(path, platform=""):
                  {'id': 'linetv', 'name': 'LineTV'},
                  {'id': 'friday', 'name': 'friDay'},
                  {'id': 'iqiyi', 'name': 'iQIYI'},
-                 {'id': 'disney', 'name': 'Disney+'}]
+                 {'id': 'disney', 'name': 'Disney+'},
+                 {'id': 'hbogo', 'name': 'HBOGO'}]
 
     if platform and platform != True:
         platform = next(item for item in platforms if item['id'] == platform)[
@@ -1288,13 +1288,12 @@ def archive_subtitle(path, platform=""):
     else:
         zipname = os.path.basename(f'{path}.WEB-DL')
 
-    zipname = zipname.replace(' ', '\\ ').replace(
-        '(', '\\(').replace(')', '\\)')
-    path = path.replace(' ', '\\ ').replace(
-        '(', '\\(').replace(')', '\\)') + '/'
+    zipname = os.path.normpath(zipname)
+    path = os.path.normpath(path)
     print(f'{zipname}.zip')
     shutil.make_archive(zipname, 'zip', path)
-    if not os.path.exists(os.path.join(Path(path).parent.absolute(), f'{zipname}.zip')):
+
+    if str(os.getcwd()) != str(Path(path).parent.absolute()):
         shutil.move(f'{zipname}.zip', Path(path).parent.absolute())
 
 
