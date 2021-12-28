@@ -255,5 +255,5 @@ def save_html(html_source, file='test.html'):
 
 def pretty_print_json(json_obj):
     formatted_json = orjson.dumps(
-        json_obj, option=[orjson.OPT_INDENT_2, orjson.OPT_APPEND_NEWLINE]).decode('utf-8')
+        json_obj, option=orjson.OPT_INDENT_2).decode('utf-8')
     return highlight(formatted_json, lexers.JsonLexer(), formatters.TerminalFormatter())
