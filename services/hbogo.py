@@ -45,34 +45,29 @@ class HBOGO(object):
 
         self.session = requests.Session()
 
-        self.language_code = {
-            'en': 'ENG',
-            'zh-Hant': 'CHN',
-            'zh-Hans': 'CHZ',
-            'ms': 'MAL',
-            'th': 'THA'
+    def get_language_code(self, lang):
+        language_code = {
+            'ENG': 'en',
+            'CHN': 'zh-Hant',
+            'CHC': 'zh-Hant',
+            'CHZ': 'zh-Hans',
+            'MAL': 'ms',
+            'THA': 'th',
+            'IND': 'id',
         }
 
-    def get_language_code(self, lang, reverse=False):
-        language_code_reverse = dict(
-            zip(self.language_code.values(), self.language_code.keys()))
-        if reverse:
-            return language_code_reverse.get(lang) if language_code_reverse.get(lang) else 'en'
-        else:
-            return self.language_code.get(lang) if self.language_code.get(lang) else 'ENG'
+        if language_code.get(lang):
+            return language_code.get(lang)
 
     def get_language_list(self):
         if not self.subtitle_language:
             self.subtitle_language = 'zh-Hant'
-        elif self.subtitle_language == 'all':
-            self.subtitle_language = ','.join(list(self.language_code.keys()))
 
         if ',' not in self.subtitle_language:
-            self.language_list = [
-                self.get_language_code(self.subtitle_language)]
+            self.language_list = [self.subtitle_language]
         else:
-            self.language_list = [self.get_language_code(
-                language) for language in self.subtitle_language.split(',')]
+            self.language_list = [
+                language for language in self.subtitle_language.split(',')]
 
     def get_territory(self):
         geo_url = f'https://api2.hbogoasia.com/v1/geog?lang=zh-Hant&version=0&bundleId={urlparse(self.url).netloc}'
@@ -81,6 +76,7 @@ class HBOGO(object):
                                 url=geo_url, method=HTTPMethod.GET)
         if 'territory' in response:
             self.territory = response['territory']
+            self.logger.debug(self.territory)
         else:
             self.logger.info('HBOGO Asia 未在此區提供服務')
             exit()
@@ -146,8 +142,14 @@ class HBOGO(object):
             season_list = http_request(session=self.session,
                                        url=series_url, method=HTTPMethod.GET)['results']
 
-            title = next(title['name'] for title in season_list[0]
-                         ['metadata']['titleInformations'] if title['lang'] == 'CHN')
+            if len(season_list) > 0:
+                if season_list[0]['metadata']['titleInformations'][-1]['lang'] != 'ENG':
+                    title = season_list[0]['metadata']['titleInformations'][-1]['name']
+                else:
+                    title = season_list[0]['metadata']['titleInformations'][0]['name']
+                title = re.sub(r'\(第\d+季\)', '', title).strip()
+            else:
+                self.logger.info('這部影集未在此區上映，請用VPN換到別區')
 
             drama_name = re.sub(r'S\d+', '', title).strip()
             self.logger.info('\n%s 共有：%s 季', drama_name, len(season_list))
@@ -156,6 +158,7 @@ class HBOGO(object):
                 season_index = season['seasonNumber']
                 if not self.download_season or season_index == self.download_season:
                     season_url = f"https://api2.hbogoasia.com/v1/tvepisode/list?parentId={season['contentId']}&territory={self.territory}"
+                    self.logger.debug(season_url)
                     season_name = str(season_index).zfill(2)
 
                     folder_path = os.path.join(
@@ -210,7 +213,7 @@ class HBOGO(object):
 
     def parse_subtitle(self, content_id, video, folder_path, file_name):
         video_url = f'https://api2.hbogoasia.com/v1/asset/playbackurl?territory={self.territory}&contentId={content_id}&sessionToken={self.session_token}&channelPartnerID={self.channel_partner_id}&operatorId=SIN&lang=zh-Hant'
-
+        self.logger.debug(video_url)
         response = http_request(session=self.session,
                                 url=video_url, method=HTTPMethod.GET)
 
@@ -220,13 +223,25 @@ class HBOGO(object):
 
         category = video['metadata']['categories'][0]
 
+        available_languages = [self.get_language_code(
+            media['lang']) for media in video['materials'] if media['type'] == 'subtitle']
+
+        if 'all' in self.language_list:
+            self.language_list = available_languages
+
+        if not set(self.language_list).intersection(available_languages):
+            self.logger.error('提供的字幕語言：%s', available_languages)
+            exit()
+
         for media in video['materials']:
             if media['type'] == 'subtitle':
-                if media['lang'] in self.language_list:
+                self.logger.debug(media)
+                sub_lang = self.get_language_code(media['lang'])
+                if sub_lang in self.language_list:
                     if len(self.language_list) > 1:
                         if category == 'SERIES':
                             lang_folder_path = os.path.join(
-                                folder_path, self.get_language_code(media['lang'], True))
+                                folder_path, sub_lang)
                         else:
                             lang_folder_path = folder_path
                     else:
@@ -237,7 +252,7 @@ class HBOGO(object):
                         subtitle_file).stem.replace(content_id, '')
 
                     subtitle_file_name = file_name.replace(
-                        '.vtt', f".{self.get_language_code(media['lang'], True)}.vtt")
+                        '.vtt', f".{sub_lang}.vtt")
 
                     subtitle_link = mpd_url.replace(
                         os.path.basename(mpd_url), f"subtitles/{lang_code}/{subtitle_file}")

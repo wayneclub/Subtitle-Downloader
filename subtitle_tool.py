@@ -911,8 +911,8 @@ def convert_subtitle(original_file, sub_type='.srt', prettify=False, print_log=T
 
     if sub_type != extension:
         if print_log:
-            print("將" + extension +
-                  " 轉換成" + sub_type + "：\n---------------------------------------------------------------")
+            print(
+                f"將{extension}轉換成{sub_type}：\n---------------------------------------------------------------")
         if sub_type == '.ass' and extension == '.srt':
             return srt_to_ass(original_file)
         else:
