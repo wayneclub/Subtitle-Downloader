@@ -2,7 +2,7 @@
 This module is to download subtitle from KKTV
 """
 
-import json
+import orjson
 import re
 import shutil
 import os
@@ -16,7 +16,7 @@ def download_subtitle(driver, output, drama_id, download_season, last_episode):
     driver.quit()
     try:
 
-        data = json.loads(web_content.find(
+        data = orjson.loads(web_content.find(
             'script', id='__NEXT_DATA__').string)
 
         drama = data['props']['initialState']['titles']['byId'][drama_id]
@@ -162,5 +162,5 @@ def download_subtitle(driver, output, drama_id, download_season, last_episode):
 
                             convert_subtitle(folder_path, 'kktv')
 
-    except json.decoder.JSONDecodeError:
+    except orjson.decoder.JSONDecodeError:
         print("String could not be converted to JSON")

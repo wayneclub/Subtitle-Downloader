@@ -6,7 +6,7 @@ import re
 import os
 import time
 import shutil
-import json
+import orjson
 from common.utils import get_ip_location, find_present_element_by_xpath, download_file, convert_subtitle
 from common.dictionary import convert_chinese_number
 
@@ -15,7 +15,7 @@ def download_subtitle(driver, output):
     web_content = find_present_element_by_xpath(
         driver, "//script[@id='__NEXT_DATA__']")
     try:
-        data = json.loads(web_content.get_attribute('innerHTML'))
+        data = orjson.loads(web_content.get_attribute('innerHTML'))
         drama = data['props']['initialState']
 
         if drama and 'album' in drama:
@@ -104,5 +104,5 @@ def download_subtitle(driver, output):
                 convert_subtitle(folder_path, 'iqiyi')
             driver.quit()
 
-    except json.decoder.JSONDecodeError:
+    except orjson.decoder.JSONDecodeError:
         print("String could not be converted to JSON")

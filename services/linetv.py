@@ -2,7 +2,7 @@
 This module is to download subtitle from LineTV
 """
 
-import json
+import orjson
 import re
 import shutil
 import os
@@ -17,7 +17,7 @@ def download_subtitle(web_content, output, drama_id, last_episode):
 
     try:
         if web_content.find('script') and web_content.find('script').string:
-            data = json.loads(web_content.find('script').string.replace(
+            data = orjson.loads(web_content.find('script').string.replace(
                 'window.__INITIAL_STATE__ = ', ''))
 
             drama = data['entities']['dramaInfo']['byId'][drama_id]
@@ -91,5 +91,5 @@ def download_subtitle(web_content, output, drama_id, last_episode):
                         else:
                             convert_subtitle(folder_path, 'linetv')
 
-    except json.decoder.JSONDecodeError:
+    except orjson.decoder.JSONDecodeError:
         print("String could not be converted to JSON")

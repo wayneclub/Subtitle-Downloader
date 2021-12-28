@@ -6,16 +6,16 @@ This module is for common tool.
 """
 import os
 from pathlib import Path
-import json
 import platform
 import re
 import time
-import requests
-from requests.adapters import HTTPAdapter
-import subprocess
-from tqdm import tqdm
+import multiprocessing
 from urllib import request
 from urllib.error import HTTPError, URLError
+import requests
+from requests.adapters import HTTPAdapter
+import orjson
+from tqdm import tqdm
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.support import expected_conditions as EC
@@ -30,6 +30,7 @@ import subtitle_tool
 class HTTPMethod:
     GET = 'GET'
     POST = 'POST'
+    PUT = 'PUT'
     DELETE = 'DELETE'
 
 
@@ -50,26 +51,58 @@ def download_file(url, output_path):
         print("找不到檔案")
 
 
-def http_request(url="", method="", kwargs=""):
-    session = requests.Session()
-    session.headers = {
-        'User-Agent': 'User-Agent:Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36'
-    }
-    session.timeout = 5
-    adapter = HTTPAdapter(max_retries=Retry(total=5, backoff_factor=1))
+def download_file_multithread(urls, output_path):
+
+    cpus = multiprocessing.cpu_count()
+    max_pool_size = 8
+    pool = multiprocessing.Pool(
+        cpus if cpus < max_pool_size else max_pool_size)
+    pool = multiprocessing.Pool(
+        cpus if cpus < max_pool_size else max_pool_size)
+    for url in urls:
+        pool.apply_async(download_file, args=(
+            url, os.path.join(output_path, os.path.basename(url))))
+    pool.close()
+    pool.join()
+
+
+def download_audio(m3u8_url, output):
+    os.system(
+        f'ffmpeg -protocol_whitelist file,http,https,tcp,tls,crypto -i "{m3u8_url}" -c copy "{output}" -preset ultrafast -loglevel warning -hide_banner -stats')
+
+
+def http_request(session=requests.Session(), url="", method="", headers="", kwargs="", raw=False):
+
+    if headers:
+        session.headers = headers
+    else:
+        session.headers = {
+            'User-Agent': 'User-Agent:Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36'
+        }
+
+    session.timeout = 10
+    adapter = HTTPAdapter(max_retries=Retry(total=5, backoff_factor=5))
     session.mount('http://', adapter)
     session.mount('https://', adapter)
+
     if method == HTTPMethod.GET:
         req = session.get(url)
     elif method == HTTPMethod.POST:
         req = session.post(url, **kwargs)
+    elif method == HTTPMethod.PUT:
+        req = session.put(url, **kwargs)
     elif method == HTTPMethod.DELETE:
         req = session.delete(url, **kwargs)
-
-    if req.status_code == 200:
-        return req.json()
     else:
-        print(f'\n{pretty_print_json(json.loads(req.text))}')
+        exit(1)
+
+    if req.ok:
+        if raw:
+            return req.text
+        else:
+            return req.json()
+    else:
+        print(f'\n{pretty_print_json(orjson.loads(req.text))}')
         exit(1)
 
 
@@ -102,8 +135,8 @@ def get_static_html(url, json_request=False):
 
         if json_request:
             try:
-                return json.loads(response.read())
-            except json.decoder.JSONDecodeError:
+                return orjson.loads(response.read())
+            except orjson.decoder.JSONDecodeError:
                 print("String could not be converted to JSON")
         else:
             return BeautifulSoup(response.read(), 'lxml')
@@ -156,7 +189,6 @@ def get_network_url(driver, search_url):
 
         url = next((log['name'] for log in logs
                     if re.search(search_url, log['name'])), None)
-        # print(m3u_file)
         delay += 1
 
         if delay > 60:
@@ -204,13 +236,8 @@ def convert_subtitle(folder_path, ott=''):
 
 
 def merge_subtitle(folder_path, file_name):
-    os.system(f'python subtitle_tool.py "{folder_path}" -m "{file_name}"')
-
-
-def download_audio(m3u8_url, output):
-    print(m3u8_url)
-    os.system(
-        f'ffmpeg -protocol_whitelist file,http,https,tcp,tls,crypto -i "{m3u8_url}" -c copy "{output}" -preset ultrafast -loglevel warning -hide_banner -stats')
+    if os.path.exists(folder_path):
+        os.system(f'python subtitle_tool.py "{folder_path}" -m "{file_name}"')
 
 
 def kill_process():
@@ -218,9 +245,7 @@ def kill_process():
 
 
 def get_ip_location():
-    response = request.urlopen(request.Request(
-        'http://ip-api.com/json/')).read()
-    return json.loads(response.decode('utf-8'))
+    return http_request(url='https://ipinfo.io/json', method=HTTPMethod.GET)
 
 
 def save_html(html_source, file='test.html'):
@@ -229,6 +254,6 @@ def save_html(html_source, file='test.html'):
 
 
 def pretty_print_json(json_obj):
-    formatted_json = json.dumps(
-        json_obj, ensure_ascii=False, sort_keys=True, indent=4)
+    formatted_json = orjson.dumps(
+        json_obj, option=[orjson.OPT_INDENT_2, orjson.OPT_APPEND_NEWLINE]).decode('utf-8')
     return highlight(formatted_json, lexers.JsonLexer(), formatters.TerminalFormatter())

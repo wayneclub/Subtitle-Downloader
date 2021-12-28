@@ -4,4 +4,6 @@ selenium
 pysubs2
 opencc
 m3u8
+requests
+orjson
 Pygments

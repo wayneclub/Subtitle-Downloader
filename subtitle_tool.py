@@ -17,7 +17,7 @@ from common.dictionary import translate
 import difflib
 from chardet import detect
 from bs4 import BeautifulSoup, CData
-import json
+import orjson
 import opencc
 import subprocess
 
@@ -1069,7 +1069,7 @@ def convert_json_content(file_contents):
     """
 
     subs = []
-    json_data = json.loads(file_contents)
+    json_data = orjson.loads(file_contents)
     if json_data.get('events'):
         for sub in json_data.get('events'):
             start_time = int(sub.get('tStartMs'))
@@ -1335,7 +1335,7 @@ def walk_dir(top_most_path, args):
     """
     if args.merge and args.merge != True:
         print(
-            f'\n合併所有字幕片段：\n---------------------------------------------------------------\n{args.merge}\n')
+            f'\n合併所有字幕片段：\n---------------------------------------------------------------\n{args.merge}')
         fila_path = f'{Path(top_most_path).parent.absolute()}/{args.merge}'
         with open(fila_path, 'wb') as merge_file:
             for segment in sorted(os.listdir(top_most_path)):
