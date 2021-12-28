@@ -79,7 +79,11 @@ class HBOGO(object):
 
         response = http_request(session=self.session,
                                 url=geo_url, method=HTTPMethod.GET)
-        self.territory = response['territory']
+        if 'territory' in response:
+            self.territory = response['territory']
+        else:
+            self.logger.info('HBOGO Asia 未在此區提供服務')
+            exit()
 
     def login(self):
 
