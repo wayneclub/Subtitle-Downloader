@@ -91,7 +91,7 @@ if __name__ == "__main__":
 
     ip = get_ip_location()
     logging.info(
-        '目前位置：%s（ip: %s）', ip['region'], ip['ip'])
+        'ip: %s (%s)', ip['ip'], ip['country'])
 
     kktv_id_search = re.search(
         r'https:\/\/www\.kktv\.me\/titles\/(.+)', query_url)
@@ -133,13 +133,6 @@ if __name__ == "__main__":
     elif disney_genre_search:
         disney_plus = DisneyPlus(args)
         disney_plus.main()
-        # genre = disney_genre_search.group(1)
-        # if email and password:
-        #     disneyplus.download_subtitle(disneyplus.login(
-        #         email.strip(), password.strip()), query_url, genre, output, download_season, language, download_audio)
-        # else:
-        #     print("Disney+需要帳號密碼登入")
-        #     exit(1)
     elif hbogo_search:
         hbogo = HBOGO(args)
         hbogo.main()

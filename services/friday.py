@@ -191,6 +191,7 @@ def download_subtitle(driver, output, genre, download_season, last_episode):
             if sub_search:
 
                 subtitle_link = f'https://sub.video.friday.tw/{sub_search.group(1)}.cht.vtt'
+                print(subtitle_link)
 
                 file_name = f'{drama_name}.WEB-DL.friDay.zh-Hant.vtt'
 
@@ -206,6 +207,8 @@ def download_subtitle(driver, output, genre, download_season, last_episode):
                 else:
                     print("找不到外掛字幕，請去其他平台尋找")
                     exit()
+            else:
+                print("此部電影尚未上映")
 
 
 def get_ja_subtitle_link(subtitle_link):
