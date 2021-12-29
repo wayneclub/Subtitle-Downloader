@@ -25,14 +25,16 @@ python download_subtitle.py URL [OPTIONS]
 ## OPTIONS
 
 ```
-  -h, --help                  show this help message and exit
-  -s --season                 download season [0-9]
-  -l, --last-episode          download last episode
-  -o, --output                output directory
-  -email, --email             account for Disney Plus and HBOGO Asia
-  -password, --password       password for Disney Plus and HBOGO Asia
-  -slang, --subtitle-language subtitle-language for Disney Plus and HBOGO Asia
-  -alang, --audio-language    audio-language for Disney Plus
+  -h, --help                    show this help message and exit
+  -s --season                   download season [0-9]
+  -l, --last-episode            download last episode
+  -o, --output                  output directory
+  -email, --email               account for Disney Plus and HBOGO Asia
+  -password, --password         password for Disney Plus and HBOGO Asia
+  -slang, --subtitle-language   Languages of HBOGO Asia's and Disney Plus's subtitles to download (optional) separated by commas
+                                default: Traditional Chinese
+                                all: download all available languages
+  -alang, --audio-language      Languages of Disney Plus's audio-tracks to download (optional) separated by commas
 ```
 
 目前只支持從
