@@ -89,7 +89,7 @@ class KKTV(object):
 
                         if film:
                             self.logger.info(
-                                '\n下載電影\n---------------------------------------------------------------')
+                                '\n下載字幕\n---------------------------------------------------------------')
                         elif self.last_episode:
                             self.logger.info(
                                 '\n第 %s 季 共有：%s 集\t下載第 %s 季 最後一集\n---------------------------------------------------------------', season_index, episode_num, season_index)
@@ -154,9 +154,9 @@ class KKTV(object):
                                                 'zh-Hant.vtt', 'ko.vtt')
 
                                             ja_folder_path = os.path.join(
-                                                folder_path, '日語')
+                                                folder_path, 'ja')
                                             ko_folder_path = os.path.join(
-                                                folder_path, '韓語')
+                                                folder_path, 'ko')
 
                                         os.makedirs(
                                             folder_path, exist_ok=True)

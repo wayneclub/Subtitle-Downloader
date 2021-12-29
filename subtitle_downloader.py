@@ -8,10 +8,11 @@ import re
 import os
 import argparse
 import logging
-from services import friday, iqiyi
+from services import iqiyi
 from services.kktv import KKTV
 from services.linetv import LineTV
-from services.hbogo import HBOGO
+from services.friday import Friday
+from services.hbogoasia import HBOGOAsia
 from services.disneyplus import DisneyPlus
 from common.utils import get_dynamic_html, get_ip_location
 
@@ -97,12 +98,12 @@ if __name__ == "__main__":
         r'https:\/\/www\.kktv\.me\/titles\/.+', query_url)
     linetv_search = re.search(
         r'https:\/\/www\.linetv\.tw\/drama\/.+\/eps\/1', query_url)
-    friday_genre_search = re.search(
+    friday_search = re.search(
         r'https:\/\/video\.friday\.tw\/(drama|anime|movie|show)\/detail\/.+', query_url)
     iqiyi_search = re.search(r'https:\/\/www\.iq\.com', query_url)
     disney_search = re.search(
         r'https:\/\/www\.disneyplus\.com\/.*(series|movies)\/.+', query_url)
-    hbogo_search = re.search(
+    hbogoasia_search = re.search(
         r'https:\/\/www\.hbogoasia\..+', query_url)
 
     if kktv_search:
@@ -111,21 +112,17 @@ if __name__ == "__main__":
     elif linetv_search:
         linetv = LineTV(args)
         linetv.main()
-    elif friday_genre_search:
-        genre = friday_genre_search.group(1)
-        friday.download_subtitle(get_dynamic_html(query_url),
-                                 output,
-                                 genre,
-                                 download_season,
-                                 last_episode)
+    elif friday_search:
+        friday = Friday(args)
+        friday.main()
     elif iqiyi_search:
         iqiyi.download_subtitle(
             get_dynamic_html(query_url), output)
     elif disney_search:
         disney_plus = DisneyPlus(args)
         disney_plus.main()
-    elif hbogo_search:
-        hbogo = HBOGO(args)
-        hbogo.main()
+    elif hbogoasia_search:
+        hbogoasia = HBOGOAsia(args)
+        hbogoasia.main()
     else:
         print("目前只支持從\n1. KKTV\t\t下載電影、劇集、綜藝、動漫字幕\n2. LineTV\t下載劇集、綜藝字幕\n3. FriDay影音\t下載劇集、電影、綜藝、動漫字幕\n4. 愛奇藝\t下載劇集\n4. Disney+\t下載電影、劇集\n5. HBOGO Asia\t下載電影、劇集\n\n請確認網站網址無誤")

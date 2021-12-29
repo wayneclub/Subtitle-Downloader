@@ -18,7 +18,7 @@ import requests
 from common.utils import http_request, HTTPMethod, download_file, pretty_print_json, convert_subtitle
 
 
-class HBOGO(object):
+class HBOGOAsia(object):
     def __init__(self, args):
         self.logger = logging.getLogger(__name__)
         self.url = args.url

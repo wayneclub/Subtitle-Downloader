@@ -2,218 +2,264 @@
 This module is to download subtitle from Friday影音
 """
 
+import logging
+import os
 import re
 import shutil
-import os
+import orjson
+import requests
 from bs4 import BeautifulSoup
-from common.utils import check_url_exist, download_file, convert_subtitle
+from common.utils import http_request, HTTPMethod, check_url_exist, download_file, convert_subtitle
 from common.dictionary import convert_chinese_number
 
 
-def download_subtitle(driver, output, genre, download_season, last_episode):
-    """Download subtitle from friDay"""
-    web_content = BeautifulSoup(driver.page_source, 'lxml')
-    driver.quit()
+class Friday(object):
+    def __init__(self, args):
+        self.logger = logging.getLogger(__name__)
+        self.url = args.url
 
-    title = web_content.find('h1', class_='title-chi')
-    if title:
-        if genre == 'movie':
-            drama_name = title.text
-            print(drama_name)
+        if args.output:
+            self.output = args.output
         else:
-            season_search = re.search(
-                r'(.+?)第(.+?)季', title.text)
-            if season_search:
-                drama_name = season_search.group(1).strip()
-                season_name = convert_chinese_number(season_search.group(2))
-            else:
-                drama_name = title.text.strip()
-                season_name = '01'
+            self.output = os.getcwd()
 
-    drama = web_content.find('ul', class_='episode-container')
-    if drama:
-        episode_num = len(drama.findAll('li'))
-        folder_path = output
-
-        episode_list = []
-        season_set = set()
-        for episode in drama.findAll('p'):
-            season_search = re.search(r'第(.+?)季(.+)', episode.text)
-            if season_search:
-                season_name = convert_chinese_number(season_search.group(1))
-                season_set.add(season_name)
-                episode_name = f'S{season_name}E{season_search.group(2)}'
-            else:
-                season_set.add(season_name)
-                episode_name = f'S{season_name}E{(episode.text).zfill(2)}'
-            episode_list.append(episode_name)
-
-        season_num = len(season_set)
-        if season_num > 1:
-            print(f"{drama_name} 共有：{season_num}季")
+        if args.season:
+            self.download_season = int(args.season)
         else:
-            print(f"{drama_name} 第 {int(season_name)} 季")
+            self.download_season = None
 
-        if last_episode:
-            print(
-                f"\n第 {int(season_name)} 季 共有：{str(len([s for s in episode_list if 'S' + season_name in s]))} 集\t下載第 {int(season_name)} 季 最後一集\n---------------------------------------------------------------")
-        else:
-            if download_season:
-                print(
-                    f"\n第 {download_season} 季 共有：{len([s for s in episode_list if 'S' + str(download_season).zfill(2) in s])} 集\t下載全集\n---------------------------------------------------------------")
-                folder_path = os.path.join(
-                    output, f'{drama_name}.S{str(download_season).zfill(2)}')
-            else:
-                if season_num > 1:
-                    print(
-                        f"\n共有：{episode_num} 集\t下載全集\n---------------------------------------------------------------")
-                    folder_path = os.path.join(output, drama_name)
+        self.last_episode = args.last_episode
+
+        self.session = requests.Session()
+
+        self.api = {
+            'episode_list': 'https://video.friday.tw/api2/episode/list?contentId={content_id}&contentType={content_type}&offset=0&length=40&mode=2',
+            'sub': 'https://sub.video.friday.tw/{sid}.cht.vtt'
+        }
+
+    def get_content_type(self, content_type):
+        program = {
+            'movie': 1,
+            'drama': 2,
+            'anime': 3,
+            'show': 4
+        }
+
+        if program.get(content_type):
+            return program.get(content_type)
+
+    def download_subtitle(self):
+        """Download subtitle from friDay"""
+
+        content_search = re.search(
+            r'https:\/\/video\.friday\.tw\/(drama|anime|movie|show)\/detail\/(.+)', self.url)
+        content_type = self.get_content_type(content_search.group(1))
+        content_id = content_search.group(2)
+
+        response = http_request(session=self.session,
+                                url=self.url, method=HTTPMethod.GET, raw=True)
+
+        web_content = BeautifulSoup(response, 'lxml')
+
+        metadata = web_content.findAll(
+            'script', attrs={'type': 'application/ld+json'})
+        metadata = orjson.loads(str(metadata[1].string))
+
+        title = re.sub(r'(.+?)(第.+[季|彈])*', '\\1', metadata['name']).strip()
+
+        folder_path = os.path.join(self.output, title)
+
+        if content_type > 1:
+            episode_list_url = self.api['episode_list'].format(
+                content_id=content_id, content_type=content_type)
+            self.logger.debug(episode_list_url)
+
+            data = http_request(session=self.session,
+                                url=episode_list_url, method=HTTPMethod.GET)['data']
+
+            episode_list = []
+            season_list = []
+            ja_lang = False
+            dual_lang = False
+            for episode in data['episodeList']:
+                if '搶先看' in episode['episodeName']:
+                    continue
+
+                subtitle = dict()
+
+                season_search = re.search(
+                    r'第(\d+)季(\d+)', episode['chineseName'])
+
+                if season_search:
+                    season_index = int(season_search.group(1))
                 else:
-                    print(
-                        f"\n第 {int(season_name)} 季 共有：{episode_num} 集\t下載全集\n---------------------------------------------------------------")
-                    folder_path = os.path.join(
-                        output, f'{drama_name}.S{season_name}')
+                    season_index = 1
+
+                subtitle['season_index'] = season_index
+
+                season_list.append(season_index)
+
+                season_name = str(season_index).zfill(2)
+
+                subtitle_link = self.api['sub'].format(
+                    sid=episode['streamingId'])
+
+                subtitle_link, ja_subtitle_link, dual_subtitle_link = self.get_subtitle_link(
+                    subtitle_link)
+
+                subtitle['zh'] = subtitle_link
+
+                episode_name = episode['episodeName'].split('季')[-1]
+
+                if episode_name.isdecimal():
+                    file_name = f'{title}.S{season_name}E{episode_name.zfill(2)}.WEB-DL.friDay.zh-Hant.vtt'
+                else:
+                    file_name = f'{title}.{episode_name}.WEB-DL.friDay.zh-Hant.vtt'
+
+                subtitle['name'] = file_name
+
+                if ja_subtitle_link:
+                    ja_lang = True
+                    subtitle['ja'] = ja_subtitle_link
+                if dual_subtitle_link:
+                    dual_lang = True
+                    subtitle['dual'] = dual_subtitle_link
+
+                episode_list.append(subtitle)
+
+            season_num = len(set(season_list))
+            episode_num = len(episode_list)
+
+            if season_num > 1:
+                self.logger.info('\n%s 共有：%s 季', title, season_num)
+            else:
+                self.logger.info('\n%s', title)
+
+            if dual_lang:
+                self.logger.info('（有提供雙語字幕）')
+            elif ja_lang:
+                self.logger.info('（有提供日語字幕）')
+
+            if self.last_episode:
+                self.logger.info('\n第 %s 季 共有：%s 集\t下載最後一集\n---------------------------------------------------------------',
+                                 season_index,
+                                 season_list.count(season_index))
+                episode_list = [episode_list[-1]]
+            else:
+                if self.download_season:
+                    self.logger.info('\n第 %s 季 共有：%s 集\t下載全集\n---------------------------------------------------------------',
+                                     self.download_season,
+                                     season_list.count(self.download_season))
+                    folder_path = f'{folder_path}.S{str(self.download_season).zfill(2)}'
+                else:
+                    if season_num > 1:
+                        self.logger.info(
+                            '\n共有：%s 集\t下載全集\n---------------------------------------------------------------',
+                            episode_num)
+                    else:
+                        self.logger.info(
+                            '\n第 %s 季 共有：%s 集\t下載全集\n---------------------------------------------------------------',
+                            season_index,
+                            episode_num)
+                        folder_path = f'{folder_path}.S{season_name}'
+
             if os.path.exists(folder_path):
                 shutil.rmtree(folder_path)
 
-        jp_lang = False
-        dual_lang = False
-        episode_list = drama.findAll('li')
-        if last_episode:
-            episode_list = [episode_list[-1]]
+            ja_folder_path = ''
+            dual_folder_path = ''
+            for subtitle in episode_list:
+                if not self.download_season or subtitle['season_index'] == self.download_season:
+                    os.makedirs(folder_path, exist_ok=True)
+                    download_file(subtitle['zh'], os.path.join(
+                        folder_path, subtitle['name']))
 
-        for episode in episode_list:
-
-            sub_search = re.search(
-                r'\?sid=(.+?)&.+?&epi=(.+?)&.+', episode['data-src'])
-            if sub_search:
-                subtitle_link = f'https://sub.video.friday.tw/{sub_search.group(1)}.cht.vtt'
-
-                subtitle_link_2 = subtitle_link.replace(
-                    '.cht.vtt', '_80000000_ffffffff.cht.vtt')
-                subtitle_link_3 = subtitle_link.replace(
-                    '.cht.vtt', '_ff000000_ffffffff.cht.vtt')
-
-                season_search = re.search(
-                    r'第(.+?)季(.+)', sub_search.group(2))
-                if season_search:
-                    season_name = convert_chinese_number(
-                        season_search.group(1))
-                    episode_name = season_search.group(2)
-                else:
-                    episode_name = sub_search.group(2).zfill(2)
-
-                if episode_name.isdecimal():
-                    file_name = f'{drama_name}.S{season_name}E{episode_name}.WEB-DL.friDay.zh-Hant.vtt'
-                else:
-                    file_name = f'{drama_name}.{episode_name}.WEB-DL.friDay.zh-Hant.vtt'
-
-                ja_file_name = file_name.replace('.zh-Hant.vtt', '.ja.vtt')
-                dual_file_name = file_name.replace('.zh-Hant.vtt', '.vtt')
-                ja_folder_path = os.path.join(folder_path, '日語')
-                dual_folder_path = os.path.join(folder_path, '雙語')
-
-                if not download_season or int(season_name) == download_season:
-
-                    if check_url_exist(subtitle_link):
-                        ja_subtitle_link = get_ja_subtitle_link(
-                            subtitle_link)
-                        dual_subtitle_link = get_dual_subtitle_link(
-                            subtitle_link)
-                        if check_url_exist(ja_subtitle_link):
-                            jp_lang = True
-                        if check_url_exist(dual_subtitle_link):
-                            dual_lang = True
-                    elif check_url_exist(subtitle_link_2):
-                        subtitle_link = subtitle_link_2
-                        ja_subtitle_link = get_ja_subtitle_link(
-                            subtitle_link)
-                        dual_subtitle_link = get_dual_subtitle_link(
-                            subtitle_link)
-                        if check_url_exist(get_ja_subtitle_link(subtitle_link)):
-                            jp_lang = True
-                        if check_url_exist(get_dual_subtitle_link(subtitle_link)):
-                            dual_lang = True
-                    elif check_url_exist(subtitle_link_3):
-                        subtitle_link = subtitle_link_3
-                        ja_subtitle_link = get_ja_subtitle_link(
-                            subtitle_link)
-                        dual_subtitle_link = get_dual_subtitle_link(
-                            subtitle_link)
-                        if check_url_exist(get_ja_subtitle_link(subtitle_link)):
-                            jp_lang = True
-                        if check_url_exist(get_dual_subtitle_link(subtitle_link)):
-                            dual_lang = True
-                    else:
-                        print("抱歉，此劇只有硬字幕，可去其他串流平台查看")
-                        exit(0)
-
-                    if jp_lang and episode_name == 1:
-                        print("（有提供日語字幕）")
-
-                    if dual_lang and episode_name == 1:
-                        print("（有提供雙語字幕）")
-
-                    if not last_episode:
-                        os.makedirs(folder_path, exist_ok=True)
-
-                        if jp_lang:
-                            os.makedirs(ja_folder_path, exist_ok=True)
-                        if dual_lang:
-                            os.makedirs(dual_folder_path, exist_ok=True)
-
-                    download_file(subtitle_link, os.path.join(
-                        folder_path, file_name))
-
-                    if jp_lang:
-                        download_file(ja_subtitle_link, os.path.join(
+                    if 'ja' in subtitle:
+                        ja_folder_path = os.path.join(folder_path, 'ja')
+                        os.makedirs(ja_folder_path, exist_ok=True)
+                        ja_file_name = subtitle['name'].replace(
+                            '.zh-Hant.vtt', '.ja.vtt')
+                        download_file(subtitle['ja'], os.path.join(
                             ja_folder_path, ja_file_name))
-                    if dual_lang:
-                        download_file(dual_subtitle_link, os.path.join(
+
+                    if 'dual' in subtitle:
+                        dual_folder_path = os.path.join(folder_path, 'dual')
+                        os.makedirs(dual_folder_path, exist_ok=True)
+                        dual_file_name = subtitle['name'].replace(
+                            '.zh-Hant.vtt', '.vtt')
+                        download_file(subtitle['dual'], os.path.join(
                             dual_folder_path, dual_file_name))
-        print()
-        if last_episode:
-            convert_subtitle(os.path.join(folder_path, file_name))
-        else:
-            if jp_lang:
+
+            if ja_folder_path and ja_lang:
                 convert_subtitle(ja_folder_path)
-            if dual_lang:
+            if dual_folder_path and dual_lang:
                 convert_subtitle(dual_folder_path)
 
             convert_subtitle(folder_path, 'friday')
 
-    if genre == 'movie':
-        sid_search = web_content.find(
-            'div', class_='popup-video-container content-vod')
-        if sid_search:
-            sub_search = re.search(
-                r'\/player\?sid=(.+?)&stype=.+', sid_search['data-src'])
-            if sub_search:
+        else:
+            self.logger.info('\n%s', title)
+            sid_search = web_content.find(
+                'div', class_='popup-video-container content-vod')
+            if sid_search:
+                sub_search = re.search(
+                    r'\/player\?sid=(.+?)&stype=.+', sid_search['data-src'])
+                if sub_search:
 
-                subtitle_link = f'https://sub.video.friday.tw/{sub_search.group(1)}.cht.vtt'
-                print(subtitle_link)
+                    subtitle_link = self.api['sub'].format(
+                        sid=sub_search.group(1))
+                    self.logger.debug(subtitle_link)
 
-                file_name = f'{drama_name}.WEB-DL.friDay.zh-Hant.vtt'
+                    file_name = f"{title}.{metadata['datePublished']}.WEB-DL.friDay.zh-Hant.vtt"
 
-                folder_path = output
-
-                if check_url_exist(subtitle_link):
-                    if not last_episode:
+                    if check_url_exist(subtitle_link):
+                        self.logger.info(
+                            '\n下載字幕\n---------------------------------------------------------------')
                         os.makedirs(folder_path, exist_ok=True)
-
-                    download_file(subtitle_link, os.path.join(
-                        folder_path, file_name))
-                    convert_subtitle(os.path.join(folder_path, file_name))
+                        download_file(subtitle_link, os.path.join(
+                            folder_path, file_name))
+                        convert_subtitle(folder_path, 'friday')
+                    else:
+                        self.logger.info('找不到外掛字幕，請去其他平台尋找')
+                        exit()
                 else:
-                    print("找不到外掛字幕，請去其他平台尋找")
+                    self.logger.info('此部電影尚未上映')
                     exit()
-            else:
-                print("此部電影尚未上映")
 
+    def get_subtitle_link(self, subtitle_link):
+        subtitle_link_2 = subtitle_link.replace(
+            '.cht.vtt', '_80000000_ffffffff.cht.vtt')
+        subtitle_link_3 = subtitle_link.replace(
+            '.cht.vtt', '_ff000000_ffffffff.cht.vtt')
 
-def get_ja_subtitle_link(subtitle_link):
-    return subtitle_link.replace('.cht.vtt', '.jpn.vtt')
+        ja_subtitle_link = ''
+        dual_subtitle_link = ''
+        if check_url_exist(subtitle_link):
+            ja_subtitle_link = self.get_ja_subtitle_link(subtitle_link)
+            dual_subtitle_link = self.get_dual_subtitle_link(subtitle_link)
+        elif check_url_exist(subtitle_link_2):
+            subtitle_link = subtitle_link_2
+            ja_subtitle_link = self.get_ja_subtitle_link(subtitle_link)
+            dual_subtitle_link = self.get_dual_subtitle_link(subtitle_link)
+        elif check_url_exist(subtitle_link_3):
+            subtitle_link = subtitle_link_3
+            ja_subtitle_link = self.get_ja_subtitle_link(subtitle_link)
+            dual_subtitle_link = self.get_dual_subtitle_link(subtitle_link)
+        else:
+            self.logger.info('抱歉，此劇只有硬字幕，可去其他串流平台查看')
+            exit(0)
 
+        return subtitle_link, ja_subtitle_link, dual_subtitle_link
 
-def get_dual_subtitle_link(subtitle_link):
-    return subtitle_link.replace('.cht.vtt', '.deu.vtt')
+    def get_ja_subtitle_link(self, subtitle_link):
+        ja_subtitle_link = subtitle_link.replace('.cht.vtt', '.jpn.vtt')
+        if check_url_exist(ja_subtitle_link):
+            return ja_subtitle_link
+
+    def get_dual_subtitle_link(self, subtitle_link):
+        dual_subtitle_link = subtitle_link.replace('.cht.vtt', '.deu.vtt')
+        if check_url_exist(dual_subtitle_link):
+            return dual_subtitle_link
+
+    def main(self):
+        self.download_subtitle()
