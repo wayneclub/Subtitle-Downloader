@@ -29,6 +29,7 @@ class HBOGO(object):
             self.output = args.output
         else:
             self.output = os.getcwd()
+
         if args.season:
             self.download_season = int(args.season)
         else:
@@ -44,6 +45,16 @@ class HBOGO(object):
         self.multi_profile_id = ""
 
         self.session = requests.Session()
+
+        self.api = {
+            'geo': 'https://api2.hbogoasia.com/v1/geog?lang=zh-Hant&version=0&bundleId={bundle_id}',
+            'login': 'https://api2.hbogoasia.com/v1/hbouser/login?lang=zh-Hant',
+            'device': 'https://api2.hbogoasia.com/v1/hbouser/device?lang=zh-Hant',
+            'tvseason': 'https://api2.hbogoasia.com/v1/tvseason/list?parentId={parent_id}&territory={territory}',
+            'tvepisode': 'https://api2.hbogoasia.com/v1/tvepisode/list?parentId={parent_id}&territory={territory}',
+            'movie': 'https://api2.hbogoasia.com/v1/movie?contentId={content_id}&territory={territory}',
+            'playback': 'https://api2.hbogoasia.com/v1/asset/playbackurl?territory={territory}&contentId={content_id}&sessionToken={session_token}&channelPartnerID={channel_partner_id}&operatorId=SIN&lang=zh-Hant'
+        }
 
     def get_language_code(self, lang):
         language_code = {
@@ -70,8 +81,7 @@ class HBOGO(object):
                 language for language in self.subtitle_language.split(',')]
 
     def get_territory(self):
-        geo_url = f'https://api2.hbogoasia.com/v1/geog?lang=zh-Hant&version=0&bundleId={urlparse(self.url).netloc}'
-
+        geo_url = self.api['geo'].format(bundle_id=urlparse(self.url).netloc)
         response = http_request(session=self.session,
                                 url=geo_url, method=HTTPMethod.GET)
         if 'territory' in response:
@@ -91,19 +101,19 @@ class HBOGO(object):
             password = getpass('輸入密碼（不顯示）：')
 
         payload = {
-            "contactPassword": password.strip(),
-            "contactUserName": username.strip(),
-            "deviceDetails": {
-                "deviceName": platform.system(),
-                "deviceType": "COMP",
-                "modelNo": self.device_id,
-                "serialNo": self.device_id,
-                "appType": "Web",
-                "status": "Active"
+            'contactPassword': password.strip(),
+            'contactUserName': username.strip(),
+            'deviceDetails': {
+                'deviceName': platform.system(),
+                'deviceType': "COMP",
+                'modelNo': self.device_id,
+                'serialNo': self.device_id,
+                'appType': 'Web',
+                'status': 'Active'
             }
         }
 
-        auth_url = 'https://api2.hbogoasia.com/v1/hbouser/login?lang=zh-Hant'
+        auth_url = self.api['login']
         kwargs = {'json': payload}
 
         response = http_request(session=self.session,
@@ -116,7 +126,7 @@ class HBOGO(object):
         self.logger.info('\n登入成功，歡迎 %s', user_name.strip())
 
     def remove_device(self):
-        delete_url = 'https://api2.hbogoasia.com/v1/hbouser/device?lang=zh-Hant'
+        delete_url = self.api['device']
         payload = {
             "sessionToken": self.session_token,
             "multiProfileId": "0",
@@ -134,7 +144,8 @@ class HBOGO(object):
                 r'https:\/\/www\.hbogoasia.+\/sr(\d+)', self.url)
             if series_id_regex:
                 series_id = series_id_regex.group(1)
-                series_url = f'https://api2.hbogoasia.com/v1/tvseason/list?parentId={series_id}&territory={self.territory}'
+                series_url = self.api['tvseason'].format(
+                    parent_d=series_id, territory=self.territory)
             else:
                 self.logger.error('找不到影集，請輸入正確網址')
                 exit(1)
@@ -157,7 +168,8 @@ class HBOGO(object):
             for season in season_list:
                 season_index = season['seasonNumber']
                 if not self.download_season or season_index == self.download_season:
-                    season_url = f"https://api2.hbogoasia.com/v1/tvepisode/list?parentId={season['contentId']}&territory={self.territory}"
+                    season_url = self.api['tvepisode'].format(
+                        parent_id=season['contentId'], territory=self.territory)
                     self.logger.debug(season_url)
                     season_name = str(season_index).zfill(2)
 
@@ -189,7 +201,8 @@ class HBOGO(object):
                     convert_subtitle(folder_path, 'hbogo')
         else:
             content_id = os.path.basename(self.url)
-            movie_url = f'https://api2.hbogoasia.com/v1/movie?contentId={content_id}&territory={self.territory}'
+            movie_url = self.api['movie'].format(
+                content_id=content_id, territory=self.territory)
 
             movie = http_request(session=self.session,
                                  url=movie_url, method=HTTPMethod.GET)
@@ -212,7 +225,8 @@ class HBOGO(object):
             convert_subtitle(folder_path, 'hbogo')
 
     def parse_subtitle(self, content_id, video, folder_path, file_name):
-        video_url = f'https://api2.hbogoasia.com/v1/asset/playbackurl?territory={self.territory}&contentId={content_id}&sessionToken={self.session_token}&channelPartnerID={self.channel_partner_id}&operatorId=SIN&lang=zh-Hant'
+        video_url = self.api['playback'].format(territory=self.territory, content_id=content_id,
+                                                session_token=self.session_token, channel_partner_id=self.channel_partner_id)
         self.logger.debug(video_url)
         response = http_request(session=self.session,
                                 url=video_url, method=HTTPMethod.GET)

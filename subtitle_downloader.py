@@ -7,7 +7,8 @@ import re
 import os
 import argparse
 import logging
-from services import kktv, linetv, friday, iqiyi
+from services import linetv, friday, iqiyi
+from services.kktv import KKTV
 from services.hbogo import HBOGO
 from services.disneyplus import DisneyPlus
 from common.utils import get_static_html, get_dynamic_html, get_ip_location
@@ -68,7 +69,7 @@ if __name__ == "__main__":
 
     if args.debug:
         logging.basicConfig(
-            format='%(asctime)s - %(name)s - %(lineno)d - %(levelname)s - %(message)s',
+            format='%(asctime)s - %(name)s - %(lineno)d - %(message)s',
             datefmt='%Y-%m-%d %H:%M:%S',
             level=logging.DEBUG,
         )
@@ -93,27 +94,21 @@ if __name__ == "__main__":
     logging.info(
         'ip: %s (%s)', ip['ip'], ip['country'])
 
-    kktv_id_search = re.search(
-        r'https:\/\/www\.kktv\.me\/titles\/(.+)', query_url)
+    kktv_search = re.search(
+        r'https:\/\/www\.kktv\.me\/titles\/.+', query_url)
     linetv_id_search = re.search(
         r'https:\/\/www\.linetv\.tw\/drama\/(.+?)\/eps\/1', query_url)
     friday_genre_search = re.search(
         r'https:\/\/video\.friday\.tw\/(drama|anime|movie|show)\/detail\/.+', query_url)
     iqiyi_search = re.search(r'https:\/\/www\.iq\.com', query_url)
-    disney_genre_search = re.search(
+    disney_search = re.search(
         r'https:\/\/www\.disneyplus\.com\/.*(series|movies)\/.+', query_url)
     hbogo_search = re.search(
         r'https:\/\/www\.hbogoasia\..+', query_url)
 
-    if kktv_id_search:
-        drama_id = kktv_id_search.group(1)
-        if drama_id:
-            query_url = f'https://www.kktv.me/play/{drama_id}010001'
-            kktv.download_subtitle(get_dynamic_html(query_url),
-                                   output,
-                                   drama_id,
-                                   download_season,
-                                   last_episode)
+    if kktv_search:
+        kktv = KKTV(args)
+        kktv.main()
     elif linetv_id_search:
         drama_id = linetv_id_search.group(1)
         linetv.download_subtitle(get_static_html(query_url),
@@ -130,7 +125,7 @@ if __name__ == "__main__":
     elif iqiyi_search:
         iqiyi.download_subtitle(
             get_dynamic_html(query_url), output)
-    elif disney_genre_search:
+    elif disney_search:
         disney_plus = DisneyPlus(args)
         disney_plus.main()
     elif hbogo_search:

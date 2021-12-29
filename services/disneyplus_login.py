@@ -13,7 +13,7 @@ class Login(object):
         self.logger = logging.getLogger(__name__)
         self.email = email
         self.password = password
-        self.web_page = 'https://www.disneyplus.com/login'
+        self.login_page = 'https://www.disneyplus.com/login'
         self.devices_url = 'https://global.edge.bamgrid.com/devices'
         self.login_url = 'https://global.edge.bamgrid.com/idp/login'
         self.token_url = 'https://global.edge.bamgrid.com/token'
@@ -24,7 +24,7 @@ class Login(object):
         self.session = requests.Session()
 
     def client_info(self):
-        res = self.session.get(self.web_page)
+        res = self.session.get(self.login_page)
         match = re.search('window.server_path = ({.*});', res.text)
         data = json.loads(match.group(1))
         client_id = data['sdk']['clientId']

@@ -134,10 +134,7 @@ def get_static_html(url, json_request=False):
         response = request.urlopen(req)
 
         if json_request:
-            try:
-                return orjson.loads(response.read())
-            except orjson.decoder.JSONDecodeError:
-                print("String could not be converted to JSON")
+            return orjson.loads(response.read())
         else:
             return BeautifulSoup(response.read(), 'lxml')
 
@@ -223,12 +220,14 @@ def get_locale(driver):
 
 def convert_subtitle(folder_path, ott=''):
     if os.path.exists(folder_path):
-        for index, file in enumerate(sorted(os.listdir(folder_path))):
+        display = True
+        for file in sorted(os.listdir(folder_path)):
             extenison = Path(file).suffix
-            if extenison != '.srt':
-                if index == 0:
+            if os.path.isfile(os.path.join(folder_path, file)) and extenison != '.srt':
+                if display:
                     print(
                         f"\n將{extenison}轉換成.srt：\n---------------------------------------------------------------")
+                    display = False
                 subtitle = os.path.join(folder_path, file)
                 subtitle_tool.convert_subtitle(subtitle, '', True, False)
         if ott:

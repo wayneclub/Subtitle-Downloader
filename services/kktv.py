@@ -1,23 +1,52 @@
 """
 This module is to download subtitle from KKTV
 """
-
-import orjson
-import re
-import shutil
+import logging
 import os
+import re
+import requests
+import shutil
+import orjson
 from bs4 import BeautifulSoup
-from common.utils import check_url_exist, download_file, convert_subtitle
+from common.utils import http_request, HTTPMethod, check_url_exist, download_file, convert_subtitle, save_html
 
 
-def download_subtitle(driver, output, drama_id, download_season, last_episode):
-    """Download subtitle from KKTV"""
-    web_content = BeautifulSoup(driver.page_source, 'lxml')
-    driver.quit()
-    try:
+class KKTV(object):
+    def __init__(self, args):
+        self.logger = logging.getLogger(__name__)
+        self.url = args.url
 
-        data = orjson.loads(web_content.find(
-            'script', id='__NEXT_DATA__').string)
+        if args.output:
+            self.output = args.output
+        else:
+            self.output = os.getcwd()
+
+        if args.season:
+            self.download_season = int(args.season)
+        else:
+            self.download_season = None
+
+        self.last_episode = args.last_episode
+
+        self.session = requests.Session()
+
+        self.api = {
+            'play': 'https://www.kktv.me/play/{drama_id}010001'
+        }
+
+    def download_subtitle(self):
+
+        drama_id = os.path.basename(self.url)
+
+        play_url = self.api['play'].format(drama_id=drama_id)
+
+        response = http_request(session=self.session,
+                                url=play_url, method=HTTPMethod.GET, raw=True)
+
+        web_content = BeautifulSoup(response, 'lxml')
+
+        data = orjson.loads(str(web_content.find(
+            'script', id='__NEXT_DATA__').string))
 
         drama = data['props']['initialState']['titles']['byId'][drama_id]
 
@@ -40,41 +69,41 @@ def download_subtitle(driver, output, drama_id, download_season, last_episode):
                 season_num = drama['totalSeriesCount']
 
             if film or anime:
-                print(drama_name)
+                self.logger.info('\n%s', drama_name)
             else:
                 if 'dual_subtitle' in drama['contentLabels']:
-                    print(f"{drama_name} 共有：{season_num}季（有提供雙語字幕）")
+                    self.logger.info('\n%s 共有： %s 季（有提供雙語字幕）',
+                                     drama_name, season_num)
                 else:
-                    print(f"{drama_name} 共有：{season_num}季")
+                    self.logger.info('\n%s 共有： %s 季', drama_name, season_num)
 
             if 'series' in drama:
                 for season in drama['series']:
                     season_index = int(season['title'][1])
-                    if not download_season or season_index == download_season:
+                    if not self.download_season or season_index == self.download_season:
                         season_name = str(season_index).zfill(2)
                         episode_num = len(season['episodes'])
 
-                        folder_path = output
+                        folder_path = os.path.join(self.output, drama_name)
 
                         if film:
-                            print(
-                                "\n下載電影\n---------------------------------------------------------------")
-                        elif last_episode:
-                            print(
-                                f"\n第 {season_index} 季 共有：{episode_num} 集\t下載第 {season_index} 季 最後一集\n---------------------------------------------------------------")
+                            self.logger.info(
+                                '\n下載電影\n---------------------------------------------------------------')
+                        elif self.last_episode:
+                            self.logger.info(
+                                '\n第 %s 季 共有：%s 集\t下載第 %s 季 最後一集\n---------------------------------------------------------------', season_index, episode_num, season_index)
 
                             season['episodes'] = [list(season['episodes'])[-1]]
                         elif anime:
-                            folder_path = os.path.join(output, drama_name)
-                            print(
-                                f"\n共有：{episode_num} 集\t下載全集\n---------------------------------------------------------------")
+                            self.logger.info(
+                                '\n共有：%s 集\t下載全集\n---------------------------------------------------------------', episode_num)
                         else:
-                            print(
-                                f"\n第 {season_index} 季 共有：{episode_num} 集\t下載全集\n---------------------------------------------------------------")
-                            folder_path = os.path.join(
-                                output, f'{drama_name}.S{season_name}')
-                            if os.path.exists(folder_path):
-                                shutil.rmtree(folder_path)
+                            self.logger.info(
+                                '\n第 %s 季 共有：%s 集\t下載全集\n---------------------------------------------------------------', season_index, episode_num)
+                            folder_path = f'{folder_path}.S{season_name}'
+
+                        if os.path.exists(folder_path):
+                            shutil.rmtree(folder_path)
 
                         jp_lang = False
                         ko_lang = False
@@ -87,7 +116,7 @@ def download_subtitle(driver, output, drama_id, download_season, last_episode):
                                 episode_name = str(episode_index).zfill(3)
 
                             if not episode['subtitles']:
-                                print("\n無提供可下載的字幕\n")
+                                self.logger.info('\n無提供可下載的字幕\n')
                                 exit()
                             if 'ja' in episode['subtitles']:
                                 jp_lang = True
@@ -150,17 +179,12 @@ def download_subtitle(driver, output, drama_id, download_season, last_episode):
                                             download_file(ko_subtitle_link, os.path.join(
                                                 ko_folder_path, os.path.basename(ko_file_name)))
 
-                        print()
-                        if film or last_episode:
-                            convert_subtitle(os.path.join(
-                                folder_path, file_name))
-                        else:
-                            if jp_lang:
-                                convert_subtitle(ja_folder_path)
-                            if ko_lang:
-                                convert_subtitle(ko_folder_path)
+                        if jp_lang:
+                            convert_subtitle(ja_folder_path)
+                        if ko_lang:
+                            convert_subtitle(ko_folder_path)
 
-                            convert_subtitle(folder_path, 'kktv')
+                        convert_subtitle(folder_path, 'kktv')
 
-    except orjson.decoder.JSONDecodeError:
-        print("String could not be converted to JSON")
+    def main(self):
+        self.download_subtitle()
