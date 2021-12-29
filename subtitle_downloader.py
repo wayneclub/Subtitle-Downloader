@@ -3,15 +3,17 @@
 """
 This module is to download subtitle from KKTV、LineTV、FriDay.
 """
+
 import re
 import os
 import argparse
 import logging
-from services import linetv, friday, iqiyi
+from services import friday, iqiyi
 from services.kktv import KKTV
+from services.linetv import LineTV
 from services.hbogo import HBOGO
 from services.disneyplus import DisneyPlus
-from common.utils import get_static_html, get_dynamic_html, get_ip_location
+from common.utils import get_dynamic_html, get_ip_location
 
 
 def print_usage():
@@ -64,9 +66,6 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    if (args.season and args.last_episode):
-        parser.error("-l 與 -s 不能共用")
-
     if args.debug:
         logging.basicConfig(
             format='%(asctime)s - %(name)s - %(lineno)d - %(message)s',
@@ -96,8 +95,8 @@ if __name__ == "__main__":
 
     kktv_search = re.search(
         r'https:\/\/www\.kktv\.me\/titles\/.+', query_url)
-    linetv_id_search = re.search(
-        r'https:\/\/www\.linetv\.tw\/drama\/(.+?)\/eps\/1', query_url)
+    linetv_search = re.search(
+        r'https:\/\/www\.linetv\.tw\/drama\/.+\/eps\/1', query_url)
     friday_genre_search = re.search(
         r'https:\/\/video\.friday\.tw\/(drama|anime|movie|show)\/detail\/.+', query_url)
     iqiyi_search = re.search(r'https:\/\/www\.iq\.com', query_url)
@@ -109,12 +108,9 @@ if __name__ == "__main__":
     if kktv_search:
         kktv = KKTV(args)
         kktv.main()
-    elif linetv_id_search:
-        drama_id = linetv_id_search.group(1)
-        linetv.download_subtitle(get_static_html(query_url),
-                                 output,
-                                 drama_id,
-                                 last_episode)
+    elif linetv_search:
+        linetv = LineTV(args)
+        linetv.main()
     elif friday_genre_search:
         genre = friday_genre_search.group(1)
         friday.download_subtitle(get_dynamic_html(query_url),

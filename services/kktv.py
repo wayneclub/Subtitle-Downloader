@@ -1,6 +1,7 @@
 """
 This module is to download subtitle from KKTV
 """
+
 import logging
 import os
 import re
@@ -8,7 +9,7 @@ import requests
 import shutil
 import orjson
 from bs4 import BeautifulSoup
-from common.utils import http_request, HTTPMethod, check_url_exist, download_file, convert_subtitle, save_html
+from common.utils import http_request, HTTPMethod, check_url_exist, download_file, convert_subtitle
 
 
 class KKTV(object):
