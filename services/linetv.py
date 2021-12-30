@@ -17,10 +17,10 @@ from common.dictionary import convert_chinese_number
 class LineTV(object):
     def __init__(self, args):
         self.logger = logging.getLogger(__name__)
-        self.url = args.url
+        self.url = args.url.strip()
 
         if args.output:
-            self.output = args.output
+            self.output = args.output.strip()
         else:
             self.output = os.getcwd()
 
@@ -59,19 +59,19 @@ class LineTV(object):
                 season_search = re.search(
                     r'(.+?)第(.+?)季', drama['drama_name'])
                 if season_search:
-                    drama_name = season_search.group(1).strip()
+                    title = season_search.group(1).strip()
                     season_name = convert_chinese_number(
                         season_search.group(2))
                 else:
-                    drama_name = drama['drama_name'].strip()
+                    title = drama['drama_name'].strip()
                     season_name = '01'
 
-                self.logger.info('\n%s 第 %s 季', drama_name, int(season_name))
+                self.logger.info('\n%s 第 %s 季', title, int(season_name))
 
             if 'current_eps' in drama:
                 episode_num = drama['current_eps']
                 folder_path = os.path.join(
-                    self.output, f'{drama_name}.S{season_name}')
+                    self.output, f'{title}.S{season_name}')
 
                 if self.last_episode:
                     drama['eps_info'] = [list(drama['eps_info'])[-1]]
@@ -97,7 +97,7 @@ class LineTV(object):
                             subtitle_link = self.api['sub_1'].format(
                                 drama_id=drama_id, episode_name=episode_name)
 
-                            file_name = f'{drama_name}.S{season_name}E{episode_name.zfill(2)}.WEB-DL.LineTV.zh-Hant.vtt'
+                            file_name = f'{title}.S{season_name}E{episode_name.zfill(2)}.WEB-DL.LineTV.zh-Hant.vtt'
 
                             if not check_url_exist(subtitle_link):
                                 if check_url_exist(subtitle_link.replace('tv-aws-media-convert-input-tokyo', 'aws-elastic-transcoder-input-tokyo')):
@@ -105,7 +105,7 @@ class LineTV(object):
                                         'tv-aws-media-convert-input-tokyo', 'aws-elastic-transcoder-input-tokyo')
                                 else:
                                     subtitle_link = self.api['sub_2'].format(
-                                        drama_id=drama_id, drama_name=quote(drama_name.encode('utf8')), episode_name=episode_name)
+                                        drama_id=drama_id, drama_name=quote(title.encode('utf8')), episode_name=episode_name)
                                     if not check_url_exist(subtitle_link):
                                         if episode['free_date']:
                                             free_date = strftime(

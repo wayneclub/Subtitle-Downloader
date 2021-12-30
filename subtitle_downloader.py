@@ -5,16 +5,15 @@ This module is to download subtitle from KKTV、LineTV、FriDay.
 """
 
 import re
-import os
 import argparse
 import logging
-from services import iqiyi
 from services.kktv import KKTV
 from services.linetv import LineTV
 from services.friday import Friday
+from services.iqiyi import IQIYI
 from services.hbogoasia import HBOGOAsia
 from services.disneyplus import DisneyPlus
-from common.utils import get_dynamic_html, get_ip_location
+from common.utils import get_ip_location
 
 
 def print_usage():
@@ -79,32 +78,21 @@ if __name__ == "__main__":
             level=logging.INFO,
         )
 
-    query_url = args.url.strip()
-    output = args.output
-    if not output:
-        output = os.getcwd()
-
-    download_season = ''
-    if args.season:
-        download_season = int(args.season)
-
-    last_episode = args.last_episode
-
     ip = get_ip_location()
     logging.info(
         'ip: %s (%s)', ip['ip'], ip['country'])
 
     kktv_search = re.search(
-        r'https:\/\/www\.kktv\.me\/titles\/.+', query_url)
+        r'https:\/\/www\.kktv\.me\/titles\/.+', args.url)
     linetv_search = re.search(
-        r'https:\/\/www\.linetv\.tw\/drama\/.+?\/eps\/1', query_url)
+        r'https:\/\/www\.linetv\.tw\/drama\/.+?\/eps\/1', args.url)
     friday_search = re.search(
-        r'https:\/\/video\.friday\.tw\/(drama|anime|movie|show)\/detail\/.+', query_url)
-    iqiyi_search = re.search(r'https:\/\/www\.iq\.com', query_url)
+        r'https:\/\/video\.friday\.tw\/(drama|anime|movie|show)\/detail\/.+', args.url)
+    iqiyi_search = re.search(r'https:\/\/www\.iq\.com', args.url)
     disney_search = re.search(
-        r'https:\/\/www\.disneyplus\.com\/.*(series|movies)\/.+', query_url)
+        r'https:\/\/www\.disneyplus\.com\/.*(series|movies)\/.+', args.url)
     hbogoasia_search = re.search(
-        r'https:\/\/www\.hbogoasia\..+', query_url)
+        r'https:\/\/www\.hbogoasia\..+', args.url)
 
     if kktv_search:
         kktv = KKTV(args)
@@ -116,8 +104,8 @@ if __name__ == "__main__":
         friday = Friday(args)
         friday.main()
     elif iqiyi_search:
-        iqiyi.download_subtitle(
-            get_dynamic_html(query_url), output)
+        iqiyi = IQIYI(args)
+        iqiyi.main()
     elif disney_search:
         disney_plus = DisneyPlus(args)
         disney_plus.main()

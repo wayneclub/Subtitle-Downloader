@@ -8,7 +8,6 @@ import os
 from pathlib import Path
 import platform
 import re
-import time
 import multiprocessing
 from urllib import request
 from urllib.error import HTTPError, URLError
@@ -16,11 +15,7 @@ import requests
 from requests.adapters import HTTPAdapter
 import orjson
 from tqdm import tqdm
-from bs4 import BeautifulSoup
 from selenium import webdriver
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.common.by import By
 from webdriver_manager.chrome import ChromeDriverManager
 from urllib3.util import Retry
 from pygments import highlight, lexers, formatters
@@ -123,27 +118,7 @@ def check_url_exist(url, print_error=False):
         return True
 
 
-def get_static_html(url, json_request=False):
-    """Get static html"""
-    try:
-        headers = {
-            'User-Agent': 'User-Agent:Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36'
-        }
-        req = request.Request(url, headers=headers)
-        response = request.urlopen(req)
-
-        if json_request:
-            return orjson.loads(response.read())
-        else:
-            return BeautifulSoup(response.read(), 'lxml')
-
-    except HTTPError as exception:
-        print(f"HTTPError: {exception.code}")
-    except URLError as exception:
-        print(f"URLError: {(exception.reason)}")
-
-
-def get_dynamic_html(url, headless=True):
+def driver_init(headless=True):
     """Get html render by js"""
     kill_process()
     options = webdriver.ChromeOptions()
@@ -157,8 +132,12 @@ def get_dynamic_html(url, headless=True):
     options.add_argument("--mute-audio")
     options.add_argument('--autoplay-policy=no-user-gesture-required')
     options.add_argument('--lang=zh-TW')
+    options.add_argument('--blink-settings=imagesEnabled=false')
+    options.add_argument("disable-infobars")
+    options.add_argument("--disable-extensions")
     prefs = {'intl.accept_languages': 'zh,zh_TW',
-             'credentials_enable_service': False, 'profile.password_manager_enabled': False}
+             'credentials_enable_service': False, 'profile.password_manager_enabled': False,
+             'profile.default_content_setting_values': {'images': 2, 'plugins': 2, 'popups': 2, 'geolocation': 2, 'notifications': 2}}
     options.add_experimental_option('prefs', prefs)
     options.add_experimental_option('excludeSwitches', ['enable-automation'])
     if platform.system() == 'Windows':
@@ -169,7 +148,6 @@ def get_dynamic_html(url, headless=True):
     driver.execute_cdp_cmd('Network.setUserAgentOverride', {
         "userAgent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.53 Safari/537.36'})
     # driver.get('chrome://settings/clearBrowserData')
-    driver.get(url)
     driver.set_page_load_timeout(110)
     return driver
 
@@ -177,40 +155,39 @@ def get_dynamic_html(url, headless=True):
 def get_network_url(driver, search_url):
     url = ''
     delay = 0
-    logs = []
+    logs = tuple()
     while not url:
-        time.sleep(2)
-        logs += driver.execute_script(
-            "return window.performance.getEntries();")
+        logs += tuple(driver.execute_script(
+            "return window.performance.getEntries();"))
 
         url = next((log['name'] for log in logs
                     if re.search(search_url, log['name'])), None)
         delay += 1
 
         if delay > 60:
-            print("找不到data，請重新執行")
+            print("找不到url，請重新執行")
             exit(1)
     return url
 
 
-def find_visible_element_by_id(driver, id_text):
-    return WebDriverWait(driver, 20).until(EC.visibility_of_element_located((By.ID, id_text)))
+# def find_visible_element_by_id(driver, id_text):
+#     return WebDriverWait(driver, 20).until(EC.visibility_of_element_located((By.ID, id_text)))
 
 
-def find_visible_element_by_xpath(driver, xpath):
-    return WebDriverWait(driver, 20).until(EC.visibility_of_element_located((By.XPATH, xpath)))
+# def find_visible_element_by_xpath(driver, xpath):
+#     return WebDriverWait(driver, 20).until(EC.visibility_of_element_located((By.XPATH, xpath)))
 
 
-def find_visible_elements_by_xpath(driver, xpath):
-    return WebDriverWait(driver, 20).until(EC.visibility_of_all_elements_located((By.XPATH, xpath)))
+# def find_visible_elements_by_xpath(driver, xpath):
+#     return WebDriverWait(driver, 20).until(EC.visibility_of_all_elements_located((By.XPATH, xpath)))
 
 
-def find_visible_element_clickable_by_xpath(driver, xpath):
-    return WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.XPATH, xpath)))
+# def find_visible_element_clickable_by_xpath(driver, xpath):
+#     return WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.XPATH, xpath)))
 
 
-def find_present_element_by_xpath(driver, xpath):
-    return WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.XPATH, xpath)))
+# def find_present_element_by_xpath(driver, xpath):
+#     return WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.XPATH, xpath)))
 
 
 def get_locale(driver):

@@ -21,12 +21,12 @@ from common.utils import http_request, HTTPMethod, pretty_print_json, convert_su
 class HBOGOAsia(object):
     def __init__(self, args):
         self.logger = logging.getLogger(__name__)
-        self.url = args.url
+        self.url = args.url.strip()
         self.username = args.email
         self.password = args.password
 
         if args.output:
-            self.output = args.output
+            self.output = args.output.strip()
         else:
             self.output = os.getcwd()
 
@@ -159,8 +159,8 @@ class HBOGOAsia(object):
             else:
                 self.logger.info('這部影集未在此區上映，請用VPN換到別區')
 
-            drama_name = re.sub(r'S\d+', '', title).strip()
-            self.logger.info('\n%s 共有：%s 季', drama_name, len(season_list))
+            title = re.sub(r'S\d+', '', title).strip()
+            self.logger.info('\n%s 共有：%s 季', title, len(season_list))
 
             for season in season_list:
                 season_index = season['seasonNumber']
@@ -171,7 +171,7 @@ class HBOGOAsia(object):
                     season_name = str(season_index).zfill(2)
 
                     folder_path = os.path.join(
-                        self.output, f'{drama_name}.S{season_name}')
+                        self.output, f'{title}.S{season_name}')
                     if os.path.exists(folder_path):
                         shutil.rmtree(folder_path)
 
@@ -187,9 +187,9 @@ class HBOGOAsia(object):
                         episode_index = episode['episodeNumber']
                         content_id = episode['contentId']
 
-                        file_name = f"{drama_name}.S{season_name}E{str(episode_index).zfill(2)}.WEB-DL.HBOGO.vtt"
+                        file_name = f'{title}.S{season_name}E{str(episode_index).zfill(2)}.WEB-DL.HBOGO.vtt'
 
-                        lang_paths = self.parse_subtitle(
+                        lang_paths = self.get_subtitle(
                             content_id, episode, folder_path, file_name)
 
                     for lang_path in lang_paths:
@@ -218,24 +218,24 @@ class HBOGOAsia(object):
             self.logger.info(
                 '\n下載字幕\n---------------------------------------------------------------')
 
-            self.parse_subtitle(content_id, movie, folder_path, file_name)
+            self.get_subtitle(content_id, movie, folder_path, file_name)
             convert_subtitle(folder_path, 'hbogo')
 
-    def parse_subtitle(self, content_id, video, folder_path, file_name):
-        video_url = self.api['playback'].format(territory=self.territory, content_id=content_id,
-                                                session_token=self.session_token, channel_partner_id=self.channel_partner_id)
-        self.logger.debug(video_url)
+    def get_subtitle(self, content_id, data, folder_path, file_name):
+        playback_url = self.api['playback'].format(territory=self.territory, content_id=content_id,
+                                                   session_token=self.session_token, channel_partner_id=self.channel_partner_id)
+        self.logger.debug(playback_url)
         response = http_request(session=self.session,
-                                url=video_url, method=HTTPMethod.GET)
+                                url=playback_url, method=HTTPMethod.GET)
 
         mpd_url = response['playbackURL']
 
         lang_paths = set()
 
-        category = video['metadata']['categories'][0]
+        category = data['metadata']['categories'][0]
 
         available_languages = tuple([self.get_language_code(
-            media['lang']) for media in video['materials'] if media['type'] == 'subtitle'])
+            media['lang']) for media in data['materials'] if media['type'] == 'subtitle'])
 
         if 'all' in self.language_list:
             self.language_list = available_languages
@@ -246,7 +246,7 @@ class HBOGOAsia(object):
 
         subtitle_urls = []
         subtitle_names = []
-        for media in video['materials']:
+        for media in data['materials']:
             if media['type'] == 'subtitle':
                 self.logger.debug(media)
                 sub_lang = self.get_language_code(media['lang'])
@@ -265,10 +265,10 @@ class HBOGOAsia(object):
                         subtitle_file).stem.replace(content_id, '')
 
                     subtitle_file_name = file_name.replace(
-                        '.vtt', f".{sub_lang}.vtt")
+                        '.vtt', f'.{sub_lang}.vtt')
 
                     subtitle_link = mpd_url.replace(
-                        os.path.basename(mpd_url), f"subtitles/{lang_code}/{subtitle_file}")
+                        os.path.basename(mpd_url), f'subtitles/{lang_code}/{subtitle_file}')
 
                     subtitle_urls.append(subtitle_link)
                     subtitle_names.append(os.path.join(

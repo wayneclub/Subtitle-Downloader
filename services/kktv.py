@@ -8,17 +8,16 @@ import re
 import requests
 import shutil
 import orjson
-from bs4 import BeautifulSoup
 from common.utils import http_request, HTTPMethod, check_url_exist, convert_subtitle, download_file_multithread
 
 
 class KKTV(object):
     def __init__(self, args):
         self.logger = logging.getLogger(__name__)
-        self.url = args.url
+        self.url = args.url.strip()
 
         if args.output:
-            self.output = args.output
+            self.output = args.output.strip()
         else:
             self.output = os.getcwd()
 
@@ -44,10 +43,8 @@ class KKTV(object):
         response = http_request(session=self.session,
                                 url=play_url, method=HTTPMethod.GET, raw=True)
 
-        web_content = BeautifulSoup(response, 'lxml')
-
-        data = orjson.loads(str(web_content.find(
-            'script', id='__NEXT_DATA__').string))
+        match = re.search(r'({\"props\":{.*})', response)
+        data = orjson.loads(match.group(1))
 
         if drama_id in data['props']['initialState']['titles']['byId']:
             drama = data['props']['initialState']['titles']['byId'][drama_id]
@@ -57,7 +54,7 @@ class KKTV(object):
 
         if drama:
             if 'title' in drama:
-                drama_name = drama['title']
+                title = drama['title']
 
             if 'titleType' in drama and drama['titleType'] == 'film':
                 film = True
@@ -74,13 +71,13 @@ class KKTV(object):
                 season_num = drama['totalSeriesCount']
 
             if film or anime:
-                self.logger.info('\n%s', drama_name)
+                self.logger.info('\n%s', title)
             else:
                 if 'dual_subtitle' in drama['contentLabels']:
                     self.logger.info('\n%s 共有：%s 季（有提供雙語字幕）',
-                                     drama_name, season_num)
+                                     title, season_num)
                 else:
-                    self.logger.info('\n%s 共有：%s 季', drama_name, season_num)
+                    self.logger.info('\n%s 共有：%s 季', title, season_num)
 
             if 'series' in drama:
                 for season in drama['series']:
@@ -89,7 +86,7 @@ class KKTV(object):
                         season_name = str(season_index).zfill(2)
                         episode_num = len(season['episodes'])
 
-                        folder_path = os.path.join(self.output, drama_name)
+                        folder_path = os.path.join(self.output, title)
 
                         if film:
                             self.logger.info(
@@ -154,11 +151,11 @@ class KKTV(object):
                                             'zh-Hant.vtt', 'ko.vtt')
 
                                         if film:
-                                            file_name = f'{drama_name}.WEB-DL.KKTV.zh-Hant.vtt'
+                                            file_name = f'{title}.WEB-DL.KKTV.zh-Hant.vtt'
                                         elif anime:
-                                            file_name = f'{drama_name}E{episode_name}.WEB-DL.KKTV.zh-Hant.vtt'
+                                            file_name = f'{title}E{episode_name}.WEB-DL.KKTV.zh-Hant.vtt'
                                         else:
-                                            file_name = f'{drama_name}.S{season_name}E{episode_name}.WEB-DL.KKTV.zh-Hant.vtt'
+                                            file_name = f'{title}.S{season_name}E{episode_name}.WEB-DL.KKTV.zh-Hant.vtt'
                                             ja_file_name = file_name.replace(
                                                 'zh-Hant.vtt', 'ja.vtt')
                                             ko_file_name = file_name.replace(

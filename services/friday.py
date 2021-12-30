@@ -15,10 +15,10 @@ from common.utils import http_request, HTTPMethod, check_url_exist, download_fil
 class Friday(object):
     def __init__(self, args):
         self.logger = logging.getLogger(__name__)
-        self.url = args.url
+        self.url = args.url.strip()
 
         if args.output:
-            self.output = args.output
+            self.output = args.output.strip()
         else:
             self.output = os.getcwd()
 

@@ -17,13 +17,14 @@ from services.disneyplus_login import Login
 class DisneyPlus(object):
     def __init__(self, args):
         self.logger = logging.getLogger(__name__)
-        self.url = args.url
+        self.url = args.url.strip()
         self.email = args.email
         self.password = args.password
         if args.output:
-            self.output = args.output
+            self.output = args.output.strip()
         else:
             self.output = os.getcwd()
+
         if args.season:
             self.download_season = int(args.season)
         else:
@@ -63,11 +64,11 @@ class DisneyPlus(object):
             self.logger.debug(series_url)
             data = http_request(session=self.session, url=series_url, method=HTTPMethod.GET)[
                 'data']['DmcSeriesBundle']
-            drama_name = data['series']['text']['title']['full']['series']['default']['content'].strip(
+            title = data['series']['text']['title']['full']['series']['default']['content'].strip(
             )
             seasons = data['seasons']['seasons']
 
-            self.logger.info('\n%s 共有：%s 季', drama_name, len(seasons))
+            self.logger.info('\n%s 共有：%s 季', title, len(seasons))
 
             for season in seasons:
                 season_index = season['seasonSequenceNumber']
@@ -76,7 +77,7 @@ class DisneyPlus(object):
                     episode_num = season['episodes_meta']['hits']
 
                     folder_path = os.path.join(
-                        self.output, f'{drama_name}.S{season_name}')
+                        self.output, f'{title}.S{season_name}')
 
                     if os.path.exists(folder_path):
                         shutil.rmtree(folder_path)
@@ -98,7 +99,7 @@ class DisneyPlus(object):
                             media_id = episode['mediaMetadata']['mediaId']
                             m3u8_url = self.get_m3u8_url(media_id)
                             self.logger.debug(m3u8_url)
-                            file_name = f'{drama_name}.S{season_name}E{episode_name}.WEB-DL.Disney+.vtt'
+                            file_name = f'{title}.S{season_name}E{episode_name}.WEB-DL.Disney+.vtt'
                             subtitle_list, audio_list = self.parse_m3u(
                                 m3u8_url)
                             self.get_subtitle(subtitle_list, program_type,
