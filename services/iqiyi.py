@@ -4,7 +4,6 @@ This module is to download subtitle from iQIYI
 
 import re
 import os
-import time
 import shutil
 import logging
 import orjson
@@ -128,9 +127,8 @@ class IQIYI(object):
                         episode_url = re.sub(
                             '^//', 'https://', episode['albumPlayUrl']).replace('lang=en_us', 'lang=zh_tw').replace('lang=zh_cn', 'lang=zh_tw').strip()
                         self.logger.debug(episode_url)
-
                         driver.get(episode_url)
-                        start = time.process_time()
+
                         dash_url = get_network_url(
                             driver, r'https:\/\/cache-video.iq.com\/dash\?')
                         self.logger.debug(dash_url)
@@ -139,8 +137,6 @@ class IQIYI(object):
 
                         lang_paths = self.get_subtitle(
                             dash_url, folder_path, file_name)
-
-                        print(time.process_time() - start)
 
                 driver.quit()
 
