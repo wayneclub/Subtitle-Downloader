@@ -76,7 +76,7 @@ class IQIYI(object):
                 allow_regions = info['regionsAllowed'].split(',')
                 if not get_ip_location()['country'].lower() in allow_regions:
                     self.logger.info(
-                        '你所在的地區無法下載，可用VPN換區到以下地區試看看：\n%s', ', '.join(allow_regions))
+                        '你所在的地區無法下載，可用VPN換區到以下地區：\n%s', ', '.join(allow_regions))
                     exit()
 
                 if 'maxOrder' in info:

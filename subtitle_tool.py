@@ -1291,9 +1291,12 @@ def archive_subtitle(path, platform=""):
     zipname = os.path.normpath(zipname)
     path = os.path.normpath(path)
     print(f'{zipname}.zip')
+
     shutil.make_archive(zipname, 'zip', path)
 
     if str(os.getcwd()) != str(Path(path).parent.absolute()):
+        if os.path.exists(f'{zipname}.zip'):
+            os.remove(f'{zipname}.zip')
         shutil.move(f'{zipname}.zip', Path(path).parent.absolute())
 
 
