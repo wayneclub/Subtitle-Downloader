@@ -192,7 +192,7 @@ class DisneyPlus(object):
     def get_subtitle(self, subtitle_list, program_type, folder_path, sub_name):
         available_languages = tuple(
             [sub['lang'] for sub in subtitle_list])
-\
+
         if 'all' in self.language_list:
             self.language_list = available_languages
 
@@ -202,26 +202,28 @@ class DisneyPlus(object):
 
         for sub in subtitle_list:
             if sub['lang'] in self.language_list:
-                file_name=sub_name.replace('.vtt', f".{sub['lang']}.srt")
-                self.logger.info('\n下載：%s\n---------------------------------------------------------------', file_name)
+                file_name = sub_name.replace('.vtt', f".{sub['lang']}.srt")
+                self.logger.info(
+                    '\n下載：%s\n---------------------------------------------------------------', file_name)
 
-                tmp_folder_path=os.path.join(
+                tmp_folder_path = os.path.join(
                     os.path.join(folder_path, sub['lang']), 'tmp')
                 if program_type == 'movie' or len(self.language_list) == 1:
-                    tmp_folder_path=os.path.join(folder_path, 'tmp')
+                    tmp_folder_path = os.path.join(folder_path, 'tmp')
 
                 if os.path.exists(tmp_folder_path):
                     shutil.rmtree(tmp_folder_path)
-                os.makedirs(tmp_folder_path, exist_ok = True)
+                os.makedirs(tmp_folder_path, exist_ok=True)
                 subtitle_names = [os.path.basename(url) for url in sub['urls']]
-                download_file_multithread(sub['urls'], subtitle_names, tmp_folder_path)
+                download_file_multithread(
+                    sub['urls'], subtitle_names, tmp_folder_path)
                 convert_subtitle(tmp_folder_path)
                 merge_subtitle(tmp_folder_path, file_name)
 
     def get_audio(self, audio_list, folder_path, audio_name):
         for audio in audio_list:
             if audio['lang'] in ['cmn-TW', 'yue']:
-                file_name=audio_name.replace(
+                file_name = audio_name.replace(
                     '.vtt', f".{audio['lang']}{audio['extension']}")
                 self.logger.info('\n下載：%s', file_name)
                 download_audio(audio['url'], os.path.join(
@@ -230,11 +232,11 @@ class DisneyPlus(object):
     def main(self):
         self.get_language_list()
         if self.email and self.password:
-            email=self.email
-            password=self.password
+            email = self.email
+            password = self.password
         else:
-            email=input('輸入帳號：')
-            password=getpass('輸入密碼（不顯示）：')
-        user=Login(email = email, password = password)
-        self.token=user.get_auth_token()
+            email = input('輸入帳號：')
+            password = getpass('輸入密碼（不顯示）：')
+        user = Login(email=email, password=password)
+        self.token = user.get_auth_token()
         self.download_subtitle()
