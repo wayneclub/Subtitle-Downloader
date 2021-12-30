@@ -233,10 +233,10 @@ class Friday(object):
                             folder_path, file_name))
                         convert_subtitle(folder_path, 'friday')
                     else:
-                        self.logger.info('找不到外掛字幕，請去其他平台尋找')
+                        self.logger.info('\n找不到外掛字幕，請去其他平台尋找')
                         exit()
                 else:
-                    self.logger.info('此部電影尚未上映')
+                    self.logger.info('\n此部電影尚未上映')
                     exit()
 
     def get_subtitle_link(self, subtitle_link):
@@ -259,7 +259,7 @@ class Friday(object):
             ja_subtitle_link = self.get_ja_subtitle_link(subtitle_link)
             dual_subtitle_link = self.get_dual_subtitle_link(subtitle_link)
         else:
-            self.logger.info('抱歉，此劇只有硬字幕，可去其他串流平台查看')
+            self.logger.info('\n抱歉，此劇只有硬字幕，可去其他串流平台查看')
             exit(0)
 
         return subtitle_link, ja_subtitle_link, dual_subtitle_link

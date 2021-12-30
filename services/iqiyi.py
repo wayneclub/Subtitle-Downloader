@@ -165,7 +165,7 @@ class IQIYI(object):
             self.language_list = available_languages
 
         if not set(self.language_list).intersection(set(available_languages)):
-            self.logger.error('提供的字幕語言：%s', available_languages)
+            self.logger.error('\n提供的字幕語言：%s', available_languages)
             exit()
 
         subtitle_urls = []

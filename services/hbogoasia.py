@@ -144,7 +144,7 @@ class HBOGOAsia(object):
                 series_url = self.api['tvseason'].format(
                     parent_id=series_id, territory=self.territory)
             else:
-                self.logger.error('找不到影集，請輸入正確網址')
+                self.logger.error('\n找不到影集，請輸入正確網址')
                 exit(1)
 
             season_list = http_request(session=self.session,
@@ -157,7 +157,7 @@ class HBOGOAsia(object):
                     title = season_list[0]['metadata']['titleInformations'][0]['name']
                 title = re.sub(r'\(第\d+季\)', '', title).strip()
             else:
-                self.logger.info('這部影集未在此區上映，請用VPN換到別區')
+                self.logger.info('\n這部影集未在此區上映，請用VPN換到別區')
 
             title = re.sub(r'S\d+', '', title).strip()
             self.logger.info('\n%s 共有：%s 季', title, len(season_list))
@@ -241,7 +241,7 @@ class HBOGOAsia(object):
             self.language_list = available_languages
 
         if not set(self.language_list).intersection(set(available_languages)):
-            self.logger.error('提供的字幕語言：%s', available_languages)
+            self.logger.error('\n提供的字幕語言：%s', available_languages)
             exit()
 
         subtitle_urls = []
