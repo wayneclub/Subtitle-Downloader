@@ -85,7 +85,7 @@ class HBOGOAsia(object):
             self.territory = response['territory']
             self.logger.debug(self.territory)
         else:
-            self.logger.info('HBOGO Asia 未在此區提供服務')
+            self.logger.info('\nHBOGO Asia 未在此區提供服務')
             exit()
 
     def login(self):
