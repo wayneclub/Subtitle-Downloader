@@ -48,7 +48,7 @@ class LineTV(object):
         response = http_request(session=self.session,
                                 url=self.url, method=HTTPMethod.GET, raw=True)
 
-        match = re.search(r'window\.__INITIAL_STATE__ = ({.*})', response)
+        match = re.search(r'window\.__INITIAL_STATE__ = (\{.*\})', response)
 
         data = orjson.loads(match.group(1))
 
@@ -96,6 +96,7 @@ class LineTV(object):
                             episode_name = str(episode['number'])
                             subtitle_link = self.api['sub_1'].format(
                                 drama_id=drama_id, episode_name=episode_name)
+                            self.logger.debug(subtitle_link)
 
                             file_name = f'{title}.S{season_name}E{episode_name.zfill(2)}.WEB-DL.LineTV.zh-Hant.vtt'
 
@@ -113,9 +114,9 @@ class LineTV(object):
                                             self.logger.info(
                                                 '%s\t...一般用戶於%s開啟', file_name, free_date)
 
-                                os.makedirs(folder_path, exist_ok=True)
-                                subtitle_urls.append(subtitle_link)
-                                subtitle_names.append(file_name)
+                            os.makedirs(folder_path, exist_ok=True)
+                            subtitle_urls.append(subtitle_link)
+                            subtitle_names.append(file_name)
                     download_file_multithread(
                         subtitle_urls, subtitle_names, folder_path)
                     convert_subtitle(folder_path, 'linetv')
