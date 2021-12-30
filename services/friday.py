@@ -9,8 +9,7 @@ import shutil
 import orjson
 import requests
 from bs4 import BeautifulSoup
-from common.utils import http_request, HTTPMethod, check_url_exist, download_file, convert_subtitle
-from common.dictionary import convert_chinese_number
+from common.utils import http_request, HTTPMethod, check_url_exist, download_file, convert_subtitle, download_file_multithread
 
 
 class Friday(object):
@@ -145,6 +144,7 @@ class Friday(object):
                                  season_index,
                                  season_list.count(season_index))
                 episode_list = [episode_list[-1]]
+                folder_path = f'{folder_path}.S{str(season_index).zfill(2)}'
             else:
                 if self.download_season:
                     self.logger.info('\n第 %s 季 共有：%s 集\t下載全集\n---------------------------------------------------------------',
@@ -168,31 +168,44 @@ class Friday(object):
 
             ja_folder_path = ''
             dual_folder_path = ''
+            subtitle_zh_urls = []
+            subtitle_zh_names = []
+            subtitle_ja_urls = []
+            subtitle_ja_names = []
+            subtitle_dual_urls = []
+            subtitle_dual_names = []
             for subtitle in episode_list:
                 if not self.download_season or subtitle['season_index'] == self.download_season:
                     os.makedirs(folder_path, exist_ok=True)
-                    download_file(subtitle['zh'], os.path.join(
-                        folder_path, subtitle['name']))
+                    subtitle_zh_urls.append(subtitle['zh'])
+                    subtitle_zh_names.append(subtitle['name'])
 
                     if 'ja' in subtitle:
                         ja_folder_path = os.path.join(folder_path, 'ja')
                         os.makedirs(ja_folder_path, exist_ok=True)
                         ja_file_name = subtitle['name'].replace(
                             '.zh-Hant.vtt', '.ja.vtt')
-                        download_file(subtitle['ja'], os.path.join(
-                            ja_folder_path, ja_file_name))
+                        subtitle_ja_urls.append(subtitle['ja'])
+                        subtitle_ja_names.append(ja_file_name)
 
                     if 'dual' in subtitle:
                         dual_folder_path = os.path.join(folder_path, 'dual')
                         os.makedirs(dual_folder_path, exist_ok=True)
                         dual_file_name = subtitle['name'].replace(
                             '.zh-Hant.vtt', '.vtt')
-                        download_file(subtitle['dual'], os.path.join(
-                            dual_folder_path, dual_file_name))
+                        subtitle_ja_urls.append(subtitle['dual'])
+                        subtitle_ja_names.append(dual_file_name)
+
+            download_file_multithread(
+                subtitle_zh_urls, subtitle_zh_names, folder_path)
 
             if ja_folder_path and ja_lang:
+                download_file_multithread(
+                    subtitle_ja_urls, subtitle_ja_names, ja_folder_path)
                 convert_subtitle(ja_folder_path)
             if dual_folder_path and dual_lang:
+                download_file_multithread(
+                    subtitle_dual_urls, subtitle_dual_names, dual_folder_path)
                 convert_subtitle(dual_folder_path)
 
             convert_subtitle(folder_path, 'friday')

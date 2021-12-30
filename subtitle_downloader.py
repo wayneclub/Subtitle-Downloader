@@ -97,7 +97,7 @@ if __name__ == "__main__":
     kktv_search = re.search(
         r'https:\/\/www\.kktv\.me\/titles\/.+', query_url)
     linetv_search = re.search(
-        r'https:\/\/www\.linetv\.tw\/drama\/.+\/eps\/1', query_url)
+        r'https:\/\/www\.linetv\.tw\/drama\/.+?\/eps\/1', query_url)
     friday_search = re.search(
         r'https:\/\/video\.friday\.tw\/(drama|anime|movie|show)\/detail\/.+', query_url)
     iqiyi_search = re.search(r'https:\/\/www\.iq\.com', query_url)

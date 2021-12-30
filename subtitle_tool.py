@@ -21,9 +21,9 @@ import orjson
 import opencc
 import subprocess
 
-SUBTITLE_FORMAT = ['.srt', '.ass', '.ssa', '.vtt', '.xml', '.json']
-IMAGE_FORMAT = ['.bmp', '.png', '.jpg', '.jpeg', '.tif', '.tiff']
-ARCHIVE_FORMAT = ['.7z', '.gz', '.rar', '.tar', '.zip']
+SUBTITLE_FORMAT = ('.srt', '.ass', '.ssa', '.vtt', '.xml', '.json')
+IMAGE_FORMAT = ('.bmp', '.png', '.jpg', '.jpeg', '.tif', '.tiff')
+ARCHIVE_FORMAT = ('.7z', '.gz', '.rar', '.tar', '.zip')
 
 
 def get_encoding_type(source):
@@ -708,8 +708,8 @@ def translate_subtitle(file_name, language, remove_cast):
 
         print_illegal_characters(sub)
 
-        notice_list = ['字幕', '時間軸', '校正', '譯者', '翻譯', '導演', '編劇', '製片', '出品', 'mandarin',
-                       'traditional', 'r3', 'chinese', '劇終', '謝謝觀賞', '"', '\'', '[']
+        notice_list = ('字幕', '時間軸', '校正', '譯者', '翻譯', '導演', '編劇', '製片', '出品', 'mandarin',
+                       'traditional', 'r3', 'chinese', '劇終', '謝謝觀賞', '"', '\'', '[')
         if any(part in sub.text.lower() for part in notice_list):
             print(sub.text + '\n')
 

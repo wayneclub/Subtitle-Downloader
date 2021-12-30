@@ -1,4 +1,4 @@
-beautifulsoup4 
+beautifulsoup4
 webdriver-manager
 selenium
 pysubs2

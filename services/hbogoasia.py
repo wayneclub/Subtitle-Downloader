@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-#coding: utf-8
+# coding: utf-8
 
 """
 This module is to download subtitle from HBOGO Asia
@@ -15,7 +15,7 @@ from getpass import getpass
 from pathlib import Path
 from urllib.parse import urlparse
 import requests
-from common.utils import http_request, HTTPMethod, download_file, pretty_print_json, convert_subtitle
+from common.utils import http_request, HTTPMethod, pretty_print_json, convert_subtitle, download_file_multithread
 
 
 class HBOGOAsia(object):
@@ -37,7 +37,7 @@ class HBOGOAsia(object):
 
         self.subtitle_language = args.subtitle_language
 
-        self.language_list = []
+        self.language_list = ()
         self.device_id = str(uuid.uuid4())
         self.territory = ""
         self.channel_partner_id = ""
@@ -74,11 +74,8 @@ class HBOGOAsia(object):
         if not self.subtitle_language:
             self.subtitle_language = 'zh-Hant'
 
-        if ',' not in self.subtitle_language:
-            self.language_list = [self.subtitle_language]
-        else:
-            self.language_list = [
-                language for language in self.subtitle_language.split(',')]
+        self.language_list = tuple([
+            language for language in self.subtitle_language.split(',')])
 
     def get_territory(self):
         geo_url = self.api['geo'].format(bundle_id=urlparse(self.url).netloc)
@@ -145,7 +142,7 @@ class HBOGOAsia(object):
             if series_id_regex:
                 series_id = series_id_regex.group(1)
                 series_url = self.api['tvseason'].format(
-                    parent_d=series_id, territory=self.territory)
+                    parent_id=series_id, territory=self.territory)
             else:
                 self.logger.error('找不到影集，請輸入正確網址')
                 exit(1)
@@ -237,16 +234,18 @@ class HBOGOAsia(object):
 
         category = video['metadata']['categories'][0]
 
-        available_languages = [self.get_language_code(
-            media['lang']) for media in video['materials'] if media['type'] == 'subtitle']
+        available_languages = tuple([self.get_language_code(
+            media['lang']) for media in video['materials'] if media['type'] == 'subtitle'])
 
         if 'all' in self.language_list:
             self.language_list = available_languages
 
-        if not set(self.language_list).intersection(available_languages):
+        if not set(self.language_list).intersection(set(available_languages)):
             self.logger.error('提供的字幕語言：%s', available_languages)
             exit()
 
+        subtitle_urls = []
+        subtitle_names = []
         for media in video['materials']:
             if media['type'] == 'subtitle':
                 self.logger.debug(media)
@@ -271,10 +270,13 @@ class HBOGOAsia(object):
                     subtitle_link = mpd_url.replace(
                         os.path.basename(mpd_url), f"subtitles/{lang_code}/{subtitle_file}")
 
+                    subtitle_urls.append(subtitle_link)
+                    subtitle_names.append(os.path.join(
+                        lang_folder_path, subtitle_file_name))
                     os.makedirs(lang_folder_path,
                                 exist_ok=True)
-                    download_file(subtitle_link, os.path.join(
-                        lang_folder_path, subtitle_file_name))
+
+        download_file_multithread(subtitle_urls, subtitle_names)
         return lang_paths
 
     def main(self):

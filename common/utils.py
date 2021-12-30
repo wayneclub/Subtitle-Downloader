@@ -51,17 +51,16 @@ def download_file(url, output_path):
         print("找不到檔案")
 
 
-def download_file_multithread(urls, output_path):
-
+def download_file_multithread(urls, file_names, output_path=""):
     cpus = multiprocessing.cpu_count()
     max_pool_size = 8
     pool = multiprocessing.Pool(
         cpus if cpus < max_pool_size else max_pool_size)
     pool = multiprocessing.Pool(
         cpus if cpus < max_pool_size else max_pool_size)
-    for url in urls:
+    for url, file_name in zip(urls, file_names):
         pool.apply_async(download_file, args=(
-            url, os.path.join(output_path, os.path.basename(url))))
+            url, os.path.join(output_path, file_name)))
     pool.close()
     pool.join()
 

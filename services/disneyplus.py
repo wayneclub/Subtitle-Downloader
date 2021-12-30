@@ -44,8 +44,8 @@ class DisneyPlus(object):
             'DmcVideo': 'https://disney.content.edge.bamgrid.com/svc/content/DmcVideoBundle/version/5.1/region/TW/audience/false/maturity/1850/language/zh-Hant/encodedFamilyId/{family_id}',
         }
 
-        self.language_code = ['zh-Hant', 'zh-Hans', 'zh-HK', 'da', 'de', 'en', 'es-ES', 'es-419',
-                              'fr-FR', 'fr-FR', 'fr-CA', 'it', 'ja', 'ko', 'nl', 'no', 'pt-PT', 'pt-BR', 'fi', 'sv']
+        self.language_code = ('zh-Hant', 'zh-Hans', 'zh-HK', 'da', 'de', 'en', 'es-ES', 'es-419',
+                              'fr-FR', 'fr-FR', 'fr-CA', 'it', 'ja', 'ko', 'nl', 'no', 'pt-PT', 'pt-BR', 'fi', 'sv')
 
     def get_language_list(self):
         if not self.subtitle_language:
@@ -53,11 +53,8 @@ class DisneyPlus(object):
         elif self.subtitle_language == 'all':
             self.subtitle_language = ','.join(list(self.language_code))
 
-        if ',' not in self.subtitle_language:
-            self.language_list = [self.subtitle_language]
-        else:
-            self.language_list = [
-                language for language in self.subtitle_language.split(',')]
+        self.language_list = tuple([
+            language for language in self.subtitle_language.split(',')])
 
     def download_subtitle(self):
         if '/series' in self.url:
@@ -110,7 +107,6 @@ class DisneyPlus(object):
                                 self.get_audio(
                                     audio_list, folder_path, file_name)
 
-                    self.logger.info(folder_path)
                     convert_subtitle(folder_path, 'disney')
 
         elif '/movies' in self.url:
@@ -193,28 +189,38 @@ class DisneyPlus(object):
         return sub_url_list, audio_url_list
 
     def get_subtitle(self, subtitle_list, program_type, folder_path, sub_name):
+        available_languages = tuple(
+            [sub['lang'] for sub in subtitle_list])
+\
+        if 'all' in self.language_list:
+            self.language_list = available_languages
+
+        if not set(self.language_list).intersection(set(available_languages)):
+            self.logger.error('提供的字幕語言：%s', available_languages)
+            exit()
 
         for sub in subtitle_list:
             if sub['lang'] in self.language_list:
-                file_name = sub_name.replace('.vtt', f".{sub['lang']}.srt")
-                self.logger.info('\n下載：%s', file_name)
+                file_name=sub_name.replace('.vtt', f".{sub['lang']}.srt")
+                self.logger.info('\n下載：%s\n---------------------------------------------------------------', file_name)
 
-                tmp_folder_path = os.path.join(
+                tmp_folder_path=os.path.join(
                     os.path.join(folder_path, sub['lang']), 'tmp')
                 if program_type == 'movie' or len(self.language_list) == 1:
-                    tmp_folder_path = os.path.join(folder_path, 'tmp')
+                    tmp_folder_path=os.path.join(folder_path, 'tmp')
 
                 if os.path.exists(tmp_folder_path):
                     shutil.rmtree(tmp_folder_path)
-                os.makedirs(tmp_folder_path, exist_ok=True)
-                download_file_multithread(sub['urls'], tmp_folder_path)
+                os.makedirs(tmp_folder_path, exist_ok = True)
+                subtitle_names = [os.path.basename(url) for url in sub['urls']]
+                download_file_multithread(sub['urls'], subtitle_names, tmp_folder_path)
                 convert_subtitle(tmp_folder_path)
                 merge_subtitle(tmp_folder_path, file_name)
 
     def get_audio(self, audio_list, folder_path, audio_name):
         for audio in audio_list:
             if audio['lang'] in ['cmn-TW', 'yue']:
-                file_name = audio_name.replace(
+                file_name=audio_name.replace(
                     '.vtt', f".{audio['lang']}{audio['extension']}")
                 self.logger.info('\n下載：%s', file_name)
                 download_audio(audio['url'], os.path.join(
@@ -223,11 +229,11 @@ class DisneyPlus(object):
     def main(self):
         self.get_language_list()
         if self.email and self.password:
-            email = self.email
-            password = self.password
+            email=self.email
+            password=self.password
         else:
-            email = input('輸入帳號：')
-            password = getpass('輸入密碼（不顯示）：')
-        user = Login(email=email, password=password)
-        self.token = user.get_auth_token()
+            email=input('輸入帳號：')
+            password=getpass('輸入密碼（不顯示）：')
+        user=Login(email = email, password = password)
+        self.token=user.get_auth_token()
         self.download_subtitle()

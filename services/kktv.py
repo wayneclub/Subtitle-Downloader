@@ -9,7 +9,7 @@ import requests
 import shutil
 import orjson
 from bs4 import BeautifulSoup
-from common.utils import http_request, HTTPMethod, check_url_exist, download_file, convert_subtitle
+from common.utils import http_request, HTTPMethod, check_url_exist, convert_subtitle, download_file_multithread
 
 
 class KKTV(object):
@@ -49,7 +49,11 @@ class KKTV(object):
         data = orjson.loads(str(web_content.find(
             'script', id='__NEXT_DATA__').string))
 
-        drama = data['props']['initialState']['titles']['byId'][drama_id]
+        if drama_id in data['props']['initialState']['titles']['byId']:
+            drama = data['props']['initialState']['titles']['byId'][drama_id]
+        else:
+            self.logger.error('找不到該劇，請確認網址重試一次')
+            exit()
 
         if drama:
             if 'title' in drama:
@@ -73,10 +77,10 @@ class KKTV(object):
                 self.logger.info('\n%s', drama_name)
             else:
                 if 'dual_subtitle' in drama['contentLabels']:
-                    self.logger.info('\n%s 共有： %s 季（有提供雙語字幕）',
+                    self.logger.info('\n%s 共有：%s 季（有提供雙語字幕）',
                                      drama_name, season_num)
                 else:
-                    self.logger.info('\n%s 共有： %s 季', drama_name, season_num)
+                    self.logger.info('\n%s 共有：%s 季', drama_name, season_num)
 
             if 'series' in drama:
                 for season in drama['series']:
@@ -95,6 +99,7 @@ class KKTV(object):
                                 '\n第 %s 季 共有：%s 集\t下載第 %s 季 最後一集\n---------------------------------------------------------------', season_index, episode_num, season_index)
 
                             season['episodes'] = [list(season['episodes'])[-1]]
+                            folder_path = f'{folder_path}.S{season_name}'
                         elif anime:
                             self.logger.info(
                                 '\n共有：%s 集\t下載全集\n---------------------------------------------------------------', episode_num)
@@ -106,8 +111,14 @@ class KKTV(object):
                         if os.path.exists(folder_path):
                             shutil.rmtree(folder_path)
 
-                        jp_lang = False
+                        ja_lang = False
                         ko_lang = False
+                        subtitle_zh_urls = []
+                        subtitle_zh_names = []
+                        subtitle_ja_urls = []
+                        subtitle_ja_names = []
+                        subtitle_ko_urls = []
+                        subtitle_ko_names = []
                         for episode in season['episodes']:
                             episode_index = int(
                                 episode['id'].replace(episode['seriesId'], ''))
@@ -120,7 +131,7 @@ class KKTV(object):
                                 self.logger.info('\n無提供可下載的字幕\n')
                                 exit()
                             if 'ja' in episode['subtitles']:
-                                jp_lang = True
+                                ja_lang = True
                             if 'ko' in episode['subtitles']:
                                 ko_lang = True
 
@@ -161,28 +172,35 @@ class KKTV(object):
                                         os.makedirs(
                                             folder_path, exist_ok=True)
 
-                                        if jp_lang:
+                                        subtitle_zh_urls.append(subtitle_link)
+                                        subtitle_zh_names.append(file_name)
+
+                                        if ja_lang and check_url_exist(ja_subtitle_link):
                                             os.makedirs(
                                                 ja_folder_path, exist_ok=True)
-
-                                        if ko_lang:
-                                            os.makedirs(
-                                                ko_folder_path, exist_ok=True)
-
-                                        download_file(subtitle_link, os.path.join(
-                                            folder_path, os.path.basename(file_name)))
-
-                                        if jp_lang and check_url_exist(ja_subtitle_link):
-                                            download_file(ja_subtitle_link, os.path.join(
-                                                ja_folder_path, os.path.basename(ja_file_name)))
+                                            subtitle_ja_urls.append(
+                                                ja_subtitle_link)
+                                            subtitle_ja_names.append(
+                                                ja_file_name)
 
                                         if ko_lang and check_url_exist(ko_subtitle_link):
-                                            download_file(ko_subtitle_link, os.path.join(
-                                                ko_folder_path, os.path.basename(ko_file_name)))
+                                            os.makedirs(
+                                                ko_folder_path, exist_ok=True)
+                                            subtitle_ko_urls.append(
+                                                ko_subtitle_link)
+                                            subtitle_ko_names.append(
+                                                ko_file_name)
 
-                        if jp_lang:
+                        download_file_multithread(
+                            subtitle_zh_urls, subtitle_zh_names, folder_path)
+
+                        if ja_folder_path and ja_lang:
+                            download_file_multithread(
+                                subtitle_ja_urls, subtitle_ja_names, ja_folder_path)
                             convert_subtitle(ja_folder_path)
-                        if ko_lang:
+                        if ko_folder_path and ko_lang:
+                            download_file_multithread(
+                                subtitle_ko_urls, subtitle_ko_names, ko_folder_path)
                             convert_subtitle(ko_folder_path)
 
                         convert_subtitle(folder_path, 'kktv')
