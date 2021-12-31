@@ -21,7 +21,7 @@ class DisneyPlus(object):
     def __init__(self, args):
         self.logger = logging.getLogger(__name__)
         self.locale = args.locale
-        _ = get_locale(__name__, self.locale)
+        # _ = get_locale(__name__, self.locale)
 
         self.url = args.url.strip()
         self.email = args.email
