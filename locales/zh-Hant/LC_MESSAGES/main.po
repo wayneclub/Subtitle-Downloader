@@ -46,13 +46,13 @@ msgstr "串流平台密碼"
 
 #: subtitle_downloader.py:50
 msgid ""
-"languages of HBOGO Asia's and Disney Plus's subtitles to download (optional) "
+"languages of subtitles; use commas to separated multiple languages"
 "separated by commas"
 msgstr "字幕語言，用','分隔"
 
 #: subtitle_downloader.py:54
 msgid ""
-"languages of Disney Plus's audio-tracks to download (optional) separated by "
+"languages of audio-tracks; use commas to separated multiple languages"
 "commas"
 msgstr "音軌語言，用','分隔"
 

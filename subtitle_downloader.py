@@ -48,11 +48,11 @@ if __name__ == "__main__":
     parser.add_argument('-slang',
                         '--subtitle-language',
                         dest='subtitle_language',
-                        help=_("languages of HBOGO Asia's and Disney Plus's subtitles to download (optional) separated by commas"))
+                        help=_("languages of subtitles; use commas to separated multiple languages"))
     parser.add_argument('-alang',
                         '--audio-language',
                         dest='audio_language',
-                        help=_("languages of Disney Plus's audio-tracks to download (optional) separated by commas"))
+                        help=_("languages of audio-tracks; use commas to separated multiple languages"))
     parser.add_argument(
         '-locale',
         '--locale',
