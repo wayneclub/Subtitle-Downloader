@@ -41,12 +41,10 @@ def get_locale(name, lang=""):
     if 'zh' in current_locale:
         locale_ = gettext.translation(
             name, localedir='locales', languages=['zh-Hant'])
+        locale_.install()
+        return locale_.gettext
     else:
-        locale_ = gettext.translation(
-            name, localedir='locales', languages=['en'])
-
-    locale_.install()
-    return locale_.gettext
+        return gettext.gettext
 
 
 def http_request(session=requests.Session(), url="", method="", headers="", kwargs="", raw=False):
