@@ -14,15 +14,13 @@ import requests
 from common.utils import get_locale, http_request, HTTPMethod, download_audio, convert_subtitle, merge_subtitle_fragments, download_file_multithread
 from services.disneyplus_login import Login
 
-_ = get_locale(__name__)
-
 
 class DisneyPlus(object):
 
     def __init__(self, args):
         self.logger = logging.getLogger(__name__)
         self.locale = args.locale
-        _ = get_locale(__name__, self.locale)
+        self._ = get_locale(__name__, self.locale)
 
         self.url = args.url.strip()
         self.email = args.email
@@ -79,7 +77,7 @@ class DisneyPlus(object):
             )
             seasons = data['seasons']['seasons']
 
-            self.logger.info(_('\n%s total: %s season(s)'),
+            self.logger.info(self._('\n%s total: %s season(s)'),
                              title, len(seasons))
 
             for season in seasons:
@@ -95,7 +93,7 @@ class DisneyPlus(object):
                         shutil.rmtree(folder_path)
 
                     self.logger.info(
-                        _('\nSeason %s total: %s episode(s)\tdownload all episodes\n---------------------------------------------------------------'), season_index, episode_num)
+                        self._('\nSeason %s total: %s episode(s)\tdownload all episodes\n---------------------------------------------------------------'), season_index, episode_num)
 
                     season_id = season['seasonId']
                     page_size = math.ceil(episode_num / 30)
@@ -217,14 +215,14 @@ class DisneyPlus(object):
 
         if not set(self.language_list).intersection(set(available_languages)):
             self.logger.error(
-                _('\nSubtitle available languages: %s'), available_languages)
+                self._('\nSubtitle available languages: %s'), available_languages)
             exit()
 
         for sub in subtitle_list:
             if sub['lang'] in self.language_list:
                 file_name = sub_name.replace('.vtt', f".{sub['lang']}.srt")
                 self.logger.info(
-                    _('\nDownload: %s\n---------------------------------------------------------------'), file_name)
+                    self._('\nDownload: %s\n---------------------------------------------------------------'), file_name)
 
                 tmp_folder_path = os.path.join(
                     os.path.join(folder_path, sub['lang']), 'tmp')
@@ -247,14 +245,12 @@ class DisneyPlus(object):
                 file_name = audio_name.replace(
                     '.vtt', f".{audio['lang']}{audio['extension']}")
                 self.logger.info(
-                    _('\nDownload: %s\n---------------------------------------------------------------'), file_name)
+                    self._('\nDownload: %s\n---------------------------------------------------------------'), file_name)
                 download_audio(audio['url'], os.path.join(
                     folder_path, file_name))
 
     def main(self):
-        # _ = get_locale(__name__, self.locale)
         self.get_language_list()
-
         user = Login(email=self.email, password=self.password,
                      locale=self.locale)
         self.profile, self.token = user.get_auth_token()
