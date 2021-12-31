@@ -251,6 +251,7 @@ class DisneyPlus(object):
                     folder_path, file_name))
 
     def main(self):
+        _ = get_locale(__name__, self.locale)
         self.get_language_list()
         if self.email and self.password:
             email = self.email
