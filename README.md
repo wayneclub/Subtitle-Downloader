@@ -2,7 +2,13 @@
 
 **NON-COMMERCIAL USE ONLY**
 
-<a href="https://colab.research.google.com/drive/13tv-eT5mx6EWBL_du9Bd2gMQFxT83NCp?usp=sharing" target="_blank"><img src="https://colab.research.google.com/assets/colab-badge.svg" title="Open this file in Google Colab" alt="Colab"/></a> <br/>
+- English
+<a href="https://colab.research.google.com/drive/13tv-eT5mx6EWBL_du9Bd2gMQFxT83NCp?usp=sharing" target="_blank"><img src="https://colab.research.google.com/assets/colab-badge.svg" title="Open this file in Google Colab" alt="Colab"/></a> 
+
+- 中文
+<a href="https://colab.research.google.com/drive/1Qu7MHUt4QXym9cNOORCKTezIBYBNNg3V?usp=sharing" target="_blank"><img src="https://colab.research.google.com/assets/colab-badge.svg" title="Open this file in Google Colab" alt="Colab"/></a> 
+
+<br/>
 
 Subtitle-Downloader supports downloading subtitles from Disney Plus, HBOGO Asia, KKTV, LineTV, friDay Video, iq.com.
 
@@ -37,11 +43,11 @@ python download_subtitle.py URL [OPTIONS]
   
   -password, --password         password for Disney Plus and HBOGO Asia
   
-  -slang, --subtitle-language   Languages of HBOGO Asia's and Disney Plus's subtitles to download (optional) separated by commas
+  -slang, --subtitle-language   languages of subtitles; use commas to separated multiple languages
                                 default: Traditional Chinese
                                 all: download all available languages
                                 
-  -alang, --audio-language      Languages of Disney Plus's audio-tracks to download (optional) separated by commas
+  -alang, --audio-language      languages of audio-tracks; use commas to separated multiple languages
 ```
 ## Subtitle Languages
 
