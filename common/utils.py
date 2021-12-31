@@ -41,6 +41,7 @@ def get_locale(name, lang=""):
             name, localedir='locales', languages=['zh-Hant'])
         lang.install()
     else:
+        print(current_locale)
         lang = gettext.translation(
             name, localedir='locales', languages=['en'])
         lang.install()
