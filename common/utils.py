@@ -35,7 +35,7 @@ class HTTPMethod:
 
 def get_locale(name, lang=""):
     current_locale = locale.getdefaultlocale()
-    if 'zh' in current_locale[0] or 'zh' in lang:
+    if 'zh' in current_locale[0] or (lang and 'zh' in lang):
         lang = gettext.translation(
             name, localedir='locales', languages=['zh-Hant'])
         lang.install()
