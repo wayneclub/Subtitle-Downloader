@@ -5,9 +5,13 @@
 This module is for common tool.
 """
 import os
+import locale
+import logging
+import gettext
 from pathlib import Path
 import platform
 import re
+import shutil
 import multiprocessing
 from urllib import request
 from urllib.error import HTTPError, URLError
@@ -43,7 +47,7 @@ def download_file(url, output_path):
             request.urlretrieve(
                 url, filename=output_path, reporthook=t.update_to)
     else:
-        print("找不到檔案")
+        logger.warning(_("\nFile not found!"))
 
 
 def download_file_multithread(urls, file_names, output_path=""):
@@ -63,6 +67,15 @@ def download_file_multithread(urls, file_names, output_path=""):
 def download_audio(m3u8_url, output):
     os.system(
         f'ffmpeg -protocol_whitelist file,http,https,tcp,tls,crypto -i "{m3u8_url}" -c copy "{output}" -preset ultrafast -loglevel warning -hide_banner -stats')
+
+
+def get_locale(name, lang=""):
+    current_locale = locale.getdefaultlocale()
+    if 'zh' in current_locale[0] or 'zh' in lang:
+        lang = gettext.translation(
+            name, localedir='locales', languages=['zh-Hant'])
+        lang.install()
+        return lang.gettext
 
 
 def http_request(session=requests.Session(), url="", method="", headers="", kwargs="", raw=False):
@@ -96,7 +109,7 @@ def http_request(session=requests.Session(), url="", method="", headers="", kwar
         else:
             return req.json()
     else:
-        print(f'\n{pretty_print_json(orjson.loads(req.text))}')
+        logger.error('\n%s', pretty_print_json(orjson.loads(req.text)))
         exit(1)
 
 
@@ -107,12 +120,12 @@ def check_url_exist(url, print_error=False):
     except HTTPError as exception:
         # Return code error (e.g. 404, 501, ...)
         if print_error:
-            print(f"HTTPError: {exception.code}")
+            logger.error('HTTPError: %s', exception.code)
         return False
     except URLError as exception:
         # Not an HTTP-specific error (e.g. connection refused)
         if print_error:
-            print(f"URLError: {exception.reason}")
+            logger.error('URLError: %s', exception.reason)
         return False
     else:
         return True
@@ -139,7 +152,8 @@ def driver_init(headless=True):
              'credentials_enable_service': False, 'profile.password_manager_enabled': False,
              'profile.default_content_setting_values': {'images': 2, 'plugins': 2, 'popups': 2, 'geolocation': 2, 'notifications': 2}}
     options.add_experimental_option('prefs', prefs)
-    options.add_experimental_option('excludeSwitches', ['enable-automation'])
+    options.add_experimental_option(
+        'excludeSwitches', ['enable-automation'])
     if platform.system() == 'Windows':
         driver = webdriver.Chrome(ChromeDriverManager(
             log_level=0).install(), options=options)
@@ -165,33 +179,9 @@ def get_network_url(driver, search_url):
         delay += 1
 
         if delay > 60:
-            print("找不到url，請重新執行")
+            logger.error(_("\nTimeout, please retry."))
             exit(1)
     return url
-
-
-# def find_visible_element_by_id(driver, id_text):
-#     return WebDriverWait(driver, 20).until(EC.visibility_of_element_located((By.ID, id_text)))
-
-
-# def find_visible_element_by_xpath(driver, xpath):
-#     return WebDriverWait(driver, 20).until(EC.visibility_of_element_located((By.XPATH, xpath)))
-
-
-# def find_visible_elements_by_xpath(driver, xpath):
-#     return WebDriverWait(driver, 20).until(EC.visibility_of_all_elements_located((By.XPATH, xpath)))
-
-
-# def find_visible_element_clickable_by_xpath(driver, xpath):
-#     return WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.XPATH, xpath)))
-
-
-# def find_present_element_by_xpath(driver, xpath):
-#     return WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.XPATH, xpath)))
-
-
-def get_locale(driver):
-    return driver.execute_script("return window.navigator.language")
 
 
 def convert_subtitle(folder_path, ott=''):
@@ -201,18 +191,30 @@ def convert_subtitle(folder_path, ott=''):
             extenison = Path(file).suffix
             if os.path.isfile(os.path.join(folder_path, file)) and extenison != '.srt':
                 if display:
-                    print(
-                        f"\n將{extenison}轉換成.srt：\n---------------------------------------------------------------")
+                    logger.info(
+                        _("\nConvert %s to .srt:\n---------------------------------------------------------------"), extenison)
                     display = False
                 subtitle = os.path.join(folder_path, file)
                 subtitle_tool.convert_subtitle(subtitle, '', True, False)
         if ott:
-            subtitle_tool.archive_subtitle(os.path.normpath(folder_path), ott)
+            logger.info(
+                _("\nArchive subtitles:\n---------------------------------------------------------------"))
+            subtitle_tool.archive_subtitle(
+                os.path.normpath(folder_path), ott, False)
 
 
-def merge_subtitle(folder_path, file_name):
+def merge_subtitle_fragments(folder_path, file_name):
     if os.path.exists(folder_path):
-        os.system(f'python subtitle_tool.py "{folder_path}" -m "{file_name}"')
+        logger.info(
+            _("\nMerge segments：\n---------------------------------------------------------------\n%s"), file_name)
+        fila_path = os.path.join(
+            Path(folder_path).parent.absolute(), file_name)
+        with open(fila_path, 'wb') as merge_file:
+            for segment in sorted(os.listdir(folder_path)):
+                with open(os.path.join(folder_path, segment), 'rb') as tmp:
+                    shutil.copyfileobj(tmp, merge_file)
+        if os.path.exists(folder_path):
+            shutil.rmtree(folder_path)
 
 
 def kill_process():
@@ -232,3 +234,8 @@ def pretty_print_json(json_obj):
     formatted_json = orjson.dumps(
         json_obj, option=orjson.OPT_INDENT_2).decode('utf-8')
     return highlight(formatted_json, lexers.JsonLexer(), formatters.TerminalFormatter())
+
+
+if __name__:
+    logger = logging.getLogger(__name__)
+    _ = get_locale(__name__)

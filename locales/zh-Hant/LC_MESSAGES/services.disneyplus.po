@@ -1,0 +1,60 @@
+# Subtitle-Downloader
+# Copyright (C) 2021
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-12-30 23:11+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Wayne <me@wayneclub.com>\n"
+"Language-Team: wayneclub <info@wayneclub.com>\n"
+"Language: zh-Hant\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: disneyplus.py:76
+#, python-format
+msgid ""
+"\n"
+"%s total: %s season(s)"
+msgstr "\n%s 共有：%s 季"
+
+#: disneyplus.py:92
+#, python-format
+msgid ""
+"\n"
+"Season %s total: %s episode(s)\tdownload all episodes\n"
+"---------------------------------------------------------------"
+msgstr "\n第 %s 季 共有：%s 集\t下載全集\n---------------------------------------------------------------"
+
+#: disneyplus.py:208
+#, python-format
+msgid ""
+"\n"
+"Subtitle available languages: %s"
+msgstr "\n提供的字幕語言：%s"
+
+#: disneyplus.py:215 disneyplus.py:237
+#, python-format
+msgid ""
+"\n"
+"Download: %s\n"
+"---------------------------------------------------------------"
+msgstr "\n下載：%s\n---------------------------------------------------------------"
+
+#: disneyplus.py:247
+msgid "Disney+ email: "
+msgstr "Disney+ 帳號："
+
+#: disneyplus.py:248
+msgid "Disney+ password: "
+msgstr "Disney+ 密碼："
+
+#: disneyplus.py:253
+#, python-format
+msgid ""
+"\n"
+"Successfully logged in. Welcome %s!"
+msgstr "\n登入成功，歡迎 %s"

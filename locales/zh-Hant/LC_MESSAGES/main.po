@@ -1,0 +1,63 @@
+# Subtitle-Downloader
+# Copyright (C) 2021
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-12-30 23:11+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Wayne <me@wayneclub.com>\n"
+"Language-Team: wayneclub <info@wayneclub.com>\n"
+"Language: zh-Hant\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: subtitle_downloader.py:22
+msgid ""
+"Download subtitles from Disney Plus, HBOGO Asia, KKTV, LineTV, friDay Video, "
+"iq.com."
+msgstr "從Disney Plus、HBOGO Asia、KKTV、LineTV、friDay影音、愛奇藝 下載劇集、電影、綜藝、動漫等字幕"
+
+#: subtitle_downloader.py:24
+msgid "series's/movie's link"
+msgstr "電影、影集的網址"
+
+#: subtitle_downloader.py:29
+msgid "download season [0-9]"
+msgstr "下載 第[0-9]季"
+
+#: subtitle_downloader.py:34
+msgid "download latest episode"
+msgstr "下載 最新一集"
+
+#: subtitle_downloader.py:38
+msgid "output directory"
+msgstr "下載路徑"
+
+#: subtitle_downloader.py:42
+msgid "account for Disney Plus and HBOGO Asia"
+msgstr "串流平台帳號"
+
+#: subtitle_downloader.py:46
+msgid "password for Disney Plus and HBOGO Asia"
+msgstr "串流平台密碼"
+
+#: subtitle_downloader.py:50
+msgid ""
+"Languages of HBOGO Asia's and Disney Plus's subtitles to download (optional) "
+"separated by commas"
+msgstr "字幕語言，用','分隔"
+
+#: subtitle_downloader.py:54
+msgid ""
+"Languages of Disney Plus's audio-tracks to download (optional) separated by "
+"commas"
+msgstr "音軌語言，用','分隔"
+
+#: subtitle_downloader.py:110
+msgid ""
+"Only support downloading subtitles from Disney Plus, HBOGO Asia, KKTV, "
+"LineTV, friDay Video, and iq.com."
+msgstr "目前只支持從\n1. KKTV\t\t下載電影、劇集、綜藝、動漫字幕\n2. LineTV\t下載劇集、綜藝字幕\n3. FriDay影音\t下載劇集、電影、綜藝、動漫字幕\n4. 愛奇藝\t下載劇集\n4. Disney+\t下載電影、劇集\n5. HBOGO Asia\t下載電影、劇集\n\n請確認網站網址無誤"

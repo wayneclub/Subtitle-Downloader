@@ -7,57 +7,58 @@ This module is to download subtitle from KKTV、LineTV、FriDay.
 import re
 import argparse
 import logging
-from services.kktv import KKTV
-from services.linetv import LineTV
-from services.friday import Friday
-from services.iqiyi import IQIYI
-from services.hbogoasia import HBOGOAsia
+from common.utils import get_locale, get_ip_location
 from services.disneyplus import DisneyPlus
-from common.utils import get_ip_location
-
-
-def print_usage():
-    """Show a info message about the usage"""
-    print("\n使用方式：\tpython download_subtitle.py url\n")
-    print("\t\turl\t\t- 欲下載的劇集字幕的網站")
-    print("\t\t-S [0-9]\t- 下載第[0-9]季\n")
+from services.hbogoasia import HBOGOAsia
+from services.iqiyi import IQIYI
+from services.friday import Friday
+from services.linetv import LineTV
+from services.kktv import KKTV
 
 
 if __name__ == "__main__":
+    _ = get_locale('main')
+
     parser = argparse.ArgumentParser(
-        description='從Disney Plus、HBOGO Asia、KKTV、LineTV、friDay影音、愛奇藝 下載劇集、電影、綜藝、動漫等字幕')
+        description=_("Download subtitles from Disney Plus, HBOGO Asia, KKTV, LineTV, friDay Video, iq.com."))
     parser.add_argument('url',
-                        help='欲下載的劇集字幕的網址')
+                        help=_("series's/movie's link"))
     parser.add_argument('-s',
                         '--season',
                         dest='season',
                         type=int,
-                        help='下載 第[0-9]季')
+                        help=_("download season [0-9]"))
     parser.add_argument('-l',
                         '--last-episode',
                         dest='last_episode',
                         action='store_true',
-                        help='下載 最新一集')
+                        help=_('download latest episode'))
     parser.add_argument('-o',
                         '--output',
                         dest='output',
-                        help='下載路徑')
+                        help=_("output directory"))
     parser.add_argument('-email',
                         '--email',
                         dest='email',
-                        help='串流平台帳號')
+                        help=_("account for Disney Plus and HBOGO Asia"))
     parser.add_argument('-password',
                         '--password',
                         dest='password',
-                        help='串流平台密碼')
+                        help=_("password for Disney Plus and HBOGO Asia"))
     parser.add_argument('-slang',
                         '--subtitle-language',
                         dest='subtitle_language',
-                        help='字幕語言')
+                        help=_("languages of HBOGO Asia's and Disney Plus's subtitles to download (optional) separated by commas"))
     parser.add_argument('-alang',
                         '--audio-language',
                         dest='audio_language',
-                        help='音軌語言')
+                        help=_("languages of Disney Plus's audio-tracks to download (optional) separated by commas"))
+    parser.add_argument(
+        '-locale',
+        '--locale',
+        dest='locale',
+        help='locale for logging messages',
+    )
     parser.add_argument(
         '-d',
         '--debug',
@@ -113,4 +114,5 @@ if __name__ == "__main__":
         hbogoasia = HBOGOAsia(args)
         hbogoasia.main()
     else:
-        print("目前只支持從\n1. KKTV\t\t下載電影、劇集、綜藝、動漫字幕\n2. LineTV\t下載劇集、綜藝字幕\n3. FriDay影音\t下載劇集、電影、綜藝、動漫字幕\n4. 愛奇藝\t下載劇集\n4. Disney+\t下載電影、劇集\n5. HBOGO Asia\t下載電影、劇集\n\n請確認網站網址無誤")
+        logging.info(
+            _("Only support downloading subtitles from Disney Plus, HBOGO Asia, KKTV, LineTV, friDay Video, and iq.com."))

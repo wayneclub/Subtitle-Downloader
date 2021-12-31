@@ -10,13 +10,18 @@ import shutil
 from getpass import getpass
 import m3u8
 import requests
-from common.utils import http_request, HTTPMethod, download_audio, convert_subtitle, merge_subtitle, download_file_multithread
+from common.utils import get_locale, http_request, HTTPMethod, download_audio, convert_subtitle, merge_subtitle_fragments, download_file_multithread
 from services.disneyplus_login import Login
+
+_ = get_locale(__name__)
 
 
 class DisneyPlus(object):
+
     def __init__(self, args):
         self.logger = logging.getLogger(__name__)
+        _ = get_locale(__name__, args.locale)
+
         self.url = args.url.strip()
         self.email = args.email
         self.password = args.password
@@ -37,12 +42,14 @@ class DisneyPlus(object):
 
         self.session = requests.Session()
 
+        self.profile = dict()
         self.token = ''
 
         self.api = {
-            'DmcSeriesBundle': 'https://disney.content.edge.bamgrid.com/svc/content/DmcSeriesBundle/version/5.1/region/TW/audience/false/maturity/1850/language/zh-Hant/encodedSeriesId/{series_id}',
-            'DmcEpisodes': 'https://disney.content.edge.bamgrid.com/svc/content/DmcEpisodes/version/5.1/region/TW/audience/false/maturity/1850/language/zh-Hant/seasonId/{season_id}/pageSize/30/page/{page}',
-            'DmcVideo': 'https://disney.content.edge.bamgrid.com/svc/content/DmcVideoBundle/version/5.1/region/TW/audience/false/maturity/1850/language/zh-Hant/encodedFamilyId/{family_id}',
+            'DmcSeriesBundle': 'https://disney.content.edge.bamgrid.com/svc/content/DmcSeriesBundle/version/5.1/region/{region}/audience/false/maturity/1850/language/{language}/encodedSeriesId/{series_id}',
+            'DmcEpisodes': 'https://disney.content.edge.bamgrid.com/svc/content/DmcEpisodes/version/5.1/region/{region}/audience/false/maturity/1850/language/{language}/seasonId/{season_id}/pageSize/30/page/{page}',
+            'DmcVideo': 'https://disney.content.edge.bamgrid.com/svc/content/DmcVideoBundle/version/5.1/region/{region}/audience/false/maturity/1850/language/{language}/encodedFamilyId/{family_id}',
+            'playback': 'https://disney.playback.edge.bamgrid.com/media/{media_id}/scenarios/restricted-drm-ctr-sw'
         }
 
         self.language_code = ('zh-Hant', 'zh-Hans', 'zh-HK', 'da', 'de', 'en', 'es-ES', 'es-419',
@@ -60,6 +67,8 @@ class DisneyPlus(object):
     def download_subtitle(self):
         if '/series' in self.url:
             series_url = self.api['DmcSeriesBundle'].format(
+                region=self.profile['country'],
+                language=self.profile['language'],
                 series_id=os.path.basename(self.url))
             self.logger.debug(series_url)
             data = http_request(session=self.session, url=series_url, method=HTTPMethod.GET)[
@@ -68,7 +77,8 @@ class DisneyPlus(object):
             )
             seasons = data['seasons']['seasons']
 
-            self.logger.info('\n%s 共有：%s 季', title, len(seasons))
+            self.logger.info(_('\n%s total: %s season(s)'),
+                             title, len(seasons))
 
             for season in seasons:
                 season_index = season['seasonSequenceNumber']
@@ -83,13 +93,15 @@ class DisneyPlus(object):
                         shutil.rmtree(folder_path)
 
                     self.logger.info(
-                        '\n第 %s 季 共有：%s 集\t下載全集\n---------------------------------------------------------------', season_index, episode_num)
+                        _('\nSeason %s total: %s episode(s)\tdownload all episodes\n---------------------------------------------------------------'), season_index, episode_num)
 
                     season_id = season['seasonId']
                     page_size = math.ceil(episode_num / 30)
 
                     for page in range(1, page_size+1):
                         episode_page_url = self.api['DmcEpisodes'].format(
+                            region=self.profile['country'],
+                            language=self.profile['language'],
                             season_id=season_id, page=page)
                         self.logger.debug(episode_page_url)
                         for episode in http_request(session=self.session, url=episode_page_url, method=HTTPMethod.GET)['data']['DmcEpisodes']['videos']:
@@ -112,6 +124,8 @@ class DisneyPlus(object):
 
         elif '/movies' in self.url:
             movie_url = self.api['DmcVideo'].format(
+                region=self.profile['country'],
+                language=self.profile['language'],
                 family_id=os.path.basename(self.url))
             data = http_request(session=self.session, url=movie_url, method=HTTPMethod.GET)[
                 'data']['DmcVideoBundle']['video']
@@ -148,7 +162,8 @@ class DisneyPlus(object):
             "Origin": 'https://www.disneyplus.com',
             "authorization": self.token
         }
-        playback_url = f'https://disney.playback.edge.bamgrid.com/media/{media_id}/scenarios/restricted-drm-ctr-sw'
+        playback_url = self.api['playback'].format(
+            media_id=media_id)
         self.logger.debug(playback_url)
         respones = http_request(
             session=self.session, url=playback_url, method=HTTPMethod.GET, headers=headers)
@@ -197,14 +212,15 @@ class DisneyPlus(object):
             self.language_list = available_languages
 
         if not set(self.language_list).intersection(set(available_languages)):
-            self.logger.error('\n提供的字幕語言：%s', available_languages)
+            self.logger.error(
+                _('\nSubtitle available languages: %s'), available_languages)
             exit()
 
         for sub in subtitle_list:
             if sub['lang'] in self.language_list:
                 file_name = sub_name.replace('.vtt', f".{sub['lang']}.srt")
                 self.logger.info(
-                    '\n下載：%s\n---------------------------------------------------------------', file_name)
+                    _('\nDownload: %s\n---------------------------------------------------------------'), file_name)
 
                 tmp_folder_path = os.path.join(
                     os.path.join(folder_path, sub['lang']), 'tmp')
@@ -218,14 +234,15 @@ class DisneyPlus(object):
                 download_file_multithread(
                     sub['urls'], subtitle_names, tmp_folder_path)
                 convert_subtitle(tmp_folder_path)
-                merge_subtitle(tmp_folder_path, file_name)
+                merge_subtitle_fragments(tmp_folder_path, file_name)
 
     def get_audio(self, audio_list, folder_path, audio_name):
         for audio in audio_list:
             if audio['lang'] in ['cmn-TW', 'yue']:
                 file_name = audio_name.replace(
                     '.vtt', f".{audio['lang']}{audio['extension']}")
-                self.logger.info('\n下載：%s', file_name)
+                self.logger.info(
+                    _('\nDownload: %s\n---------------------------------------------------------------'), file_name)
                 download_audio(audio['url'], os.path.join(
                     folder_path, file_name))
 
@@ -235,8 +252,10 @@ class DisneyPlus(object):
             email = self.email
             password = self.password
         else:
-            email = input('輸入帳號：')
-            password = getpass('輸入密碼（不顯示）：')
+            email = input(_('Disney+ email: '))
+            password = getpass(_('Disney+ password: '))
         user = Login(email=email, password=password)
-        self.token = user.get_auth_token()
+        self.profile, self.token = user.get_auth_token()
+        self.logger.info(
+            _('\nSuccessfully logged in. Welcome %s!'), self.profile['name'])
         self.download_subtitle()

@@ -1,5 +1,5 @@
 '''
-This module is to Login Disney+
+This module is to login Disney+
 '''
 
 import logging
@@ -70,15 +70,16 @@ class Login(object):
             return access_token
 
         if 'unreliable-location' in str(res.text):
-            print('Make sure you use NL proxy/vpn, or your proxy/vpn is blacklisted.')
+            self.logger.info(
+                'Make sure you use NL proxy/vpn, or your proxy/vpn is blacklisted.')
             exit()
         else:
             try:
-                print('Error: ' + str(res.json()
-                                      ['errors']['error_description']))
+                self.logger.error('Error: %s', res.json()[
+                                  'errors']['error_description'])
                 exit()
             except Exception:
-                print('Error: ' + str(res.text))
+                self.logger.error('Error: %s', res.text)
                 exit()
 
     def login(self, access_token):
@@ -102,10 +103,10 @@ class Login(object):
             return id_token
 
         try:
-            print('Error: ' + str(res.json()['errors']))
+            self.logger.error('Error: %s', res.json()['errors'])
             exit()
         except Exception:
-            print('Error: ' + str(res.text))
+            self.logger.error('Error: %s', res.text)
             exit()
 
     def grant(self, id_token, access_token):
@@ -153,10 +154,10 @@ class Login(object):
             return access_token
 
         try:
-            print('Error: ' + str(res.json()['errors']))
+            self.logger.error('Error: %s', res.json()['errors'])
             exit()
         except Exception:
-            print('Error: ' + str(res.text))
+            self.logger.error('Error: %s', res.text)
             exit()
 
     def get_auth_token(self):
@@ -167,10 +168,9 @@ class Login(object):
         id_token = self.login(access_token)
         user_assertion = self.grant(id_token, access_token)
         token = self.final_token(user_assertion, client_apikey)
+        profile = self.get_profile_name(client_id, token)
 
-        self.get_profile_name(client_id, token)
-
-        return token
+        return profile, token
 
     def get_profile_name(self, client_id, token):
         headers = {
@@ -188,6 +188,10 @@ class Login(object):
             url=self.current_account_url, headers=headers)
 
         if res.status_code == 200:
-            profile_name = res.json()['activeProfile']['profileName']
-            self.logger.info(
-                '\n登入成功，歡迎 %s', profile_name)
+            self.logger.debug(res.json())
+            user = res.json()
+            profile = dict()
+            profile['name'] = user['activeProfile']['profileName']
+            profile['language'] = user['activeProfile']['attributes']['languagePreferences']['appLanguage']
+            profile['country'] = user['attributes']['locations']['registration']['geoIp']['country']
+            return profile

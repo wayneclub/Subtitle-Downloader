@@ -1263,10 +1263,14 @@ def json_to_srt(str_name_file):
     return str_name_file
 
 
-def archive_subtitle(path, platform=""):
+def archive_subtitle(path, platform="", display=True):
     """
     Archive subtitles
     """
+
+    if display:
+        print("\n將字幕封裝打包：\n---------------------------------------------------------------")
+
     platforms = [{'id': 'nf', 'name': 'Netflix'},
                  {'id': 'kktv', 'name': 'KKTV'},
                  {'id': 'linetv', 'name': 'LineTV'},
@@ -1280,8 +1284,6 @@ def archive_subtitle(path, platform=""):
             'name']
     else:
         platform = ''
-
-    print("\n將字幕封裝打包：\n---------------------------------------------------------------")
 
     if platform:
         zipname = os.path.basename(f'{path}.WEB-DL.{platform}')
