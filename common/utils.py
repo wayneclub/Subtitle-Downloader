@@ -152,7 +152,7 @@ def get_network_url(driver, search_url, _=get_locale(__name__)):
     return url
 
 
-def convert_subtitle(folder_path, ott="", _=get_locale(__name__)):
+def convert_subtitle(folder_path="", ott="", _=get_locale(__name__)):
     if os.path.exists(folder_path):
         display = True
         for file in sorted(os.listdir(folder_path)):
@@ -171,7 +171,7 @@ def convert_subtitle(folder_path, ott="", _=get_locale(__name__)):
                 os.path.normpath(folder_path), ott, False)
 
 
-def merge_subtitle_fragments(folder_path, file_name, _=get_locale(__name__)):
+def merge_subtitle_fragments(folder_path="", file_name="", _=get_locale(__name__)):
     if os.path.exists(folder_path):
         logger.info(
             _("\nMerge segments：\n---------------------------------------------------------------\n%s"), file_name)
