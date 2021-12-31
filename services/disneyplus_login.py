@@ -9,14 +9,11 @@ import requests
 from getpass import getpass
 from common.utils import get_locale
 
-_ = get_locale(__name__)
-
 
 class Login(object):
     def __init__(self, email, password, locale):
         self.logger = logging.getLogger(__name__)
-        print(locale)
-        _ = get_locale(__name__, locale)
+        self._ = get_locale(__name__, locale)
         self.email = email
         self.password = password
         self.login_page = 'https://www.disneyplus.com/login'
@@ -89,12 +86,13 @@ class Login(object):
                 exit()
 
     def login(self, access_token):
+
         if self.email and self.password:
             email = self.email.strip()
             password = self.password.strip()
         else:
-            email = input(_('Disney+ email: '))
-            password = getpass(_('Disney+ password: '))
+            email = input(self._('Disney+ email: '))
+            password = getpass(self._('Disney+ password: '))
 
         headers = {
             'accept': 'application/json; charset=utf-8',
@@ -209,6 +207,6 @@ class Login(object):
             profile['country'] = user['attributes']['locations']['registration']['geoIp']['country']
 
             self.logger.info(
-                _('\nSuccessfully logged in. Welcome %s!'), profile['name'])
+                self._('\nSuccessfully logged in. Welcome %s!'), profile['name'])
 
             return profile
