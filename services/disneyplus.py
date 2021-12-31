@@ -2,12 +2,13 @@
 This module is to download subtitle from Disney+
 """
 
+import locale
 import re
 import os
 import logging
 import math
 import shutil
-from getpass import getpass
+
 import m3u8
 import requests
 from common.utils import get_locale, http_request, HTTPMethod, download_audio, convert_subtitle, merge_subtitle_fragments, download_file_multithread
@@ -21,7 +22,7 @@ class DisneyPlus(object):
     def __init__(self, args):
         self.logger = logging.getLogger(__name__)
         self.locale = args.locale
-        # _ = get_locale(__name__, self.locale)
+        _ = get_locale(__name__, self.locale)
 
         self.url = args.url.strip()
         self.email = args.email
@@ -251,16 +252,10 @@ class DisneyPlus(object):
                     folder_path, file_name))
 
     def main(self):
-        _ = get_locale(__name__, self.locale)
+        # _ = get_locale(__name__, self.locale)
         self.get_language_list()
-        if self.email and self.password:
-            email = self.email
-            password = self.password
-        else:
-            email = input(_('Disney+ email: '))
-            password = getpass(_('Disney+ password: '))
-        user = Login(email=email, password=password)
+
+        user = Login(email=self.email, password=self.password,
+                     locale=self.locale)
         self.profile, self.token = user.get_auth_token()
-        self.logger.info(
-            _('\nSuccessfully logged in. Welcome %s!'), self.profile['name'])
         self.download_subtitle()
