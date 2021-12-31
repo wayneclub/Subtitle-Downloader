@@ -237,7 +237,7 @@ def merge_subtitle(first_file, second_file):
     subs_first.sort()
 
     subs_first.save(new_file_name)
-    print(os.path.basename(new_file_name) + '\t...合併完成\n')
+    print(os.path.basename(new_file_name) + '\t...completed\n')
 
 
 def format_subtitle(file_name):
@@ -1106,7 +1106,7 @@ def ass_to_srt(str_name_file):
         str_name_file).parent) + '/' + rename_subtitle(str_name_file)
     file_create(str_name_file, str_data)
     format_subtitle(str_name_file)
-    print(os.path.basename(str_name_file) + "\t...轉檔完成")
+    print(os.path.basename(str_name_file) + "\t...completed")
 
     return str_name_file
 
@@ -1149,7 +1149,7 @@ def vtt_to_srt(str_name_file):
         sub.text = text.strip()
 
     subs.save(str_name_file)
-    print(os.path.basename(str_name_file) + "\t...轉檔完成")
+    print(os.path.basename(str_name_file) + "\t...completed")
 
     return str_name_file
 
@@ -1242,7 +1242,7 @@ def xml_to_srt(str_name_file):
     str_name_file: str = str(Path(
         str_name_file).parent) + '/' + rename_subtitle(str_name_file)
     subs.save(str_name_file)
-    print(os.path.basename(str_name_file) + "\t...轉檔完成\n")
+    print(os.path.basename(str_name_file) + "\t...completed\n")
 
     return str_name_file
 
@@ -1258,7 +1258,7 @@ def json_to_srt(str_name_file):
     str_name_file: str = str(Path(
         str_name_file).parent) + '/' + rename_subtitle(str_name_file)
     subs.save(str_name_file)
-    print(os.path.basename(str_name_file) + "\t...轉檔完成")
+    print(os.path.basename(str_name_file) + "\t...completed")
 
     return str_name_file
 
