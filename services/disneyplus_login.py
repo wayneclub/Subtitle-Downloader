@@ -15,8 +15,8 @@ _ = get_locale(__name__)
 class Login(object):
     def __init__(self, email, password, locale):
         self.logger = logging.getLogger(__name__)
-        self.locale = locale
-        _ = get_locale(__name__, self.locale)
+        print(locale)
+        _ = get_locale(__name__, locale)
         self.email = email
         self.password = password
         self.login_page = 'https://www.disneyplus.com/login'

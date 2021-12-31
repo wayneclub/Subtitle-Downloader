@@ -37,6 +37,8 @@ def get_locale(name, lang=""):
     current_locale = locale.getdefaultlocale()[0]
     if lang and 'zh' in lang:
         current_locale = 'zh'
+    else:
+        current_locale = 'en'
 
     if 'zh' in current_locale:
         locale_ = gettext.translation(
