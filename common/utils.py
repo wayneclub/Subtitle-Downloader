@@ -33,42 +33,6 @@ class HTTPMethod:
     DELETE = 'DELETE'
 
 
-class DownloadProgressBar(tqdm):
-    def update_to(self, b=1, bsize=1, tsize=None):
-        if tsize is not None:
-            self.total = tsize
-        self.update(b * bsize - self.n)
-
-
-def download_file(url, output_path, _=get_locale(__name__)):
-    if check_url_exist(url):
-        with DownloadProgressBar(unit='B', unit_scale=True,
-                                 miniters=1, desc=os.path.basename(output_path)) as t:
-            request.urlretrieve(
-                url, filename=output_path, reporthook=t.update_to)
-    else:
-        logger.warning(_("\nFile not found!"))
-
-
-def download_file_multithread(urls, file_names, output_path=""):
-    cpus = multiprocessing.cpu_count()
-    max_pool_size = 8
-    pool = multiprocessing.Pool(
-        cpus if cpus < max_pool_size else max_pool_size)
-    pool = multiprocessing.Pool(
-        cpus if cpus < max_pool_size else max_pool_size)
-    for url, file_name in zip(urls, file_names):
-        pool.apply_async(download_file, args=(
-            url, os.path.join(output_path, file_name)))
-    pool.close()
-    pool.join()
-
-
-def download_audio(m3u8_url, output):
-    os.system(
-        f'ffmpeg -protocol_whitelist file,http,https,tcp,tls,crypto -i "{m3u8_url}" -c copy "{output}" -preset ultrafast -loglevel warning -hide_banner -stats')
-
-
 def get_locale(name, lang=""):
     current_locale = locale.getdefaultlocale()
     if 'zh' in current_locale[0] or 'zh' in lang:
@@ -238,6 +202,42 @@ def pretty_print_json(json_obj):
     formatted_json = orjson.dumps(
         json_obj, option=orjson.OPT_INDENT_2).decode('utf-8')
     return highlight(formatted_json, lexers.JsonLexer(), formatters.TerminalFormatter())
+
+
+class DownloadProgressBar(tqdm):
+    def update_to(self, b=1, bsize=1, tsize=None):
+        if tsize is not None:
+            self.total = tsize
+        self.update(b * bsize - self.n)
+
+
+def download_file(url, output_path, _=get_locale(__name__)):
+    if check_url_exist(url):
+        with DownloadProgressBar(unit='B', unit_scale=True,
+                                 miniters=1, desc=os.path.basename(output_path)) as t:
+            request.urlretrieve(
+                url, filename=output_path, reporthook=t.update_to)
+    else:
+        logger.warning(_("\nFile not found!"))
+
+
+def download_file_multithread(urls, file_names, output_path=""):
+    cpus = multiprocessing.cpu_count()
+    max_pool_size = 8
+    pool = multiprocessing.Pool(
+        cpus if cpus < max_pool_size else max_pool_size)
+    pool = multiprocessing.Pool(
+        cpus if cpus < max_pool_size else max_pool_size)
+    for url, file_name in zip(urls, file_names):
+        pool.apply_async(download_file, args=(
+            url, os.path.join(output_path, file_name)))
+    pool.close()
+    pool.join()
+
+
+def download_audio(m3u8_url, output):
+    os.system(
+        f'ffmpeg -protocol_whitelist file,http,https,tcp,tls,crypto -i "{m3u8_url}" -c copy "{output}" -preset ultrafast -loglevel warning -hide_banner -stats')
 
 
 if __name__:
