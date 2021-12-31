@@ -32,7 +32,7 @@ if __name__ == "__main__":
                         '--last-episode',
                         dest='last_episode',
                         action='store_true',
-                        help=_('download latest episode'))
+                        help=_('download the latest episode'))
     parser.add_argument('-o',
                         '--output',
                         dest='output',

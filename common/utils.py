@@ -75,7 +75,11 @@ def get_locale(name, lang=""):
         lang = gettext.translation(
             name, localedir='locales', languages=['zh-Hant'])
         lang.install()
-        return lang.gettext
+    else:
+        lang = gettext.translation(
+            name, localedir='locales', languages=['en'])
+        lang.install()
+    return lang.gettext
 
 
 def http_request(session=requests.Session(), url="", method="", headers="", kwargs="", raw=False):

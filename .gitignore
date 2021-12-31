@@ -3,4 +3,6 @@ __pycache__/
 *.pyc
 *.pot
 *.srt
+*.vtt
+__tmp__/
 test.py

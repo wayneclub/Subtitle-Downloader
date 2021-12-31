@@ -18,13 +18,13 @@ msgstr ""
 msgid ""
 "\n"
 "File not found!"
-msgstr "\n找不到檔案"
+msgstr "\nFile not found!"
 
 #: common/utils.py:182
 msgid ""
 "\n"
 "Timeout, please retry."
-msgstr "\n逾時，請再試一次"
+msgstr "\nTimeout, please retry."
 
 #: common/utils.py:195
 #, python-brace-format
@@ -32,14 +32,14 @@ msgid ""
 "\n"
 "Convert %s to .srt:\n"
 "---------------------------------------------------------------"
-msgstr "\n將 %s 轉換成 .srt：\n---------------------------------------------------------------"
+msgstr "\nConvert %s to .srt:\n---------------------------------------------------------------"
 
 #: common/utils.py:201
 msgid ""
 "\n"
 "Archive subtitles:\n"
 "---------------------------------------------------------------"
-msgstr "\n將字幕封裝打包：\n---------------------------------------------------------------"
+msgstr "\nArchive subtitles:\n---------------------------------------------------------------"
 
 #: common/utils.py:209
 #, python-format
@@ -48,4 +48,4 @@ msgid ""
 "Merge segments：\n"
 "---------------------------------------------------------------\n"
 "%s"
-msgstr "\n合併所有字幕片段：\n---------------------------------------------------------------\n%s"
+msgstr "\nMerge segments:\n---------------------------------------------------------------\n%s"
