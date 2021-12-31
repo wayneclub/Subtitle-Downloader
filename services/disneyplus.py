@@ -20,7 +20,8 @@ class DisneyPlus(object):
 
     def __init__(self, args):
         self.logger = logging.getLogger(__name__)
-        _ = get_locale(__name__, args.locale)
+        self.locale = args.locale
+        _ = get_locale(__name__, self.locale)
 
         self.url = args.url.strip()
         self.email = args.email
@@ -121,7 +122,7 @@ class DisneyPlus(object):
                                     audio_list, folder_path, file_name)
 
                     convert_subtitle(folder_path=folder_path,
-                                     ott='disney', _=_)
+                                     ott='disney', lang=self.locale)
 
         elif '/movies' in self.url:
             movie_url = self.api['DmcVideo'].format(
@@ -151,7 +152,8 @@ class DisneyPlus(object):
             if self.audio_language:
                 self.get_audio(audio_list, folder_path, file_name)
 
-            convert_subtitle(folder_path, 'disney', _)
+            convert_subtitle(folder_path=folder_path,
+                             ott='disney', lang=self.locale)
 
     def get_m3u8_url(self, media_id):
         headers = {
@@ -234,9 +236,9 @@ class DisneyPlus(object):
                 subtitle_names = [os.path.basename(url) for url in sub['urls']]
                 download_file_multithread(
                     sub['urls'], subtitle_names, tmp_folder_path)
-                convert_subtitle(folder_path=tmp_folder_path, _=_)
+                convert_subtitle(folder_path=tmp_folder_path, lang=self.locale)
                 merge_subtitle_fragments(
-                    folder_path=tmp_folder_path, file_name=file_name, _=_)
+                    folder_path=tmp_folder_path, file_name=file_name, lang=self.locale)
 
     def get_audio(self, audio_list, folder_path, audio_name):
         for audio in audio_list:

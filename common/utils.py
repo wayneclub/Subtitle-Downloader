@@ -134,7 +134,8 @@ def driver_init(headless=True):
     return driver
 
 
-def get_network_url(driver, search_url, _=get_locale(__name__)):
+def get_network_url(driver, search_url, lang=""):
+    _ = get_locale(__name__, lang)
     url = ''
     delay = 0
     logs = tuple()
@@ -152,7 +153,8 @@ def get_network_url(driver, search_url, _=get_locale(__name__)):
     return url
 
 
-def convert_subtitle(folder_path="", ott="", _=get_locale(__name__)):
+def convert_subtitle(folder_path="", ott="", lang=""):
+    _ = get_locale(__name__, lang)
     if os.path.exists(folder_path):
         display = True
         for file in sorted(os.listdir(folder_path)):
@@ -171,7 +173,8 @@ def convert_subtitle(folder_path="", ott="", _=get_locale(__name__)):
                 os.path.normpath(folder_path), ott, False)
 
 
-def merge_subtitle_fragments(folder_path="", file_name="", _=get_locale(__name__)):
+def merge_subtitle_fragments(folder_path="", file_name="", lang=""):
+    _ = get_locale(__name__, lang)
     if os.path.exists(folder_path):
         logger.info(
             _("\nMerge segments：\n---------------------------------------------------------------\n%s"), file_name)
@@ -211,7 +214,8 @@ class DownloadProgressBar(tqdm):
         self.update(b * bsize - self.n)
 
 
-def download_file(url, output_path, _=get_locale(__name__)):
+def download_file(url, output_path, lang=""):
+    _ = get_locale(__name__, lang)
     if check_url_exist(url):
         with DownloadProgressBar(unit='B', unit_scale=True,
                                  miniters=1, desc=os.path.basename(output_path)) as t:
