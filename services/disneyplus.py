@@ -120,7 +120,7 @@ class DisneyPlus(object):
                                 self.get_audio(
                                     audio_list, folder_path, file_name)
 
-                    convert_subtitle(folder_path, 'disney')
+                    convert_subtitle(folder_path, 'disney', _=_)
 
         elif '/movies' in self.url:
             movie_url = self.api['DmcVideo'].format(
@@ -150,7 +150,7 @@ class DisneyPlus(object):
             if self.audio_language:
                 self.get_audio(audio_list, folder_path, file_name)
 
-            convert_subtitle(folder_path, 'disney')
+            convert_subtitle(folder_path, 'disney', _=_)
 
     def get_m3u8_url(self, media_id):
         headers = {
@@ -233,8 +233,8 @@ class DisneyPlus(object):
                 subtitle_names = [os.path.basename(url) for url in sub['urls']]
                 download_file_multithread(
                     sub['urls'], subtitle_names, tmp_folder_path)
-                convert_subtitle(tmp_folder_path)
-                merge_subtitle_fragments(tmp_folder_path, file_name)
+                convert_subtitle(tmp_folder_path, _=_)
+                merge_subtitle_fragments(tmp_folder_path, file_name, _=_)
 
     def get_audio(self, audio_list, folder_path, audio_name):
         for audio in audio_list:
