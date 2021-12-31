@@ -34,18 +34,19 @@ class HTTPMethod:
 
 
 def get_locale(name, lang=""):
-    current_locale = locale.getdefaultlocale()
-    print(lang)
-    if 'zh' in current_locale[0] or (lang and 'zh' in lang):
-        lang = gettext.translation(
+    current_locale = locale.getdefaultlocale()[0]
+    if lang and 'zh' in lang:
+        current_locale = 'zh'
+
+    if 'zh' in current_locale:
+        locale_ = gettext.translation(
             name, localedir='locales', languages=['zh-Hant'])
-        lang.install()
     else:
-        print(current_locale)
-        lang = gettext.translation(
+        locale_ = gettext.translation(
             name, localedir='locales', languages=['en'])
-        lang.install()
-    return lang.gettext
+
+    locale_.install()
+    return locale_.gettext
 
 
 def http_request(session=requests.Session(), url="", method="", headers="", kwargs="", raw=False):
