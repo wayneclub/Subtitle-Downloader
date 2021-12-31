@@ -108,8 +108,7 @@ python subtitle_downloader.py https://www.disneyplus.com/series/loki/6pARMvILBGz
 > 4. 愛奇藝 下載劇集
 > 4. Disney+ 下載電影、劇集
 > 5. HBOGO Asia 下載電影、劇集
+> 
+> 請確認網站網址無誤
 
-請確認網站網址無誤
-
-使用方式：
 ![alt text](https://github.com/wayneclub/Subtitle-Downloader/blob/main/guide.png?raw=true)
