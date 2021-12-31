@@ -43,18 +43,3 @@ msgid ""
 "Download: %s\n"
 "---------------------------------------------------------------"
 msgstr "\n下載：%s\n---------------------------------------------------------------"
-
-#: disneyplus.py:247
-msgid "Disney+ email: "
-msgstr "Disney+ 帳號："
-
-#: disneyplus.py:248
-msgid "Disney+ password: "
-msgstr "Disney+ 密碼："
-
-#: disneyplus.py:253
-#, python-format
-msgid ""
-"\n"
-"Successfully logged in. Welcome %s!"
-msgstr "\n登入成功，歡迎 %s"
