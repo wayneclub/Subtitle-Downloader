@@ -97,6 +97,9 @@ Disney Plus
 | fi | Suomi | 芬蘭文 |
 | sv | Svenska | 瑞典文 |
 
+```
+python subtitle_downloader.py https://www.disneyplus.com/series/loki/6pARMvILBGzF -slang en,zh-Hant
+```
 
 目前只支持從
 1. KKTV 下載電影、劇集、綜藝、動漫字幕
