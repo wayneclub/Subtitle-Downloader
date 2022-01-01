@@ -49,19 +49,6 @@ python download_subtitle.py URL [OPTIONS]
 ```
 ## Subtitle Languages
 
-iq.com
-
-| Codec | Language | 語言 |
-| --- | --- | --- |
-| en | English | 英文 |
-| zh-Hant | Traditional Chinese | 繁體中文 |
-| zh-Hans | Simplified Chinese | 簡體中文 |
-| ms | Malay | 馬來文 |
-| vi | Vietnamese | 越南文 |
-| th | Thai | 泰文 |
-| id | Indonesian | 印尼文 |
-| ar | Arabic | 阿拉伯文 |
-
 HBOGO Asia
 
 | Codec | Language | 語言 |
@@ -96,6 +83,19 @@ Disney Plus
 | pt-BR | Português (Brasil) | 葡萄牙語文（巴西） |
 | fi | Suomi | 芬蘭文 |
 | sv | Svenska | 瑞典文 |
+
+iq.com
+
+| Codec | Language | 語言 |
+| --- | --- | --- |
+| en | English | 英文 |
+| zh-Hant | Traditional Chinese | 繁體中文 |
+| zh-Hans | Simplified Chinese | 簡體中文 |
+| ms | Malay | 馬來文 |
+| vi | Vietnamese | 越南文 |
+| th | Thai | 泰文 |
+| id | Indonesian | 印尼文 |
+| ar | Arabic | 阿拉伯文 |
 
 ```
 python subtitle_downloader.py https://www.disneyplus.com/series/loki/6pARMvILBGzF -slang en,zh-Hant
