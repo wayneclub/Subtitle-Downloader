@@ -2,7 +2,7 @@
 
 **NON-COMMERCIAL USE ONLY**
 
-Subtitle-Downloader supports downloading subtitles from Disney Plus, HBOGO Asia, KKTV, LineTV, friDay Video, iq.com.
+Subtitle-Downloader supports downloading subtitles from Disney Plus, HBOGO Asia, KKTV, LineTV, friDay Video, iq.com, and Viu.
 
 - English
 <a href="https://colab.research.google.com/drive/1Qu7MHUt4QXym9cNOORCKTezIBYBNNg3V?usp=sharing" target="_blank"><img src="https://colab.research.google.com/assets/colab-badge.svg" title="Open this file in Google Colab" alt="Colab"/></a> 
