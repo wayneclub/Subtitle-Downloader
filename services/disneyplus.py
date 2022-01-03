@@ -207,13 +207,16 @@ class DisneyPlus(Service):
             if sub_lang in self.language_list:
                 sub = {}
                 sub['lang'] = sub_lang
-                m3u8_data = http_request(session=self.session, url=os.path.join(
-                    base_url, media_uri), method=HTTPMethod.GET, raw=True)
+
+                sub_m3u8 = f'{base_url}/{media_uri}'
+                self.logger.debug(sub_m3u8)
+                m3u8_data = http_request(
+                    session=self.session, url=sub_m3u8, method=HTTPMethod.GET, raw=True)
 
                 sub['urls'] = []
                 for segement in re.findall(r'.+\-MAIN\/.+\.vtt', m3u8_data):
-                    sub_url = os.path.join(
-                        os.path.join(base_url, 'r'), segement)
+                    sub_url = f'{base_url}/r/{segement}'
+                    self.logger.debug(sub_url)
                     sub['urls'].append(sub_url)
                 sub_url_list.append(sub)
 
@@ -231,10 +234,10 @@ class DisneyPlus(Service):
                 if media.type == 'AUDIO' and not 'Audio Description' in media.name:
                     audio = {}
                     if media.group_id == 'eac-3':
-                        audio['url'] = os.path.join(base_url, media.uri)
+                        audio['url'] = f'{base_url}/{media.uri}'
                         audio['extension'] = '.eac3'
                     elif media.group_id == 'aac-128k':
-                        audio['url'] = os.path.join(base_url, media.uri)
+                        audio['url'] = f'{base_url}/{media.uri}'
                         audio['extension'] = '.aac'
                     audio['lang'] = media.language
                     audio_url_list.append(audio)
