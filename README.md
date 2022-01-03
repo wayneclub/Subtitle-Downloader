@@ -97,6 +97,17 @@ iq.com
 | id | Indonesian | 印尼文 |
 | ar | Arabic | 阿拉伯文 |
 
+Viu
+| Codec | Language | 語言 |
+| --- | --- | --- |
+| en | English | 英文 |
+| zh-Hant | Traditional Chinese | 繁體中文 |
+| zh-Hans | Simplified Chinese | 簡體中文 |
+| ms | Malay | 馬來文 |
+| th | Thai | 泰文 |
+| id | Indonesian | 印尼文 |
+| my | Burmese | 緬甸文 |
+
 ```
 python subtitle_downloader.py https://www.disneyplus.com/series/loki/6pARMvILBGzF -slang en,zh-Hant
 ```
