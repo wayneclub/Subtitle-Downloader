@@ -1,3 +1,6 @@
+#!/usr/bin/python3
+# coding: utf-8
+
 """
 This module is to download subtitle from iQIYI
 """
@@ -7,33 +10,20 @@ import os
 import shutil
 import logging
 import orjson
-import requests
-from common.utils import http_request, HTTPMethod, get_ip_location, driver_init, get_network_url, convert_subtitle, download_file_multithread
+from common.utils import get_locale, Platform, http_request, HTTPMethod, get_ip_location, driver_init, get_network_url, download_files
+from common.subtitle import convert_subtitle
 from common.dictionary import convert_chinese_number
+from services.service import Service
 
 
-class IQIYI(object):
+class IQIYI(Service):
     def __init__(self, args):
+        super().__init__(args)
         self.logger = logging.getLogger(__name__)
-        self.url = args.url.strip()
-
-        if args.output:
-            self.output = args.output.strip()
-        else:
-            self.output = os.getcwd()
-
-        if args.season:
-            self.download_season = int(args.season)
-        else:
-            self.download_season = None
-
-        self.last_episode = args.last_episode
-
+        self._ = get_locale(__name__, self.locale)
         self.subtitle_language = args.subtitle_language
 
         self.language_list = ()
-
-        self.session = requests.Session()
 
         self.api = {
             'meta': 'https://meta.video.iqiyi.com'
@@ -61,6 +51,24 @@ class IQIYI(object):
         self.language_list = tuple([
             language for language in self.subtitle_language.split(',')])
 
+    def get_all_languages(self, data):
+
+        if not 'stl' in data:
+            self.logger.info(
+                self._("\nSorry, there's no embeded subtitles in this video!"))
+            exit(0)
+
+        available_languages = tuple(
+            [self.get_language_code(sub['_name']) for sub in data['stl']])
+
+        if 'all' in self.language_list:
+            self.language_list = available_languages
+
+        if not set(self.language_list).intersection(set(available_languages)):
+            self.logger.error(
+                self._("\nSubtitle available languages: %s"), available_languages)
+            exit(0)
+
     def download_subtitle(self):
         response = http_request(session=self.session,
                                 url=self.url, method=HTTPMethod.GET, raw=True)
@@ -76,8 +84,8 @@ class IQIYI(object):
                 allow_regions = info['regionsAllowed'].split(',')
                 if not get_ip_location()['country'].lower() in allow_regions:
                     self.logger.info(
-                        '\n你所在的地區無法下載，可用VPN換區到以下地區：\n%s', ', '.join(allow_regions))
-                    exit()
+                        self._("\nThis video is only allows in:\n%s"), ', '.join(allow_regions))
+                    exit(0)
 
                 if 'maxOrder' in info:
                     current_eps = info['maxOrder']
@@ -92,18 +100,7 @@ class IQIYI(object):
                 else:
                     season_name = '01'
 
-                self.logger.info('\n%s', title)
-
-                if current_eps == episode_num:
-                    self.logger.info('\n第 %s 季 共有：%s 集\t下載全集\n---------------------------------------------------------------',
-                                     int(season_name),
-                                     episode_num)
-                else:
-                    self.logger.info(
-                        '\n第 %s 季 共有：%s 集\t更新至 第 %s 集\t下載全集\n---------------------------------------------------------------',
-                        int(season_name),
-                        episode_num,
-                        current_eps)
+                self.logger.info("\n%s", title)
 
             episode_list = []
             if 'cacheAlbumList' in drama['album'] and '1' in drama['album']['cacheAlbumList'] and len(drama['album']['cacheAlbumList']['1']) > 0:
@@ -111,10 +108,29 @@ class IQIYI(object):
             elif 'play' in drama and 'cachePlayList' in drama['play'] and '1' in drama['play']['cachePlayList'] and len(drama['play']['cachePlayList']['1']) > 0:
                 episode_list = drama['play']['cachePlayList']['1']
 
+            if self.last_episode:
+                episode_list = [list(episode_list)[-1]]
+                self.logger.info(self._("\nSeason %s total: %s episode(s)\tdownload season %s last episode\n---------------------------------------------------------------"),
+                                 int(season_name), current_eps, int(season_name))
+            else:
+                if current_eps == episode_num:
+                    self.logger.info(self._("\nSeason %s total: %s episode(s)\tdownload all episodes\n---------------------------------------------------------------"),
+                                     int(season_name),
+                                     episode_num)
+                else:
+                    self.logger.info(
+                        self._(
+                            "\nSeason %s total: %s episode(s)\tupdate to episode %s\tdownload all episodes\n---------------------------------------------------------------"),
+                        int(season_name),
+                        episode_num,
+                        current_eps)
+
             folder_path = os.path.join(self.output, f'{title}.S{season_name}')
             if os.path.exists(folder_path):
                 shutil.rmtree(folder_path)
 
+            languages = set()
+            subtitles = []
             if len(episode_list) > 0:
                 driver = driver_init()
                 lang_paths = set()
@@ -129,48 +145,37 @@ class IQIYI(object):
                         self.logger.debug(episode_url)
                         driver.get(episode_url)
 
+                        file_name = f'{title}.S{season_name}E{episode_name}.WEB-DL.{Platform.IQIYI}.vtt'
+
+                        self.logger.info(self._("Finding %s ..."), file_name)
                         dash_url = get_network_url(
                             driver, r'https:\/\/cache-video.iq.com\/dash\?')
                         self.logger.debug(dash_url)
 
-                        file_name = f'{title}.S{season_name}E{episode_name}.WEB-DL.iQiyi.srt'
+                        episode_data = http_request(session=self.session,
+                                                    url=dash_url, method=HTTPMethod.GET)['data']['program']
 
-                        lang_paths = self.get_subtitle(
-                            dash_url, folder_path, file_name)
+                        self.get_all_languages(episode_data)
+
+                        subs, lang_paths = self.get_subtitle(
+                            episode_data, folder_path, file_name)
+                        subtitles += subs
+                        languages = set.union(languages, lang_paths)
 
                 driver.quit()
 
-                for lang_path in lang_paths:
-                    convert_subtitle(lang_path)
-                convert_subtitle(folder_path, 'iqiyi')
+                download_files(subtitles)
 
-    def get_subtitle(self, url, folder_path, file_name):
-        response = http_request(session=self.session,
-                                url=url, method=HTTPMethod.GET)
+                for lang_path in sorted(languages):
+                    convert_subtitle(folder_path=lang_path, lang=self.locale)
+                convert_subtitle(folder_path=folder_path,
+                                 ott=Platform.IQIYI, lang=self.locale)
 
-        data = response['data']['program']
-
-        if not 'stl' in data:
-            self.logger.info('抱歉，此劇只有硬字幕，可去其他串流平台查看')
-            exit(0)
-        else:
-            data = data['stl']
+    def get_subtitle(self, data, folder_path, file_name):
 
         lang_paths = set()
-
-        available_languages = tuple([self.get_language_code(
-            sub['_name']) for sub in data])
-
-        if 'all' in self.language_list:
-            self.language_list = available_languages
-
-        if not set(self.language_list).intersection(set(available_languages)):
-            self.logger.error('\n提供的字幕語言：%s', available_languages)
-            exit()
-
-        subtitle_urls = []
-        subtitle_names = []
-        for sub in data:
+        subtitles = []
+        for sub in data['stl']:
             self.logger.debug(sub)
             sub_lang = self.get_language_code(sub['_name'])
             if sub_lang in self.language_list:
@@ -180,30 +185,27 @@ class IQIYI(object):
                     lang_folder_path = folder_path
                 lang_paths.add(lang_folder_path)
 
-                if 'srt' in sub:
-                    subtitle_link = sub['srt']
-                    subtitle_file_name = file_name.replace(
-                        '.srt', f'.{sub_lang}.srt')
-                elif 'webvtt' in sub:
+                if 'webvtt' in sub:
                     subtitle_link = sub['webvtt']
                     subtitle_file_name = file_name.replace(
-                        '.srt', f'.{sub_lang}.vtt')
+                        '.vtt', f'.{sub_lang}.vtt')
                 else:
                     subtitle_link = sub['xml']
                     subtitle_file_name = file_name.replace(
-                        '.srt', f'.{sub_lang}.xml')
+                        '.vtt', f'.{sub_lang}.xml')
 
                 subtitle_link = self.api['meta'] + \
                     subtitle_link.replace('\\/', '/')
 
                 os.makedirs(lang_folder_path,
                             exist_ok=True)
-                subtitle_urls.append(subtitle_link)
-                subtitle_names.append(os.path.join(
-                    lang_folder_path, subtitle_file_name))
 
-        download_file_multithread(subtitle_urls, subtitle_names)
-        return lang_paths
+                subtitle = dict()
+                subtitle['name'] = subtitle_file_name
+                subtitle['path'] = lang_folder_path
+                subtitle['url'] = subtitle_link
+                subtitles.append(subtitle)
+        return subtitles, lang_paths
 
     def main(self):
         self.get_language_list()

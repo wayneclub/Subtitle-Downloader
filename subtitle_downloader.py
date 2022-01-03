@@ -1,4 +1,5 @@
-# -*- coding: UTF-8 -*-
+#!/usr/bin/python3
+# coding: utf-8
 
 """
 This module is to download subtitle from KKTV、LineTV、FriDay.
@@ -14,13 +15,13 @@ from services.iqiyi import IQIYI
 from services.friday import Friday
 from services.linetv import LineTV
 from services.kktv import KKTV
-
+from services.viu import Viu
 
 if __name__ == "__main__":
     _ = get_locale('main')
 
     parser = argparse.ArgumentParser(
-        description=_("Download subtitles from Disney Plus, HBOGO Asia, KKTV, LineTV, friDay Video, iq.com."))
+        description=_("Download subtitles from Disney Plus, HBOGO Asia, KKTV, LineTV, friDay Video, iq.com, and Viu"))
     parser.add_argument('url',
                         help=_("series's/movie's link"))
     parser.add_argument('-s',
@@ -32,7 +33,7 @@ if __name__ == "__main__":
                         '--last-episode',
                         dest='last_episode',
                         action='store_true',
-                        help=_('download the latest episode'))
+                        help=_("download the latest episode"))
     parser.add_argument('-o',
                         '--output',
                         dest='output',
@@ -94,6 +95,8 @@ if __name__ == "__main__":
         r'https:\/\/www\.disneyplus\.com\/.*(series|movies)\/.+', args.url)
     hbogoasia_search = re.search(
         r'https:\/\/www\.hbogoasia\..+', args.url)
+    viu_search = re.search(
+        r'https:\/\/www.viu.com\/ott\/.+', args.url)
 
     if kktv_search:
         kktv = KKTV(args)
@@ -113,6 +116,9 @@ if __name__ == "__main__":
     elif hbogoasia_search:
         hbogoasia = HBOGOAsia(args)
         hbogoasia.main()
+    elif viu_search:
+        viu = Viu(args)
+        viu.main()
     else:
         logging.info(
-            _("Only support downloading subtitles from Disney Plus, HBOGO Asia, KKTV, LineTV, friDay Video, and iq.com."))
+            _("Only support downloading subtitles from Disney Plus, HBOGO Asia, KKTV, LineTV, friDay Video, iq.com, and Viu"))

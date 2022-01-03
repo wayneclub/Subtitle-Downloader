@@ -14,32 +14,25 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: disneyplus.py:76
+#: common/subtitle.py:57
 #, python-format
 msgid ""
 "\n"
-"%s total: %s season(s)"
-msgstr "\n%s 共有：%s 季"
-
-#: disneyplus.py:92
-#, python-format
-msgid ""
-"\n"
-"Season %s total: %s episode(s)\tdownload all episodes\n"
+"Convert %s to .srt:\n"
 "---------------------------------------------------------------"
-msgstr "\n第 %s 季 共有：%s 集\t下載全集\n---------------------------------------------------------------"
+msgstr "\n將 %s 轉換成 .srt：\n---------------------------------------------------------------"
 
-#: disneyplus.py:208
-#, python-format
+#: common/subtitle.py:65
 msgid ""
 "\n"
-"Subtitle available languages: %s"
-msgstr "\n提供的字幕語言：%s"
-
-#: disneyplus.py:142 disneyplus.py:215 disneyplus.py:237
-#, python-format
-msgid ""
-"\n"
-"Download: %s\n"
+"Archive subtitles:\n"
 "---------------------------------------------------------------"
-msgstr "\n下載：%s\n---------------------------------------------------------------"
+msgstr "\n將字幕封裝打包：\n---------------------------------------------------------------"
+
+#: common/subtitle.py:117
+#, python-format
+msgid ""
+"\n"
+"Merge segments：\n"
+"---------------------------------------------------------------"
+msgstr "\n合併所有字幕片段：\n---------------------------------------------------------------"

@@ -1,3 +1,6 @@
+#!/usr/bin/python3
+# coding: utf-8
+
 """
 This module is to download subtitle from KKTV
 """
@@ -5,30 +8,18 @@ This module is to download subtitle from KKTV
 import logging
 import os
 import re
-import requests
 import shutil
 import orjson
-from common.utils import http_request, HTTPMethod, check_url_exist, convert_subtitle, download_file_multithread
+from common.utils import get_locale, Platform, http_request, HTTPMethod, check_url_exist, download_file_multithread
+from common.subtitle import convert_subtitle
+from services.service import Service
 
 
-class KKTV(object):
+class KKTV(Service):
     def __init__(self, args):
+        super().__init__(args)
         self.logger = logging.getLogger(__name__)
-        self.url = args.url.strip()
-
-        if args.output:
-            self.output = args.output.strip()
-        else:
-            self.output = os.getcwd()
-
-        if args.season:
-            self.download_season = int(args.season)
-        else:
-            self.download_season = None
-
-        self.last_episode = args.last_episode
-
-        self.session = requests.Session()
+        self._ = get_locale(__name__, self.locale)
 
         self.api = {
             'play': 'https://www.kktv.me/play/{drama_id}010001'
@@ -50,7 +41,7 @@ class KKTV(object):
             drama = data['props']['initialState']['titles']['byId'][drama_id]
         else:
             self.logger.error('找不到該劇，請確認網址重試一次')
-            exit()
+            exit(0)
 
         if drama:
             if 'title' in drama:
@@ -126,7 +117,7 @@ class KKTV(object):
 
                             if not episode['subtitles']:
                                 self.logger.info('\n無提供可下載的字幕\n')
-                                exit()
+                                exit(0)
                             if 'ja' in episode['subtitles']:
                                 ja_lang = True
                             if 'ko' in episode['subtitles']:
@@ -151,11 +142,11 @@ class KKTV(object):
                                             'zh-Hant.vtt', 'ko.vtt')
 
                                         if film:
-                                            file_name = f'{title}.WEB-DL.KKTV.zh-Hant.vtt'
+                                            file_name = f'{title}.WEB-DL.{Platform.KKTV}.zh-Hant.vtt'
                                         elif anime:
-                                            file_name = f'{title}E{episode_name}.WEB-DL.KKTV.zh-Hant.vtt'
+                                            file_name = f'{title}E{episode_name}.WEB-DL.{Platform.KKTV}.zh-Hant.vtt'
                                         else:
-                                            file_name = f'{title}.S{season_name}E{episode_name}.WEB-DL.KKTV.zh-Hant.vtt'
+                                            file_name = f'{title}.S{season_name}E{episode_name}.WEB-DL.{Platform.KKTV}.zh-Hant.vtt'
                                             ja_file_name = file_name.replace(
                                                 'zh-Hant.vtt', 'ja.vtt')
                                             ko_file_name = file_name.replace(
@@ -200,7 +191,7 @@ class KKTV(object):
                                 subtitle_ko_urls, subtitle_ko_names, ko_folder_path)
                             convert_subtitle(ko_folder_path)
 
-                        convert_subtitle(folder_path, 'kktv')
+                        convert_subtitle(folder_path, Platform.KKTV)
 
     def main(self):
         self.download_subtitle()

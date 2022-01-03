@@ -1,3 +1,6 @@
+#!/usr/bin/python3
+# coding: utf-8
+
 """
 This module is to download subtitle from LineTV
 """
@@ -5,33 +8,21 @@ This module is to download subtitle from LineTV
 import logging
 import os
 import re
-import requests
 import shutil
 from urllib.parse import quote
 from time import strftime, localtime
 import orjson
-from common.utils import http_request, HTTPMethod, check_url_exist, convert_subtitle, download_file_multithread
+from common.utils import get_locale, Platform, http_request, HTTPMethod, check_url_exist, download_files
 from common.dictionary import convert_chinese_number
+from common.subtitle import convert_subtitle
+from services.service import Service
 
 
-class LineTV(object):
+class LineTV(Service):
     def __init__(self, args):
+        super().__init__(args)
         self.logger = logging.getLogger(__name__)
-        self.url = args.url.strip()
-
-        if args.output:
-            self.output = args.output.strip()
-        else:
-            self.output = os.getcwd()
-
-        if args.season:
-            self.download_season = int(args.season)
-        else:
-            self.download_season = None
-
-        self.last_episode = args.last_episode
-
-        self.session = requests.Session()
+        self._ = get_locale(__name__, self.locale)
 
         self.api = {
             'sub_1': 'https://s3-ap-northeast-1.amazonaws.com/tv-aws-media-convert-input-tokyo/subtitles/{drama_id}/{drama_id}-eps-{episode_name}.vtt',
@@ -66,7 +57,8 @@ class LineTV(object):
                     title = drama['drama_name'].strip()
                     season_name = '01'
 
-                self.logger.info('\n%s 第 %s 季', title, int(season_name))
+                self.logger.info(self._("\n%s Season %s"),
+                                 title, int(season_name))
 
             if 'current_eps' in drama:
                 episode_num = drama['current_eps']
@@ -75,22 +67,26 @@ class LineTV(object):
 
                 if self.last_episode:
                     drama['eps_info'] = [list(drama['eps_info'])[-1]]
-                    self.logger.info('\n第 %s 季 共有：%s 集\t下載第 %s 季 最後一集\n---------------------------------------------------------------', int(
-                        season_name), episode_num, int(season_name))
+                    self.logger.info(self._("\nSeason %s total: %s episode(s)\tdownload season %s last episode\n---------------------------------------------------------------"),
+                                     int(season_name),
+                                     episode_num,
+                                     int(season_name))
                 else:
                     if drama['current_eps'] != drama['total_eps']:
-                        self.logger.info('\n第 %s 季 共有：%s 集\t更新至 第 %s 集\t下載全集\n---------------------------------------------------------------', int(
-                            season_name), drama['total_eps'], episode_num)
+                        self.logger.info(self._("\nSeason %s total: %s episode(s)\tupdate to episode %s\tdownload all episodes\n---------------------------------------------------------------"),
+                                         int(season_name),
+                                         drama['total_eps'],
+                                         episode_num)
                     else:
-                        self.logger.info('\n第 %s 季 共有：%s 集\t下載全集\n---------------------------------------------------------------', int(
-                            season_name), episode_num)
+                        self.logger.info(self._("\nSeason %s total: %s episode(s)\tdownload all episodes\n---------------------------------------------------------------"),
+                                         int(season_name),
+                                         episode_num)
 
                 if os.path.exists(folder_path):
                     shutil.rmtree(folder_path)
 
                 if 'eps_info' in drama:
-                    subtitle_urls = []
-                    subtitle_names = []
+                    subtitles = []
                     for episode in drama['eps_info']:
                         if 'number' in episode:
                             episode_name = str(episode['number'])
@@ -98,7 +94,7 @@ class LineTV(object):
                                 drama_id=drama_id, episode_name=episode_name)
                             self.logger.debug(subtitle_link)
 
-                            file_name = f'{title}.S{season_name}E{episode_name.zfill(2)}.WEB-DL.LineTV.zh-Hant.vtt'
+                            file_name = f'{title}.S{season_name}E{episode_name.zfill(2)}.WEB-DL.{Platform.LINETV}.zh-Hant.vtt'
 
                             if not check_url_exist(subtitle_link):
                                 if check_url_exist(subtitle_link.replace('tv-aws-media-convert-input-tokyo', 'aws-elastic-transcoder-input-tokyo')):
@@ -112,14 +108,18 @@ class LineTV(object):
                                             free_date = strftime(
                                                 '%Y-%m-%d', localtime(int(episode['free_date'])/1000))
                                             self.logger.info(
-                                                '%s\t...一般用戶於%s開啟', file_name, free_date)
+                                                self._("%s\t...free user will be available on %s"), file_name, free_date)
 
                             os.makedirs(folder_path, exist_ok=True)
-                            subtitle_urls.append(subtitle_link)
-                            subtitle_names.append(file_name)
-                    download_file_multithread(
-                        subtitle_urls, subtitle_names, folder_path)
-                    convert_subtitle(folder_path, 'linetv')
+                            subtitle = dict()
+                            subtitle['name'] = file_name
+                            subtitle['path'] = folder_path
+                            subtitle['url'] = subtitle_link
+                            subtitles.append(subtitle)
+
+                    download_files(subtitles)
+                    convert_subtitle(folder_path=folder_path,
+                                     ott=Platform.LINETV, lang=self.locale)
 
     def main(self):
         self.download_subtitle()

@@ -14,14 +14,54 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: disneyplus.py:76
+#: services/hbogoasia.py:79
+msgid ""
+"\n"
+"Out of service!"
+msgstr ""
+
+#: services/hbogoasia.py:88
+msgid "HBOGO Asia username: "
+msgstr "HBOGO Asia 帳號："
+
+#: services/hbogoasia.py:89
+msgid "HBOGO Asia password: "
+msgstr "HBOGO Asia 密碼："
+
+#: services/hbogoasia.py:115
+#, python-format
+msgid ""
+"\n"
+"Successfully logged in. Welcome %s!"
+msgstr "\n登入成功，歡迎 %s"
+
+#: services/hbogoasia.py:138
+#, python-format
+msgid ""
+"\n"
+"Subtitle available languages: %s"
+msgstr "\n提供的字幕語言：%s"
+
+#: services/hbogoasia.py:151
+msgid ""
+"\n"
+"Series not found!"
+msgstr "\n找不到影集，請輸入正確網址"
+
+#: services/hbogoasia.py:165
+msgid ""
+"\n"
+"The series isn't available in this region."
+msgstr "\n這部影集未在此區上映，請用VPN換到別區"
+
+#: services/hbogoasia.py:168
 #, python-format
 msgid ""
 "\n"
 "%s total: %s season(s)"
 msgstr "\n%s 共有：%s 季"
 
-#: disneyplus.py:92
+#: services/hbogoasia.py:189
 #, python-format
 msgid ""
 "\n"
@@ -29,15 +69,12 @@ msgid ""
 "---------------------------------------------------------------"
 msgstr "\n第 %s 季 共有：%s 集\t下載全集\n---------------------------------------------------------------"
 
-#: disneyplus.py:208
+#: services/iqiyi.py:199
 #, python-format
-msgid ""
-"\n"
-"Subtitle available languages: %s"
-msgstr "\n提供的字幕語言：%s"
+msgid "Finding %s ..."
+msgstr "尋找 %s ..."
 
-#: disneyplus.py:142 disneyplus.py:215 disneyplus.py:237
-#, python-format
+#: services/hbogoasia.py:225
 msgid ""
 "\n"
 "Download: %s\n"

@@ -17,8 +17,8 @@ msgstr ""
 #: subtitle_downloader.py:22
 msgid ""
 "Download subtitles from Disney Plus, HBOGO Asia, KKTV, LineTV, friDay Video, "
-"iq.com."
-msgstr "從Disney Plus、HBOGO Asia、KKTV、LineTV、friDay影音、愛奇藝 下載劇集、電影、綜藝、動漫等字幕"
+"iq.com, and Viu"
+msgstr "從Disney Plus、HBOGO Asia、KKTV、LineTV、friDay影音、愛奇藝、Viu 下載劇集、電影、綜藝、動漫等字幕"
 
 #: subtitle_downloader.py:24
 msgid "series's/movie's link"
@@ -47,13 +47,11 @@ msgstr "串流平台密碼"
 #: subtitle_downloader.py:50
 msgid ""
 "languages of subtitles; use commas to separated multiple languages"
-"separated by commas"
 msgstr "字幕語言，用','分隔"
 
 #: subtitle_downloader.py:54
 msgid ""
 "languages of audio-tracks; use commas to separated multiple languages"
-"commas"
 msgstr "音軌語言，用','分隔"
 
 #: subtitle_downloader.py:110

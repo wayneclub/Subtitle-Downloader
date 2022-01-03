@@ -1,6 +1,9 @@
-'''
+#!/usr/bin/python3
+# coding: utf-8
+
+"""
 This module is to login Disney+
-'''
+"""
 
 import logging
 import re
@@ -75,15 +78,15 @@ class Login(object):
         if 'unreliable-location' in str(res.text):
             self.logger.info(
                 'Make sure you use NL proxy/vpn, or your proxy/vpn is blacklisted.')
-            exit()
+            exit(0)
         else:
             try:
                 self.logger.error('Error: %s', res.json()[
                                   'errors']['error_description'])
-                exit()
+                exit(0)
             except Exception:
                 self.logger.error('Error: %s', res.text)
-                exit()
+                exit(0)
 
     def login(self, access_token):
 
@@ -91,8 +94,8 @@ class Login(object):
             email = self.email.strip()
             password = self.password.strip()
         else:
-            email = input(self._('Disney+ email: '))
-            password = getpass(self._('Disney+ password: '))
+            email = input(self._("Disney+ email: "))
+            password = getpass(self._("Disney+ password: "))
 
         headers = {
             'accept': 'application/json; charset=utf-8',
@@ -115,10 +118,10 @@ class Login(object):
 
         try:
             self.logger.error('Error: %s', res.json()['errors'])
-            exit()
+            exit(0)
         except Exception:
             self.logger.error('Error: %s', res.text)
-            exit()
+            exit(0)
 
     def grant(self, id_token, access_token):
 
@@ -166,10 +169,10 @@ class Login(object):
 
         try:
             self.logger.error('Error: %s', res.json()['errors'])
-            exit()
+            exit(0)
         except Exception:
             self.logger.error('Error: %s', res.text)
-            exit()
+            exit(0)
 
     def get_auth_token(self):
 
@@ -207,6 +210,6 @@ class Login(object):
             profile['country'] = user['attributes']['locations']['registration']['geoIp']['country']
 
             self.logger.info(
-                self._('\nSuccessfully logged in. Welcome %s!'), profile['name'])
+                self._("\nSuccessfully logged in. Welcome %s!"), profile['name'])
 
             return profile

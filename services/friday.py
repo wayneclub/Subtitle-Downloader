@@ -1,3 +1,6 @@
+#!/usr/bin/python3
+# coding: utf-8
+
 """
 This module is to download subtitle from Friday影音
 """
@@ -7,29 +10,17 @@ import os
 import re
 import shutil
 import orjson
-import requests
 from bs4 import BeautifulSoup
-from common.utils import http_request, HTTPMethod, check_url_exist, download_file, convert_subtitle, download_file_multithread
+from common.utils import get_locale, Platform, http_request, HTTPMethod, check_url_exist, download_file, download_file_multithread
+from common.subtitle import convert_subtitle
+from services.service import Service
 
 
-class Friday(object):
+class Friday(Service):
     def __init__(self, args):
+        super().__init__(args)
         self.logger = logging.getLogger(__name__)
-        self.url = args.url.strip()
-
-        if args.output:
-            self.output = args.output.strip()
-        else:
-            self.output = os.getcwd()
-
-        if args.season:
-            self.download_season = int(args.season)
-        else:
-            self.download_season = None
-
-        self.last_episode = args.last_episode
-
-        self.session = requests.Session()
+        self._ = get_locale(__name__, self.locale)
 
         self.api = {
             'episode_list': 'https://video.friday.tw/api2/episode/list?contentId={content_id}&contentType={content_type}&offset=0&length=40&mode=2',
@@ -111,9 +102,9 @@ class Friday(object):
                 episode_name = episode['episodeName'].split('季')[-1]
 
                 if episode_name.isdecimal():
-                    file_name = f'{title}.S{season_name}E{episode_name.zfill(2)}.WEB-DL.friDay.zh-Hant.vtt'
+                    file_name = f'{title}.S{season_name}E{episode_name.zfill(2)}.WEB-DL.{Platform.FRIDAY}.zh-Hant.vtt'
                 else:
-                    file_name = f'{title}.{episode_name}.WEB-DL.friDay.zh-Hant.vtt'
+                    file_name = f'{title}.{episode_name}.WEB-DL.{Platform.FRIDAY}.zh-Hant.vtt'
 
                 subtitle['name'] = file_name
 
@@ -208,7 +199,7 @@ class Friday(object):
                     subtitle_dual_urls, subtitle_dual_names, dual_folder_path)
                 convert_subtitle(dual_folder_path)
 
-            convert_subtitle(folder_path, 'friday')
+            convert_subtitle(folder_path, Platform.FRIDAY)
 
         else:
             self.logger.info('\n%s', title)
@@ -223,7 +214,7 @@ class Friday(object):
                         sid=sub_search.group(1))
                     self.logger.debug(subtitle_link)
 
-                    file_name = f"{title}.{metadata['datePublished']}.WEB-DL.friDay.zh-Hant.vtt"
+                    file_name = f"{title}.{metadata['datePublished']}.WEB-DL.{Platform.FRIDAY}.zh-Hant.vtt"
 
                     if check_url_exist(subtitle_link):
                         self.logger.info(
@@ -231,13 +222,13 @@ class Friday(object):
                         os.makedirs(folder_path, exist_ok=True)
                         download_file(subtitle_link, os.path.join(
                             folder_path, file_name))
-                        convert_subtitle(folder_path, 'friday')
+                        convert_subtitle(folder_path, Platform.FRIDAY)
                     else:
                         self.logger.info('\n找不到外掛字幕，請去其他平台尋找')
-                        exit()
+                        exit(0)
                 else:
                     self.logger.info('\n此部電影尚未上映')
-                    exit()
+                    exit(0)
 
     def get_subtitle_link(self, subtitle_link):
         subtitle_link_2 = subtitle_link.replace(

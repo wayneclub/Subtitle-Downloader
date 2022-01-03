@@ -13,15 +13,3 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-
-#: common/utils.py:50
-msgid ""
-"\n"
-"File not found!"
-msgstr "\n找不到檔案"
-
-#: common/utils.py:182
-msgid ""
-"\n"
-"Timeout, please retry."
-msgstr "\n逾時，請再試一次"

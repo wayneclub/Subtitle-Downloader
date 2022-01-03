@@ -11,7 +11,7 @@ import gettext
 from pathlib import Path
 import platform
 import re
-import shutil
+from operator import itemgetter
 import multiprocessing
 from urllib import request
 from urllib.error import HTTPError, URLError
@@ -22,15 +22,25 @@ from tqdm import tqdm
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
 from urllib3.util import Retry
-from pygments import highlight, lexers, formatters
-import subtitle_tool
+# from common.subtitle import
 
 
 class HTTPMethod:
-    GET = 'GET'
-    POST = 'POST'
-    PUT = 'PUT'
-    DELETE = 'DELETE'
+    GET = "GET"
+    POST = "POST"
+    PUT = "PUT"
+    DELETE = "DELETE"
+
+
+class Platform:
+    NETFLIX = "Netflix"
+    KKTV = "KKTV"
+    LINETV = "LineTV"
+    FRIDAY = "friDay"
+    IQIYI = "iQIYI"
+    DISNEY = "Disney+"
+    HBOGO = "HBOGO"
+    VIU = "Viu"
 
 
 def get_locale(name, lang=""):
@@ -52,12 +62,15 @@ def http_request(session=requests.Session(), url="", method="", headers="", kwar
     if headers:
         session.headers = headers
     else:
+        # session.headers = {
+        #     'User-Agent': 'User-Agent:Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36'
+        # }
         session.headers = {
-            'User-Agent': 'User-Agent:Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36'
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36'
         }
 
     session.timeout = 10
-    adapter = HTTPAdapter(max_retries=Retry(total=5, backoff_factor=5))
+    adapter = HTTPAdapter(max_retries=Retry(total=5, backoff_factor=2))
     session.mount('http://', adapter)
     session.mount('https://', adapter)
 
@@ -78,7 +91,8 @@ def http_request(session=requests.Session(), url="", method="", headers="", kwar
         else:
             return req.json()
     else:
-        logger.error('\n%s', pretty_print_json(orjson.loads(req.text)))
+        # logger.error('\n%s', pretty_print_json(orjson.loads(req.text)))
+        logger.error('\n%s', req.text)
         exit(1)
 
 
@@ -131,7 +145,7 @@ def driver_init(headless=True):
     driver.execute_cdp_cmd('Network.setUserAgentOverride', {
         "userAgent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.53 Safari/537.36'})
     # driver.get('chrome://settings/clearBrowserData')
-    driver.set_page_load_timeout(110)
+    driver.set_page_load_timeout(120)
     return driver
 
 
@@ -154,41 +168,6 @@ def get_network_url(driver, search_url, lang=""):
     return url
 
 
-def convert_subtitle(folder_path="", ott="", lang=""):
-    _ = get_locale(__name__, lang)
-    if os.path.exists(folder_path):
-        display = True
-        for file in sorted(os.listdir(folder_path)):
-            extenison = Path(file).suffix
-            if os.path.isfile(os.path.join(folder_path, file)) and extenison != '.srt':
-                if display:
-                    logger.info(
-                        _("\nConvert %s to .srt:\n---------------------------------------------------------------"), extenison)
-                    display = False
-                subtitle = os.path.join(folder_path, file)
-                subtitle_tool.convert_subtitle(subtitle, '', True, False)
-        if ott:
-            logger.info(
-                _("\nArchive subtitles:\n---------------------------------------------------------------"))
-            subtitle_tool.archive_subtitle(
-                os.path.normpath(folder_path), ott, False)
-
-
-def merge_subtitle_fragments(folder_path="", file_name="", lang=""):
-    _ = get_locale(__name__, lang)
-    if os.path.exists(folder_path):
-        logger.info(
-            _("\nMerge segments：\n---------------------------------------------------------------\n%s"), file_name)
-        fila_path = os.path.join(
-            Path(folder_path).parent.absolute(), file_name)
-        with open(fila_path, 'wb') as merge_file:
-            for segment in sorted(os.listdir(folder_path)):
-                with open(os.path.join(folder_path, segment), 'rb') as tmp:
-                    shutil.copyfileobj(tmp, merge_file)
-        if os.path.exists(folder_path):
-            shutil.rmtree(folder_path)
-
-
 def kill_process():
     os.system('killall chromedriver > /dev/null 2>&1')
 
@@ -203,9 +182,8 @@ def save_html(html_source, file='test.html'):
 
 
 def pretty_print_json(json_obj):
-    formatted_json = orjson.dumps(
+    return orjson.dumps(
         json_obj, option=orjson.OPT_INDENT_2).decode('utf-8')
-    return highlight(formatted_json, lexers.JsonLexer(), formatters.TerminalFormatter())
 
 
 class DownloadProgressBar(tqdm):
@@ -236,6 +214,29 @@ def download_file_multithread(urls, file_names, output_path=""):
     for url, file_name in zip(urls, file_names):
         pool.apply_async(download_file, args=(
             url, os.path.join(output_path, file_name)))
+    pool.close()
+    pool.join()
+
+
+def download_files(files):
+    cpus = multiprocessing.cpu_count()
+    max_pool_size = 8
+    pool = multiprocessing.Pool(
+        cpus if cpus < max_pool_size else max_pool_size)
+
+    lang_paths = []
+    for file in sorted(files, key=itemgetter('name')):
+        if 'url' in file and 'name' in file and 'path' in file:
+            if 'segment' in file and file['segment']:
+                extension = Path(file['name']).suffix
+                sequence = str(lang_paths.count(file['path'])).zfill(2)
+                file_name = os.path.join(file['path'], file['name'].replace(
+                    extension, f'-seg_{sequence}{extension}'))
+                lang_paths.append(file['path'])
+            else:
+                file_name = os.path.join(file['path'], file['name'])
+            pool.apply_async(download_file, args=(
+                file['url'], file_name))
     pool.close()
     pool.join()
 
