@@ -212,8 +212,9 @@ class DisneyPlus(Service):
 
                 sub['urls'] = []
                 for segement in re.findall(r'.+\-MAIN\/.+\.vtt', m3u8_data):
-                    sub['urls'].append(os.path.join(
-                        f'{base_url}/r/', segement))
+                    sub_url = os.path.join(
+                        os.path.join(base_url, 'r'), segement)
+                    sub['urls'].append(sub_url)
                 sub_url_list.append(sub)
 
         audio_url_list = []
