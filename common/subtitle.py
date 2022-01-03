@@ -113,12 +113,12 @@ def archive_subtitle(path, ott="", lang=""):
 
 def ms_to_timestamp(ms: int) -> str:
     """Convert ms to 'HH:MM:SS,mmm'"""
-    MAX_REPRESENTABLE_TIME = 359999999
+    max_representable_time = 359999999
 
     if ms < 0:
         ms = 0
-    if ms > MAX_REPRESENTABLE_TIME:
-        ms = MAX_REPRESENTABLE_TIME
+    if ms > max_representable_time:
+        ms = max_representable_time
     h, m, s, ms = pysubs2.time.ms_to_times(ms)
     return "%02d:%02d:%02d,%03d" % (h, m, s, ms)
 
