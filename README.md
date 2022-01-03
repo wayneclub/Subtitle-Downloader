@@ -12,7 +12,7 @@ Subtitle-Downloader supports downloading subtitles from Disney Plus, HBOGO Asia,
 
 ## DESCRIPTION
 
-Subtitle-Downloader is a command-line program to download subtitles from the most popular streaming platform. It requires the Python interpreter, version 3.6+, and is not platform specific. It should work on your Unix box, on Windows or on macOS. This project is only for personal research and language learning.
+Subtitle-Downloader is a command-line program to download subtitles from the most popular streaming platform. It requires the Python interpreter, version 3.6+, and is not platform specific. It should work on Linux, on Windows or on macOS. This project is only for personal research and language learning.
 
 ## INSTALLATION
 
