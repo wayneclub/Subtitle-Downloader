@@ -8,8 +8,8 @@ This module is to login Disney+
 import logging
 import re
 import json
-import requests
 from getpass import getpass
+import requests
 from common.utils import get_locale
 
 
