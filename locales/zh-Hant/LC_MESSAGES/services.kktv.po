@@ -70,3 +70,8 @@ msgid ""
 "\n"
 "Sorry, there's no embeded subtitles in this video!"
 msgstr "\n無提供可下載的字幕"
+
+#: services/kktv.py:168
+#, python-format
+msgid "Finding %s ..."
+msgstr "尋找 %s ..."

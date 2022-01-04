@@ -18,8 +18,8 @@ msgstr ""
 #, python-format
 msgid ""
 "\n"
-"%s total: %s season(s)"
-msgstr "\n%s 共有：%s 季"
+"%s Season %s"
+msgstr "\n%s 第 %s 季"
 
 #: services/viu.py:108
 #, python-format
@@ -44,6 +44,11 @@ msgid ""
 "Season %s total: %s episode(s)\tdownload all episodes\n"
 "---------------------------------------------------------------"
 msgstr "\n第 %s 季 共有：%s 集\t下載全集\n---------------------------------------------------------------"
+
+#: services/viu.py:133
+#, python-format
+msgid "Finding %s ..."
+msgstr "尋找 %s ..."
 
 #: services/viu.py:140
 #, python-format

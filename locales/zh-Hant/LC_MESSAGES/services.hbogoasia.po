@@ -18,7 +18,7 @@ msgstr ""
 msgid ""
 "\n"
 "Out of service!"
-msgstr ""
+msgstr "\nHBOGO Asia未在此區提供服務，請用VPN換到別區"
 
 #: services/hbogoasia.py:88
 msgid "HBOGO Asia username: "
@@ -69,7 +69,7 @@ msgid ""
 "---------------------------------------------------------------"
 msgstr "\n第 %s 季 共有：%s 集\t下載全集\n---------------------------------------------------------------"
 
-#: services/iqiyi.py:199
+#: services/hbogoasia.py:199
 #, python-format
 msgid "Finding %s ..."
 msgstr "尋找 %s ..."

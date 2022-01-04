@@ -164,6 +164,8 @@ class Friday(Service):
             subtitles = []
             for episode in episode_list:
                 if not self.download_season or episode['season_index'] == self.download_season:
+                    self.logger.info(self._("Finding %s ..."), episode['name'])
+
                     os.makedirs(folder_path, exist_ok=True)
                     languages.add(folder_path)
                     subtitle = dict()

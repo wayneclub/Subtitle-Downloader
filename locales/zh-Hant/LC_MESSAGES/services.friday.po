@@ -53,6 +53,11 @@ msgid ""
 "---------------------------------------------------------------"
 msgstr "\n共有：%s 集\t下載全集\n---------------------------------------------------------------"
 
+#: services/friday.py:167
+#, python-format
+msgid "Finding %s ..."
+msgstr "尋找 %s ..."
+
 #: services/friday.py:225
 #, python-format
 msgid ""

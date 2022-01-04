@@ -165,6 +165,9 @@ class KKTV(Service):
                                             ko_folder_path = os.path.join(
                                                 folder_path, 'ko')
 
+                                        self.logger.info(
+                                            self._("Finding %s ..."), file_name)
+
                                         if check_url_exist(subtitle_link):
                                             os.makedirs(
                                                 folder_path, exist_ok=True)

@@ -87,13 +87,14 @@ class Viu(Service):
             session=self.session, url=meta_url, method=HTTPMethod.GET)['data']
 
         title = data['series']['name']
-        if title.split(' ')[-1].isdecimal():
-            title = title.replace(title.split(' ')[-1], '').strip()
-            season_name = title.split(' ')[-1].zfill(2)
+        if data['series']['name'].split(' ')[-1].isdecimal():
+            title = title.replace(
+                data['series']['name'].split(' ')[-1], '').strip()
+            season_name = data['series']['name'].split(' ')[-1].zfill(2)
         else:
             season_name = '01'
 
-        self.logger.info(self._("\n%s total: %s season(s)"),
+        self.logger.info(self._("\n%s Season %s"),
                          title, int(season_name))
 
         folder_path = os.path.join(
@@ -129,6 +130,7 @@ class Viu(Service):
 
             file_name = f'{title}.S{season_name}E{episode_name}.WEB-DL.{Platform.VIU}.vtt'
 
+            self.logger.info(self._("Finding %s ..."), file_name)
             episode_data = http_request(session=self.session,
                                         url=episode_url, method=HTTPMethod.GET)['data']['current_product']['subtitle']
 
