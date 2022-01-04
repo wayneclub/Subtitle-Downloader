@@ -44,7 +44,7 @@ class Viu(Service):
 
     def get_language_list(self):
         if not self.subtitle_language:
-            self.subtitle_language = 'en'
+            self.subtitle_language = 'zh-Hant'
 
         self.language_list = tuple([
             language for language in self.subtitle_language.split(',')])
