@@ -2,7 +2,7 @@
 
 set/p url="url: "
 
-@REM 下載位置
+@REM Output directory
 set output=""
 @REM Disney+、HBOGO Asia
 set email=""
