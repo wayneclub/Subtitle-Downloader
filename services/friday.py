@@ -11,7 +11,7 @@ import re
 import shutil
 import orjson
 from bs4 import BeautifulSoup
-from common.utils import get_locale, Platform, http_request, HTTPMethod, check_url_exist, download_file, download_file_multithread
+from common.utils import get_locale, Platform, http_request, HTTPMethod, check_url_exist, download_file, download_files
 from common.subtitle import convert_subtitle
 from services.service import Service
 
@@ -160,49 +160,46 @@ class Friday(Service):
             if os.path.exists(folder_path):
                 shutil.rmtree(folder_path)
 
-            ja_folder_path = ''
-            dual_folder_path = ''
-            subtitle_zh_urls = []
-            subtitle_zh_names = []
-            subtitle_ja_urls = []
-            subtitle_ja_names = []
-            subtitle_dual_urls = []
-            subtitle_dual_names = []
-            for subtitle in episode_list:
-                if not self.download_season or subtitle['season_index'] == self.download_season:
+            languages = set()
+            subtitles = []
+            for episode in episode_list:
+                if not self.download_season or episode['season_index'] == self.download_season:
                     os.makedirs(folder_path, exist_ok=True)
-                    subtitle_zh_urls.append(subtitle['zh'])
-                    subtitle_zh_names.append(subtitle['name'])
+                    languages.add(folder_path)
+                    subtitle = dict()
+                    subtitle['name'] = episode['name']
+                    subtitle['path'] = folder_path
+                    subtitle['url'] = episode['zh']
+                    subtitles.append(subtitle)
 
-                    if 'ja' in subtitle:
+                    if 'ja' in episode:
                         ja_folder_path = os.path.join(folder_path, 'ja')
                         os.makedirs(ja_folder_path, exist_ok=True)
-                        ja_file_name = subtitle['name'].replace(
+                        ja_file_name = episode['name'].replace(
                             '.zh-Hant.vtt', '.ja.vtt')
-                        subtitle_ja_urls.append(subtitle['ja'])
-                        subtitle_ja_names.append(ja_file_name)
+                        languages.add(ja_folder_path)
+                        subtitle = dict()
+                        subtitle['name'] = ja_file_name
+                        subtitle['path'] = ja_folder_path
+                        subtitle['url'] = episode['ja']
+                        subtitles.append(subtitle)
 
-                    if 'dual' in subtitle:
+                    if 'dual' in episode:
                         dual_folder_path = os.path.join(folder_path, 'dual')
                         os.makedirs(dual_folder_path, exist_ok=True)
-                        dual_file_name = subtitle['name'].replace(
+                        dual_file_name = episode['name'].replace(
                             '.zh-Hant.vtt', '.vtt')
-                        subtitle_ja_urls.append(subtitle['dual'])
-                        subtitle_ja_names.append(dual_file_name)
+                        languages.add(dual_folder_path)
+                        subtitle = dict()
+                        subtitle['name'] = dual_file_name
+                        subtitle['path'] = dual_folder_path
+                        subtitle['url'] = episode['dual']
+                        subtitles.append(subtitle)
 
-            download_file_multithread(
-                subtitle_zh_urls, subtitle_zh_names, folder_path)
-
-            if ja_folder_path and ja_lang:
-                download_file_multithread(
-                    subtitle_ja_urls, subtitle_ja_names, ja_folder_path)
-                convert_subtitle(folder_path=ja_folder_path, lang=self.locale)
-            if dual_folder_path and dual_lang:
-                download_file_multithread(
-                    subtitle_dual_urls, subtitle_dual_names, dual_folder_path)
-                convert_subtitle(folder_path=dual_folder_path,
-                                 lang=self.locale)
-
+            download_files(subtitles)
+            for lang_path in sorted(languages):
+                convert_subtitle(
+                    folder_path=lang_path, lang=self.locale)
             convert_subtitle(folder_path=folder_path,
                              ott=Platform.FRIDAY, lang=self.locale)
 
@@ -219,7 +216,9 @@ class Friday(Service):
                         sid=sub_search.group(1))
                     self.logger.debug(subtitle_link)
 
-                    file_name = f"{title}.{metadata['datePublished']}.WEB-DL.{Platform.FRIDAY}.zh-Hant.vtt"
+                    release_year = metadata['datePublished']
+                    file_name = f"{title}.{release_year}.WEB-DL.{Platform.FRIDAY}.zh-Hant.vtt"
+                    folder_path = f"{folder_path}.{release_year}"
 
                     if check_url_exist(subtitle_link):
                         self.logger.info(
@@ -227,8 +226,8 @@ class Friday(Service):
                                 "\nDownload: %s\n---------------------------------------------------------------"),
                             file_name)
                         os.makedirs(folder_path, exist_ok=True)
-                        download_file(subtitle_link, os.path.join(
-                            folder_path, file_name))
+                        download_file(url=subtitle_link, output_path=os.path.join(
+                            folder_path, file_name), lang=self.locale)
                         convert_subtitle(
                             folder_path=folder_path, ott=Platform.FRIDAY, lang=self.locale)
                     else:

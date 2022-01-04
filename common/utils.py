@@ -203,20 +203,6 @@ def download_file(url, output_path, lang=""):
         logger.warning(_("\nFile not found!"))
 
 
-def download_file_multithread(urls, file_names, output_path=""):
-    cpus = multiprocessing.cpu_count()
-    max_pool_size = 8
-    pool = multiprocessing.Pool(
-        cpus if cpus < max_pool_size else max_pool_size)
-    pool = multiprocessing.Pool(
-        cpus if cpus < max_pool_size else max_pool_size)
-    for url, file_name in zip(urls, file_names):
-        pool.apply_async(download_file, args=(
-            url, os.path.join(output_path, file_name)))
-    pool.close()
-    pool.join()
-
-
 def download_files(files):
     cpus = multiprocessing.cpu_count()
     max_pool_size = 8

@@ -10,7 +10,7 @@ import os
 import re
 import shutil
 import orjson
-from common.utils import get_locale, Platform, http_request, HTTPMethod, check_url_exist, download_file_multithread
+from common.utils import get_locale, Platform, http_request, HTTPMethod, check_url_exist, download_files
 from common.subtitle import convert_subtitle
 from services.service import Service
 
@@ -111,12 +111,8 @@ class KKTV(Service):
 
                         ja_lang = False
                         ko_lang = False
-                        subtitle_zh_urls = []
-                        subtitle_zh_names = []
-                        subtitle_ja_urls = []
-                        subtitle_ja_names = []
-                        subtitle_ko_urls = []
-                        subtitle_ko_names = []
+                        languages = set()
+                        subtitles = []
                         for episode in season['episodes']:
                             episode_index = int(
                                 episode['id'].replace(episode['seriesId'], ''))
@@ -169,42 +165,42 @@ class KKTV(Service):
                                             ko_folder_path = os.path.join(
                                                 folder_path, 'ko')
 
-                                        os.makedirs(
-                                            folder_path, exist_ok=True)
+                                        if check_url_exist(subtitle_link):
+                                            os.makedirs(
+                                                folder_path, exist_ok=True)
 
-                                        subtitle_zh_urls.append(subtitle_link)
-                                        subtitle_zh_names.append(file_name)
+                                            languages.add(folder_path)
+
+                                            subtitle = dict()
+                                            subtitle['name'] = file_name
+                                            subtitle['path'] = folder_path
+                                            subtitle['url'] = subtitle_link
+                                            subtitles.append(subtitle)
 
                                         if ja_lang and check_url_exist(ja_subtitle_link):
                                             os.makedirs(
                                                 ja_folder_path, exist_ok=True)
-                                            subtitle_ja_urls.append(
-                                                ja_subtitle_link)
-                                            subtitle_ja_names.append(
-                                                ja_file_name)
+                                            languages.add(ja_folder_path)
+                                            subtitle = dict()
+                                            subtitle['name'] = ja_file_name
+                                            subtitle['path'] = ja_folder_path
+                                            subtitle['url'] = ja_subtitle_link
+                                            subtitles.append(subtitle)
 
                                         if ko_lang and check_url_exist(ko_subtitle_link):
                                             os.makedirs(
                                                 ko_folder_path, exist_ok=True)
-                                            subtitle_ko_urls.append(
-                                                ko_subtitle_link)
-                                            subtitle_ko_names.append(
-                                                ko_file_name)
+                                            languages.add(ko_folder_path)
+                                            subtitle = dict()
+                                            subtitle['name'] = ko_file_name
+                                            subtitle['path'] = ko_folder_path
+                                            subtitle['url'] = ko_subtitle_link
+                                            subtitles.append(subtitle)
 
-                        download_file_multithread(
-                            subtitle_zh_urls, subtitle_zh_names, folder_path)
-
-                        if ja_folder_path and ja_lang:
-                            download_file_multithread(
-                                subtitle_ja_urls, subtitle_ja_names, ja_folder_path)
+                        download_files(subtitles)
+                        for lang_path in sorted(languages):
                             convert_subtitle(
-                                folder_path=ja_folder_path, lang=self.locale)
-                        if ko_folder_path and ko_lang:
-                            download_file_multithread(
-                                subtitle_ko_urls, subtitle_ko_names, ko_folder_path)
-                            convert_subtitle(
-                                folder_path=ko_folder_path, lang=self.locale)
-
+                                folder_path=lang_path, lang=self.locale)
                         convert_subtitle(
                             folder_path=folder_path, ott=Platform.KKTV, lang=self.locale)
 

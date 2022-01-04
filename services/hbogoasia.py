@@ -287,9 +287,6 @@ class HBOGOAsia(Service):
                     subtitles.append(subtitle)
         return subtitles, lang_paths
 
-        # download_file_multithread(subtitle_urls, subtitle_names)
-        # return lang_paths
-
     def main(self):
         self.get_language_list()
         self.get_territory()
