@@ -20,8 +20,9 @@ from requests.adapters import HTTPAdapter
 import orjson
 from tqdm import tqdm
 from selenium import webdriver
-from webdriver_manager.chrome import ChromeDriverManager
+# from webdriver_manager.chrome import ChromeDriverManager
 from urllib3.util import Retry
+import chromedriver_binary
 
 
 class HTTPMethod:
@@ -143,7 +144,6 @@ def driver_init(headless=True):
     driver = webdriver.Chrome('chromedriver', options=options)
     driver.execute_cdp_cmd('Network.setUserAgentOverride', {
         "userAgent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.53 Safari/537.36'})
-    # driver.get('chrome://settings/clearBrowserData')
     driver.set_page_load_timeout(120)
     return driver
 
