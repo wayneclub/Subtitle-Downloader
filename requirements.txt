@@ -6,4 +6,5 @@ orjson
 pysubs2
 requests
 selenium
+chromedriver-binary
 webdriver-manager
