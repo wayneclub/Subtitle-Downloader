@@ -4,6 +4,8 @@
 
 Subtitle-Downloader supports downloading subtitles from Disney Plus, HBOGO Asia, KKTV, LineTV, friDay Video, iq.com, and Viu.
 
+***Recommend using colab and save times for environmental issues.***
+
 - English
 <a href="https://colab.research.google.com/drive/1Qu7MHUt4QXym9cNOORCKTezIBYBNNg3V?usp=sharing" target="_blank"><img src="https://colab.research.google.com/assets/colab-badge.svg" title="Open this file in Google Colab" alt="Colab"/></a> 
 
@@ -122,6 +124,13 @@ Viu
 ```
 python subtitle_downloader.py https://www.disneyplus.com/series/loki/6pARMvILBGzF -slang en,zh-Hant
 ```
+
+## Windows
+```
+1. Run install_requirements.bat
+2. Run Subtitle_Downloader.bat
+```
+
 
 > 目前只支持從
 > 1. KKTV 下載電影、劇集、綜藝、動漫字幕
