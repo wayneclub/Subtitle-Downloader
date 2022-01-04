@@ -97,7 +97,6 @@ def archive_subtitle(path, platform="", lang=""):
     else:
         zipname = os.path.basename(f'{path}.WEB-DL')
 
-    zipname = os.path.normpath(zipname)
     path = os.path.normpath(path)
     logger.info("%s.zip", zipname)
 

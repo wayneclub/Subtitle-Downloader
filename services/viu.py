@@ -73,12 +73,17 @@ class Viu(Service):
             language_flag_id = match.group(2)
             area_id = match.group(3)
         else:
-            # region = 'sg'
-            # language_flag_id = '3'
-            # area_id = '2'
-            region = 'hk'
-            language_flag_id = '1'
-            area_id = '1'
+            if self.region and self.region.lower() == 'sg':
+                region = 'sg'
+                area_id = '2'
+            else:
+                region = 'hk'
+                area_id = '1'
+
+            if self.default_language and 'zh' in self.default_language:
+                language_flag_id = '1'
+            else:
+                language_flag_id = '3'
 
         meta_url = self.api['ott'].format(
             region=region, area_id=area_id, language_flag_id=language_flag_id, product_id=product_id)

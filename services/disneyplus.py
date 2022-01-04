@@ -332,4 +332,8 @@ class DisneyPlus(Service):
         user = Login(email=self.email, password=self.password,
                      locale=self.locale)
         self.profile, self.token = user.get_auth_token()
+        if self.default_language:
+            self.profile['language'] = self.default_language
+        if self.region:
+            self.profile['country'] = self.region
         self.download_subtitle()

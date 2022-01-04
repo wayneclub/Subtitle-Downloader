@@ -22,7 +22,9 @@ if __name__ == "__main__":
     _ = get_locale('main')
 
     parser = argparse.ArgumentParser(
-        description=_("Download subtitles from Disney Plus, HBOGO Asia, KKTV, LineTV, friDay Video, iq.com, and Viu"))
+        description=_(
+            "Download subtitles from Disney Plus, HBOGO Asia, KKTV, LineTV, friDay Video, iq.com, and Viu"),
+        add_help=False)
     parser.add_argument('url',
                         help=_("series's/movie's link"))
     parser.add_argument('-s',
@@ -56,17 +58,31 @@ if __name__ == "__main__":
                         dest='audio_language',
                         help=_("languages of audio-tracks; use commas to separate multiple languages"))
     parser.add_argument(
+        '-region',
+        '--region',
+        dest='region',
+        help=_("streaming service's region"),
+    )
+    parser.add_argument(
         '-locale',
         '--locale',
         dest='locale',
-        help='locale for logging messages',
+        help=_("interface language"),
     )
     parser.add_argument(
         '-d',
         '--debug',
         action='store_true',
-        help='enable debug logging',
+        help=_("enable debug logging"),
     )
+    parser.add_argument(
+        '-h',
+        '--help',
+        action='help',
+        default=argparse.SUPPRESS,
+        help=_("show this help message and exit")
+    )
+
     args = parser.parse_args()
 
     if args.debug:
