@@ -49,17 +49,6 @@ python download_subtitle.py URL [OPTIONS]
 ```
 ## Subtitle Languages
 
-HBOGO Asia
-
-| Codec | Language | 語言 |
-| --- | --- | --- |
-| en | English | 英文 |
-| zh-Hant | Traditional Chinese | 繁體中文 |
-| zh-Hans | Simplified Chinese | 簡體中文 |
-| ms | Malay | 馬來文 |
-| th | Thai | 泰文 |
-| id | Indonesian | 印尼文 |
-
 Disney Plus
 
 | Codec | Language | 語言 |
@@ -70,19 +59,41 @@ Disney Plus
 | zh-HK | Cantonese | 港繁 |
 | da | Dansk | 丹麥文 |
 | de | Deutsch | 德文 |
+| de-forced | Deutsch [forced] | 德文 [強制軌] |
 | es-ES | Español | 西班牙文 |
-| es-419 | Español (Latinoamericano) | 西班牙文（拉丁美洲 |
+| es-ES-forced | Español [forced] |
+| es-419 | Español (Latinoamericano) | 西班牙文（拉丁美洲） |
+| es-419-forced | Español (Latinoamericano) [forced] | 西班牙文（拉丁美洲）[強制軌] |
 | fr-FR | Français | 法文 |
+| fr-FR-forced | Français [forced] |
 | fr-CA | Français (Canadien) | 法文（加拿大） |
+| fr-CA-forced | Français (Canadien) [forced] | 法文（加拿大）[強制軌] |
 | it | Italiano | 義大利文 |
+| it-forced | Italiano [forced] | 義大利文 [強制軌] |
 | ja | Japanese | 日文 |
+| ja-forced | Japanese [forced] | 日文 [強制軌] |
 | ko | Korean | 韓文 |
+| ko-forced | Korean [forced] | 韓文 [強制軌] |
 | nl | Nederlands | 荷蘭文 |
 | no | Norsk | 挪威文 |
+| pl | Polski | 波蘭文 |
+| pl-forced | Polski [forced] | 波蘭文 [強制軌] |
 | pt-PT | Português | 葡萄牙文 |
-| pt-BR | Português (Brasil) | 葡萄牙語文（巴西） |
+| pt-BR | Português (Brasil) | 葡萄牙文（巴西） |
+| pt-BR-forced | Português (Brasil) [forced] | 葡萄牙文（巴西）[強制軌] |
 | fi | Suomi | 芬蘭文 |
 | sv | Svenska | 瑞典文 |
+
+HBOGO Asia
+
+| Codec | Language | 語言 |
+| --- | --- | --- |
+| en | English | 英文 |
+| zh-Hant | Traditional Chinese | 繁體中文 |
+| zh-Hans | Simplified Chinese | 簡體中文 |
+| ms | Malay | 馬來文 |
+| th | Thai | 泰文 |
+| id | Indonesian | 印尼文 |
 
 iq.com
 
