@@ -77,15 +77,15 @@ class Login(object):
 
         if 'unreliable-location' in str(res.text):
             self.logger.info(
-                'Make sure you use NL proxy/vpn, or your proxy/vpn is blacklisted.')
+                "Make sure you use NL proxy/vpn, or your proxy/vpn is blacklisted.")
             exit(0)
         else:
             try:
-                self.logger.error('Error: %s', res.json()[
+                self.logger.error("Error: %s", res.json()[
                                   'errors']['error_description'])
                 exit(0)
             except Exception:
-                self.logger.error('Error: %s', res.text)
+                self.logger.error("Error: %s", res.text)
                 exit(0)
 
     def login(self, access_token):
@@ -117,10 +117,10 @@ class Login(object):
             return id_token
 
         try:
-            self.logger.error('Error: %s', res.json()['errors'])
+            self.logger.error("Error: %s", res.json()['errors'])
             exit(0)
         except Exception:
-            self.logger.error('Error: %s', res.text)
+            self.logger.error("Error: %s", res.text)
             exit(0)
 
     def grant(self, id_token, access_token):
@@ -168,10 +168,10 @@ class Login(object):
             return access_token
 
         try:
-            self.logger.error('Error: %s', res.json()['errors'])
+            self.logger.error("Error: %s", res.json()['errors'])
             exit(0)
         except Exception:
-            self.logger.error('Error: %s', res.text)
+            self.logger.error("Error: %s", res.text)
             exit(0)
 
     def get_auth_token(self):

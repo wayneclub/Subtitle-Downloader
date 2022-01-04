@@ -91,7 +91,6 @@ def http_request(session=requests.Session(), url="", method="", headers="", kwar
         else:
             return req.json()
     else:
-        # logger.error('\n%s', pretty_print_json(orjson.loads(req.text)))
         logger.error("\n%s", req.text)
         exit(1)
 
@@ -103,12 +102,12 @@ def check_url_exist(url, print_error=False):
     except HTTPError as exception:
         # Return code error (e.g. 404, 501, ...)
         if print_error:
-            logger.error('HTTPError: %s', exception.code)
+            logger.error("HTTPError: %s", exception.code)
         return False
     except URLError as exception:
         # Not an HTTP-specific error (e.g. connection refused)
         if print_error:
-            logger.error('URLError: %s', exception.reason)
+            logger.error("URLError: %s", exception.reason)
         return False
     else:
         return True
