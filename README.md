@@ -41,11 +41,11 @@ python download_subtitle.py URL [OPTIONS]
   
   -password, --password         password for Disney Plus and HBOGO Asia
   
-  -slang, --subtitle-language   languages of subtitles; use commas to separated multiple languages
+  -slang, --subtitle-language   languages of subtitles; use commas to separate multiple languages
                                 default: Traditional Chinese
                                 all: download all available languages
                                 
-  -alang, --audio-language      languages of audio-tracks; use commas to separated multiple languages
+  -alang, --audio-language      languages of audio-tracks; use commas to separate multiple languages
 ```
 ## Subtitle Languages
 
