@@ -1,7 +1,6 @@
 @@ECHO OFF
 
 set/p url="url: "
-pip install -r requirement.txt
 
 @REM 下載位置
 set output=""
