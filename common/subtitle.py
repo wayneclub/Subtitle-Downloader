@@ -70,9 +70,9 @@ def convert_subtitle(folder_path="", platform="", lang=""):
                     subs.save(subtitle_name)
                     os.remove(subtitle)
                     logger.info(os.path.basename(subtitle_name))
-            if ott:
+            if platform:
                 archive_subtitle(path=os.path.normpath(
-                    folder_path), platform=ott, lang=lang)
+                    folder_path), platform=platform, lang=lang)
         else:
             subtitle_name = folder_path.replace(
                 Path(folder_path).suffix, '.srt')
@@ -92,8 +92,8 @@ def archive_subtitle(path, platform="", lang=""):
     logger.info(
         _("\nArchive subtitles:\n---------------------------------------------------------------"))
 
-    if ott:
-        zipname = os.path.basename(f'{path}.WEB-DL.{ott}')
+    if platform:
+        zipname = os.path.basename(f'{path}.WEB-DL.{platform}')
     else:
         zipname = os.path.basename(f'{path}.WEB-DL')
 
