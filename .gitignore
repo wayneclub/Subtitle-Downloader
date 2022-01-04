@@ -4,5 +4,7 @@ __pycache__/
 *.pot
 *.srt
 *.vtt
+*.log
+*.zip
 __tmp__/
 test.py

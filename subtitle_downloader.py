@@ -8,6 +8,7 @@ This module is to download subtitle from KKTV、LineTV、FriDay.
 import re
 import argparse
 import logging
+from datetime import datetime
 from common.utils import get_locale, get_ip_location
 from services.disneyplus import DisneyPlus
 from services.hbogoasia import HBOGOAsia
@@ -73,6 +74,11 @@ if __name__ == "__main__":
             format='%(asctime)s - %(name)s - %(lineno)d - %(message)s',
             datefmt='%Y-%m-%d %H:%M:%S',
             level=logging.DEBUG,
+            handlers=[
+                logging.FileHandler(
+                    f"Subtitle-Downloader_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.log"),
+                logging.StreamHandler()
+            ]
         )
     else:
         logging.basicConfig(

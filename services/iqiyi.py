@@ -34,11 +34,13 @@ class IQIYI(Service):
             '英語': 'en',
             '繁體中文': 'zh-Hant',
             '簡體中文': 'zh-Hans',
+            '韓語': 'ko',
             '馬來語': 'ms',
             '越南語': 'vi',
             '泰語': 'th',
             '印尼語': 'id',
-            '阿拉伯語': 'ar'
+            '阿拉伯語': 'ar',
+            '西班牙語': 'es'
         }
 
         if language_code.get(lang):
@@ -153,14 +155,16 @@ class IQIYI(Service):
                         self.logger.debug(dash_url)
 
                         episode_data = http_request(session=self.session,
-                                                    url=dash_url, method=HTTPMethod.GET)['data']['program']
+                                                    url=dash_url, method=HTTPMethod.GET)['data']
+                        if 'program' in episode_data:
+                            episode_data = episode_data['program']
 
-                        self.get_all_languages(episode_data)
+                            self.get_all_languages(episode_data)
 
-                        subs, lang_paths = self.get_subtitle(
-                            episode_data, folder_path, file_name)
-                        subtitles += subs
-                        languages = set.union(languages, lang_paths)
+                            subs, lang_paths = self.get_subtitle(
+                                episode_data, folder_path, file_name)
+                            subtitles += subs
+                            languages = set.union(languages, lang_paths)
 
                 driver.quit()
 
