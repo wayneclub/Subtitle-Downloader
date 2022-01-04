@@ -49,11 +49,11 @@ if __name__ == "__main__":
     parser.add_argument('-slang',
                         '--subtitle-language',
                         dest='subtitle_language',
-                        help=_("languages of subtitles; use commas to separated multiple languages"))
+                        help=_("languages of subtitles; use commas to separate multiple languages"))
     parser.add_argument('-alang',
                         '--audio-language',
                         dest='audio_language',
-                        help=_("languages of audio-tracks; use commas to separated multiple languages"))
+                        help=_("languages of audio-tracks; use commas to separate multiple languages"))
     parser.add_argument(
         '-locale',
         '--locale',
