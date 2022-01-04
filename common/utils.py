@@ -9,7 +9,6 @@ import locale
 import logging
 import gettext
 from pathlib import Path
-import platform
 import re
 from operator import itemgetter
 import multiprocessing
@@ -20,7 +19,6 @@ from requests.adapters import HTTPAdapter
 import orjson
 from tqdm import tqdm
 from selenium import webdriver
-# from webdriver_manager.chrome import ChromeDriverManager
 from urllib3.util import Retry
 import chromedriver_binary
 
@@ -136,11 +134,6 @@ def driver_init(headless=True):
     options.add_experimental_option('prefs', prefs)
     options.add_experimental_option(
         'excludeSwitches', ['enable-automation'])
-    # if platform.system() == 'Windows':
-    #     driver = webdriver.Chrome(ChromeDriverManager(
-    #         log_level=0).install(), options=options)
-    # else:
-    #     driver = webdriver.Chrome('chromedriver', options=options)
     driver = webdriver.Chrome('chromedriver', options=options)
     driver.execute_cdp_cmd('Network.setUserAgentOverride', {
         "userAgent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.53 Safari/537.36'})

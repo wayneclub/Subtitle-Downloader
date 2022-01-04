@@ -208,7 +208,7 @@ class HBOGOAsia(Service):
                             folder_path=lang_path, lang=self.locale)
 
                     convert_subtitle(folder_path=folder_path,
-                                     ott=Platform.HBOGO, lang=self.locale)
+                                     platform=Platform.HBOGO, lang=self.locale)
         else:
             content_id = os.path.basename(self.url)
             movie_url = self.api['movie'].format(
@@ -236,7 +236,7 @@ class HBOGOAsia(Service):
 
             download_files(subtitles)
             convert_subtitle(folder_path=folder_path,
-                             ott=Platform.HBOGO, lang=self.locale)
+                             platform=Platform.HBOGO, lang=self.locale)
 
     def get_subtitle(self, content_id, data, folder_path, file_name):
         playback_url = self.api['playback'].format(territory=self.territory, content_id=content_id,

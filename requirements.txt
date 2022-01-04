@@ -7,4 +7,3 @@ pysubs2
 requests
 selenium
 chromedriver-binary-auto
-webdriver-manager

@@ -114,7 +114,7 @@ class DisneyPlus(Service):
                                     audio_list, folder_path, file_name)
 
                     convert_subtitle(folder_path=folder_path,
-                                     ott=Platform.DISNEY, lang=self.locale)
+                                     platform=Platform.DISNEY, lang=self.locale)
 
         elif '/movies' in self.url:
             movie_url = self.api['DmcVideo'].format(
@@ -149,7 +149,7 @@ class DisneyPlus(Service):
                 self.get_audio(audio_list, folder_path, file_name)
 
             convert_subtitle(folder_path=folder_path,
-                             ott=Platform.DISNEY, lang=self.locale)
+                             platform=Platform.DISNEY, lang=self.locale)
 
     def get_m3u8_url(self, media_id):
         headers = {

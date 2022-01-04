@@ -45,7 +45,7 @@ def convert_utf8(srcfile):
         logger.error("Encode Error")
 
 
-def convert_subtitle(folder_path="", ott="", lang=""):
+def convert_subtitle(folder_path="", platform="", lang=""):
     """
     Convert subtitle to .srt
     """
@@ -72,7 +72,7 @@ def convert_subtitle(folder_path="", ott="", lang=""):
                     logger.info(os.path.basename(subtitle_name))
             if ott:
                 archive_subtitle(path=os.path.normpath(
-                    folder_path), ott=ott, lang=lang)
+                    folder_path), platform=ott, lang=lang)
         else:
             subtitle_name = folder_path.replace(
                 Path(folder_path).suffix, '.srt')
@@ -84,7 +84,7 @@ def convert_subtitle(folder_path="", ott="", lang=""):
             logger.info(os.path.basename(subtitle_name))
 
 
-def archive_subtitle(path, ott="", lang=""):
+def archive_subtitle(path, platform="", lang=""):
     """
     Archive subtitles
     """

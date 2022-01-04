@@ -173,7 +173,7 @@ class IQIYI(Service):
                 for lang_path in sorted(languages):
                     convert_subtitle(folder_path=lang_path, lang=self.locale)
                 convert_subtitle(folder_path=folder_path,
-                                 ott=Platform.IQIYI, lang=self.locale)
+                                 platform=Platform.IQIYI, lang=self.locale)
 
     def get_subtitle(self, data, folder_path, file_name):
 

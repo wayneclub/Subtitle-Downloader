@@ -205,7 +205,7 @@ class KKTV(Service):
                             convert_subtitle(
                                 folder_path=lang_path, lang=self.locale)
                         convert_subtitle(
-                            folder_path=folder_path, ott=Platform.KKTV, lang=self.locale)
+                            folder_path=folder_path, platform=Platform.KKTV, lang=self.locale)
 
     def main(self):
         self.download_subtitle()

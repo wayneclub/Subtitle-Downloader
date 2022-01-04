@@ -152,7 +152,7 @@ class Viu(Service):
             convert_subtitle(folder_path=lang_path, lang=self.locale)
 
         convert_subtitle(folder_path=folder_path,
-                         ott=Platform.VIU, lang=self.locale)
+                         platform=Platform.VIU, lang=self.locale)
 
     def get_subtitle(self, data, folder_path, file_name):
 

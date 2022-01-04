@@ -203,7 +203,7 @@ class Friday(Service):
                 convert_subtitle(
                     folder_path=lang_path, lang=self.locale)
             convert_subtitle(folder_path=folder_path,
-                             ott=Platform.FRIDAY, lang=self.locale)
+                             platform=Platform.FRIDAY, lang=self.locale)
 
         else:
             self.logger.info("\n%s", title)
@@ -231,7 +231,7 @@ class Friday(Service):
                         download_file(url=subtitle_link, output_path=os.path.join(
                             folder_path, file_name), lang=self.locale)
                         convert_subtitle(
-                            folder_path=folder_path, ott=Platform.FRIDAY, lang=self.locale)
+                            folder_path=folder_path, platform=Platform.FRIDAY, lang=self.locale)
                     else:
                         self.logger.info(
                             self._("\nSorry, there's no embeded subtitles in this video!"))

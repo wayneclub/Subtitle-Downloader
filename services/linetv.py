@@ -119,7 +119,7 @@ class LineTV(Service):
 
                     download_files(subtitles)
                     convert_subtitle(folder_path=folder_path,
-                                     ott=Platform.LINETV, lang=self.locale)
+                                     platform=Platform.LINETV, lang=self.locale)
 
     def main(self):
         self.download_subtitle()
