@@ -61,11 +61,11 @@ Disney Plus
 | de | Deutsch | 德文 |
 | de-forced | Deutsch [forced] | 德文 [強制軌] |
 | es-ES | Español | 西班牙文 |
-| es-ES-forced | Español [forced] |
+| es-ES-forced | Español [forced] | 西班牙文 [強制軌] |
 | es-419 | Español (Latinoamericano) | 西班牙文（拉丁美洲） |
 | es-419-forced | Español (Latinoamericano) [forced] | 西班牙文（拉丁美洲）[強制軌] |
 | fr-FR | Français | 法文 |
-| fr-FR-forced | Français [forced] |
+| fr-FR-forced | Français [forced] | 法文 [強制軌] |
 | fr-CA | Français (Canadien) | 法文（加拿大） |
 | fr-CA-forced | Français (Canadien) [forced] | 法文（加拿大）[強制軌] |
 | it | Italiano | 義大利文 |
@@ -130,6 +130,7 @@ python subtitle_downloader.py https://www.disneyplus.com/series/loki/6pARMvILBGz
 > 4. 愛奇藝 下載劇集
 > 4. Disney+ 下載電影、劇集
 > 5. HBOGO Asia 下載電影、劇集
+> 6. Viu 下載劇集
 > 
 > 請確認網站網址無誤
 
