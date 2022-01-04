@@ -1,0 +1,72 @@
+# Subtitle-Downloader
+# Copyright (C) 2021
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-12-30 23:11+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Wayne <me@wayneclub.com>\n"
+"Language-Team: wayneclub <info@wayneclub.com>\n"
+"Language: zh-Hant\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: services/kktv.py:43
+msgid ""
+"\n"
+"Series not found!"
+msgstr "\n找不到該劇，請確認網址重試一次"
+
+#: services/kktv.py:68
+#, python-format
+msgid ""
+"\n"
+"%s total: %s season(s) (Provide bilingual subtitles)"
+msgstr "\n%s 共有：%s 季（提供雙語字幕）"
+
+#: services/kktv.py:72
+#, python-format
+msgid ""
+"\n"
+"%s total: %s season(s)"
+msgstr "\n%s 共有：%s 季"
+
+#: services/kktv.py:85
+msgid ""
+"\n"
+"Download:\n"
+"---------------------------------------------------------------"
+msgstr "\n下載：\n---------------------------------------------------------------"
+
+#: services/kktv.py:89
+#, python-format
+msgid ""
+"\n"
+"Season %s total: %s episode(s)\tdownload season %s last episode\n"
+"---------------------------------------------------------------"
+msgstr "\n第 %s 季 共有：%s 集\t下載第 %s 季 最後一集\n---------------------------------------------------------------"
+
+#: services/kktv.py:99
+#, python-format
+msgid ""
+"\n"
+"Total: %s episode(s)\tdownload all episodes\n"
+"---------------------------------------------------------------"
+msgstr "\n共有：%s 集\t下載全集\n---------------------------------------------------------------"
+
+#: services/kktv.py:104
+#, python-format
+msgid ""
+"\n"
+"Season %s total: %s episode(s)\tdownload all episodes\n"
+"---------------------------------------------------------------"
+msgstr "\n第 %s 季 共有：%s 集\t下載全集\n---------------------------------------------------------------"
+
+#: services/kktv.py:130
+msgid ""
+"\n"
+"Sorry, there's no embeded subtitles in this video!"
+msgstr "\n無提供可下載的字幕"

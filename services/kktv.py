@@ -40,7 +40,7 @@ class KKTV(Service):
         if drama_id in data['props']['initialState']['titles']['byId']:
             drama = data['props']['initialState']['titles']['byId'][drama_id]
         else:
-            self.logger.error('找不到該劇，請確認網址重試一次')
+            self.logger.error(self._("\nSeries not found!"))
             exit(0)
 
         if drama:
@@ -62,13 +62,14 @@ class KKTV(Service):
                 season_num = drama['totalSeriesCount']
 
             if film or anime:
-                self.logger.info('\n%s', title)
+                self.logger.info("\n%s", title)
             else:
                 if 'dual_subtitle' in drama['contentLabels']:
-                    self.logger.info('\n%s 共有：%s 季（有提供雙語字幕）',
+                    self.logger.info(self._("\n%s total: %s season(s) (Provide bilingual subtitles)"),
                                      title, season_num)
                 else:
-                    self.logger.info('\n%s 共有：%s 季', title, season_num)
+                    self.logger.info(
+                        self._("\n%s total: %s season(s)"), title, season_num)
 
             if 'series' in drama:
                 for season in drama['series']:
@@ -80,20 +81,29 @@ class KKTV(Service):
                         folder_path = os.path.join(self.output, title)
 
                         if film:
-                            self.logger.info(
-                                '\n下載字幕\n---------------------------------------------------------------')
+                            self.logger.info(self._(
+                                "\nDownload:\n---------------------------------------------------------------"))
                         elif self.last_episode:
                             self.logger.info(
-                                '\n第 %s 季 共有：%s 集\t下載第 %s 季 最後一集\n---------------------------------------------------------------', season_index, episode_num, season_index)
+                                self._(
+                                    "\nSeason %s total: %s episode(s)\tdownload season %s last episode\n---------------------------------------------------------------"),
+                                season_index,
+                                episode_num,
+                                season_index)
 
                             season['episodes'] = [list(season['episodes'])[-1]]
                             folder_path = f'{folder_path}.S{season_name}'
                         elif anime:
                             self.logger.info(
-                                '\n共有：%s 集\t下載全集\n---------------------------------------------------------------', episode_num)
+                                self._(
+                                    "\nTotal: %s episode(s)\tdownload all episodes\n---------------------------------------------------------------"),
+                                episode_num)
                         else:
                             self.logger.info(
-                                '\n第 %s 季 共有：%s 集\t下載全集\n---------------------------------------------------------------', season_index, episode_num)
+                                self._(
+                                    "\nSeason %s total: %s episode(s)\tdownload all episodes\n---------------------------------------------------------------"),
+                                season_index,
+                                episode_num)
                             folder_path = f'{folder_path}.S{season_name}'
 
                         if os.path.exists(folder_path):
@@ -116,8 +126,10 @@ class KKTV(Service):
                                 episode_name = str(episode_index).zfill(3)
 
                             if not episode['subtitles']:
-                                self.logger.info('\n無提供可下載的字幕\n')
+                                self.logger.info(
+                                    self._("\nSorry, there's no embeded subtitles in this video!"))
                                 exit(0)
+
                             if 'ja' in episode['subtitles']:
                                 ja_lang = True
                             if 'ko' in episode['subtitles']:
@@ -185,13 +197,16 @@ class KKTV(Service):
                         if ja_folder_path and ja_lang:
                             download_file_multithread(
                                 subtitle_ja_urls, subtitle_ja_names, ja_folder_path)
-                            convert_subtitle(ja_folder_path)
+                            convert_subtitle(
+                                folder_path=ja_folder_path, lang=self.locale)
                         if ko_folder_path and ko_lang:
                             download_file_multithread(
                                 subtitle_ko_urls, subtitle_ko_names, ko_folder_path)
-                            convert_subtitle(ko_folder_path)
+                            convert_subtitle(
+                                folder_path=ko_folder_path, lang=self.locale)
 
-                        convert_subtitle(folder_path, Platform.KKTV)
+                        convert_subtitle(
+                            folder_path=folder_path, ott=Platform.KKTV, lang=self.locale)
 
     def main(self):
         self.download_subtitle()

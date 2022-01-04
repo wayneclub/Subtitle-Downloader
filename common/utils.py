@@ -92,7 +92,7 @@ def http_request(session=requests.Session(), url="", method="", headers="", kwar
             return req.json()
     else:
         # logger.error('\n%s', pretty_print_json(orjson.loads(req.text)))
-        logger.error('\n%s', req.text)
+        logger.error("\n%s", req.text)
         exit(1)
 
 

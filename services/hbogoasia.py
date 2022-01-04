@@ -204,7 +204,8 @@ class HBOGOAsia(Service):
 
                     download_files(subtitles)
                     for lang_path in sorted(languages):
-                        convert_subtitle(lang_path)
+                        convert_subtitle(
+                            folder_path=lang_path, lang=self.locale)
 
                     convert_subtitle(folder_path=folder_path,
                                      ott=Platform.HBOGO, lang=self.locale)
@@ -218,7 +219,7 @@ class HBOGOAsia(Service):
 
             title = next(title['name'] for title in movie['metadata']
                          ['titleInformations'] if title['lang'] == 'CHN').strip()
-            self.logger.info('\n%s', title)
+            self.logger.info("\n%s", title)
 
             release_year = movie['metadata']['releaseDate'][:4]
 

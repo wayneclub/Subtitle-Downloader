@@ -149,7 +149,7 @@ class IQIYI(Service):
 
                         self.logger.info(self._("Finding %s ..."), file_name)
                         dash_url = get_network_url(
-                            driver, r'https:\/\/cache-video.iq.com\/dash\?')
+                            driver=driver, search_url=r"https:\/\/cache-video.iq.com\/dash\?", lang=self.locale)
                         self.logger.debug(dash_url)
 
                         episode_data = http_request(session=self.session,

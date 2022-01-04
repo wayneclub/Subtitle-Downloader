@@ -121,35 +121,38 @@ class Friday(Service):
             episode_num = len(episode_list)
 
             if season_num > 1:
-                self.logger.info('\n%s 共有：%s 季', title, season_num)
+                self.logger.info(
+                    self._("\n%s total: %s season(s)"), title, season_num)
             else:
-                self.logger.info('\n%s', title)
+                self.logger.info("\n%s", title)
 
             if dual_lang:
-                self.logger.info('（有提供雙語字幕）')
+                self.logger.info(self._("(Provide bilingual subtitles)"))
             elif ja_lang:
-                self.logger.info('（有提供日語字幕）')
+                self.logger.info(self._("(Provide Japanese subtitles)"))
 
             if self.last_episode:
-                self.logger.info('\n第 %s 季 共有：%s 集\t下載最後一集\n---------------------------------------------------------------',
+                self.logger.info(self._("\nSeason %s total: %s episode(s)\tdownload season %s last episode\n---------------------------------------------------------------"),
                                  season_index,
                                  season_list.count(season_index))
                 episode_list = [episode_list[-1]]
                 folder_path = f'{folder_path}.S{str(season_index).zfill(2)}'
             else:
                 if self.download_season:
-                    self.logger.info('\n第 %s 季 共有：%s 集\t下載全集\n---------------------------------------------------------------',
+                    self.logger.info(self._("\nSeason %s total: %s episode(s)\tdownload all episodes\n---------------------------------------------------------------"),
                                      self.download_season,
                                      season_list.count(self.download_season))
                     folder_path = f'{folder_path}.S{str(self.download_season).zfill(2)}'
                 else:
                     if season_num > 1:
                         self.logger.info(
-                            '\n共有：%s 集\t下載全集\n---------------------------------------------------------------',
+                            self._(
+                                "\nTotal: %s episode(s)\tdownload all episodes\n---------------------------------------------------------------"),
                             episode_num)
                     else:
                         self.logger.info(
-                            '\n第 %s 季 共有：%s 集\t下載全集\n---------------------------------------------------------------',
+                            self._(
+                                "\nSeason %s total: %s episode(s)\tdownload all episodes\n---------------------------------------------------------------"),
                             season_index,
                             episode_num)
                         folder_path = f'{folder_path}.S{season_name}'
@@ -193,16 +196,18 @@ class Friday(Service):
             if ja_folder_path and ja_lang:
                 download_file_multithread(
                     subtitle_ja_urls, subtitle_ja_names, ja_folder_path)
-                convert_subtitle(ja_folder_path)
+                convert_subtitle(folder_path=ja_folder_path, lang=self.locale)
             if dual_folder_path and dual_lang:
                 download_file_multithread(
                     subtitle_dual_urls, subtitle_dual_names, dual_folder_path)
-                convert_subtitle(dual_folder_path)
+                convert_subtitle(folder_path=dual_folder_path,
+                                 lang=self.locale)
 
-            convert_subtitle(folder_path, Platform.FRIDAY)
+            convert_subtitle(folder_path=folder_path,
+                             ott=Platform.FRIDAY, lang=self.locale)
 
         else:
-            self.logger.info('\n%s', title)
+            self.logger.info("\n%s", title)
             sid_search = web_content.find(
                 'div', class_='popup-video-container content-vod')
             if sid_search:
@@ -218,16 +223,20 @@ class Friday(Service):
 
                     if check_url_exist(subtitle_link):
                         self.logger.info(
-                            '\n下載字幕\n---------------------------------------------------------------')
+                            self._(
+                                "\nDownload: %s\n---------------------------------------------------------------"),
+                            file_name)
                         os.makedirs(folder_path, exist_ok=True)
                         download_file(subtitle_link, os.path.join(
                             folder_path, file_name))
-                        convert_subtitle(folder_path, Platform.FRIDAY)
+                        convert_subtitle(
+                            folder_path=folder_path, ott=Platform.FRIDAY, lang=self.locale)
                     else:
-                        self.logger.info('\n找不到外掛字幕，請去其他平台尋找')
+                        self.logger.info(
+                            self._("\nSorry, there's no embeded subtitles in this video!"))
                         exit(0)
                 else:
-                    self.logger.info('\n此部電影尚未上映')
+                    self.logger.info(self._("\nThe film isn't released."))
                     exit(0)
 
     def get_subtitle_link(self, subtitle_link):
@@ -250,7 +259,8 @@ class Friday(Service):
             ja_subtitle_link = self.get_ja_subtitle_link(subtitle_link)
             dual_subtitle_link = self.get_dual_subtitle_link(subtitle_link)
         else:
-            self.logger.info('\n抱歉，此劇只有硬字幕，可去其他串流平台查看')
+            self.logger.info(
+                self._("\nSorry, there's no embeded subtitles in this video!"))
             exit(0)
 
         return subtitle_link, ja_subtitle_link, dual_subtitle_link

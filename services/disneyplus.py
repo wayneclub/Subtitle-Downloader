@@ -123,10 +123,10 @@ class DisneyPlus(Service):
                 family_id=os.path.basename(self.url))
             data = http_request(session=self.session, url=movie_url, method=HTTPMethod.GET)[
                 'data']['DmcVideoBundle']['video']
-            movie_name = data['text']['title']['full']['program']['default']['content'].strip(
+            title = data['text']['title']['full']['program']['default']['content'].strip(
             )
-            self.logger.info('\n%s', movie_name)
-            folder_path = os.path.join(self.output, movie_name)
+            self.logger.info("\n%s", title)
+            folder_path = os.path.join(self.output, title)
             if os.path.exists(folder_path):
                 shutil.rmtree(folder_path)
 
@@ -137,7 +137,7 @@ class DisneyPlus(Service):
             media_id = data['mediaMetadata']['mediaId']
             m3u8_url = self.get_m3u8_url(media_id)
 
-            file_name = f'{movie_name}.{release_year}.WEB-DL.Disney+.vtt'
+            file_name = f'{title}.{release_year}.WEB-DL.Disney+.vtt'
             subtitle_list, audio_list = self.parse_m3u(m3u8_url)
 
             self.logger.info(

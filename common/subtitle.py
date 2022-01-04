@@ -99,7 +99,7 @@ def archive_subtitle(path, ott="", lang=""):
 
     zipname = os.path.normpath(zipname)
     path = os.path.normpath(path)
-    logger.info('%s.zip', zipname)
+    logger.info("%s.zip", zipname)
 
     shutil.make_archive(zipname, 'zip', path)
 
@@ -112,15 +112,16 @@ def archive_subtitle(path, ott="", lang=""):
 
 
 def ms_to_timestamp(ms: int) -> str:
-    """Convert ms to 'HH:MM:SS,mmm'"""
+    """
+    Convert ms to 'HH:MM:SS,mmm'
+    """
     max_representable_time = 359999999
 
     if ms < 0:
         ms = 0
     if ms > max_representable_time:
         ms = max_representable_time
-    h, m, s, ms = pysubs2.time.ms_to_times(ms)
-    return "%02d:%02d:%02d,%03d" % (h, m, s, ms)
+    return "%02d:%02d:%02d,%03d" % (pysubs2.time.ms_to_times(ms))
 
 
 def convert_list_to_subtitle(subs):
