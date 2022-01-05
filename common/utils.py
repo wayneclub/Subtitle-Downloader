@@ -60,11 +60,8 @@ def http_request(session=requests.Session(), url="", method="", headers="", kwar
     if headers:
         session.headers = headers
     else:
-        # session.headers = {
-        #     'User-Agent': 'User-Agent:Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36'
-        # }
         session.headers = {
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36'
+            'User-Agent': get_user_agent()
         }
 
     session.timeout = 10
@@ -91,6 +88,15 @@ def http_request(session=requests.Session(), url="", method="", headers="", kwar
     else:
         logger.error("\n%s", req.text)
         exit(1)
+
+
+def get_user_agent():
+    user_agent_list = ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36',
+                       'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36',
+                       'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36',
+                       'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.132 Safari/537.36',
+                       'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.53 Safari/537.36')
+    return user_agent_list[0]
 
 
 def check_url_exist(url, print_error=False):
@@ -136,7 +142,7 @@ def driver_init(headless=True):
         'excludeSwitches', ['enable-automation'])
     driver = webdriver.Chrome('chromedriver', options=options)
     driver.execute_cdp_cmd('Network.setUserAgentOverride', {
-        "userAgent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.53 Safari/537.36'})
+                           "userAgent": get_user_agent})
     driver.set_page_load_timeout(120)
     return driver
 

@@ -11,7 +11,7 @@ import logging
 import math
 import shutil
 import m3u8
-from common.utils import Platform, get_locale, http_request, HTTPMethod, download_audio, download_files
+from common.utils import Platform, get_locale, get_user_agent, http_request, HTTPMethod, download_audio, download_files
 from common.subtitle import convert_subtitle, merge_subtitle_fragments
 from services.disneyplus_login import Login
 from services.service import Service
@@ -33,7 +33,7 @@ class DisneyPlus(Service):
         self.audio_language = args.audio_language
 
         self.profile = dict()
-        self.token = ''
+        self.access_token = ''
 
         self.api = {
             'DmcSeriesBundle': 'https://disney.content.edge.bamgrid.com/svc/content/DmcSeriesBundle/version/5.1/region/{region}/audience/false/maturity/1850/language/{language}/encodedSeriesId/{series_id}',
@@ -154,12 +154,12 @@ class DisneyPlus(Service):
     def get_m3u8_url(self, media_id):
         headers = {
             "accept": "application/vnd.media-service+json; version=2",
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.132 Safari/537.36",
+            "User-Agent": get_user_agent(),
             "Sec-Fetch-Mode": "cors",
-            "x-bamsdk-platform": "macosx",
+            "x-bamsdk-platform": "macintosh",
             "x-bamsdk-version": '3.10',
             "Origin": 'https://www.disneyplus.com',
-            "authorization": self.token
+            "authorization": self.access_token
         }
         playback_url = self.api['playback'].format(
             media_id=media_id)
@@ -331,9 +331,10 @@ class DisneyPlus(Service):
         self.get_language_list()
         user = Login(email=self.email, password=self.password,
                      locale=self.locale)
-        self.profile, self.token = user.get_auth_token()
+        self.profile, self.access_token = user.get_auth_token()
         if self.default_language:
             self.profile['language'] = self.default_language
+            # self.profile['language'] = 'en'
         if self.region:
             self.profile['country'] = self.region
         self.download_subtitle()

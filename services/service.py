@@ -29,7 +29,7 @@ class Service(object):
 
         self.locale = args.locale
 
-        if args.season:
+        if args.region:
             self.region = args.region.upper()
         else:
             self.region = None
