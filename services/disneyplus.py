@@ -240,6 +240,7 @@ class DisneyPlus(Service):
                         audio['url'] = f'{base_url}/{media.uri}'
                         audio['extension'] = '.aac'
                     audio['lang'] = media.language
+                    self.logger.debug(audio['url'])
                     audio_url_list.append(audio)
 
         return sub_url_list, audio_url_list

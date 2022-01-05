@@ -8,6 +8,7 @@ import locale
 import logging
 import os
 import requests
+from common.utils import get_ip_location
 
 
 class Service(object):
@@ -32,7 +33,7 @@ class Service(object):
         if args.region:
             self.region = args.region.upper()
         else:
-            self.region = None
+            self.region = get_ip_location()['country']
 
         self.session = requests.Session()
 

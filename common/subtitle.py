@@ -13,6 +13,8 @@ import pysubs2
 from chardet import detect
 from common.utils import get_locale
 
+SUBTITLE_FORMAT = ['.srt', '.ass', '.ssa', '.vtt', '.xml', '.json']
+
 
 def get_encoding_type(source):
     """
@@ -56,7 +58,7 @@ def convert_subtitle(folder_path="", platform="", lang=""):
             display = True
             for file in sorted(os.listdir(folder_path)):
                 extenison = Path(file).suffix
-                if os.path.isfile(os.path.join(folder_path, file)) and extenison != '.srt':
+                if os.path.isfile(os.path.join(folder_path, file)) and extenison in SUBTITLE_FORMAT:
                     if display:
                         logger.info(
                             _("\nConvert %s to .srt:\n---------------------------------------------------------------"), extenison)
@@ -73,7 +75,7 @@ def convert_subtitle(folder_path="", platform="", lang=""):
             if platform:
                 archive_subtitle(path=os.path.normpath(
                     folder_path), platform=platform, lang=lang)
-        else:
+        elif os.path.isfile(folder_path) and Path(folder_path).suffix in SUBTITLE_FORMAT:
             subtitle_name = folder_path.replace(
                 Path(folder_path).suffix, '.srt')
             convert_utf8(folder_path)
