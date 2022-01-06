@@ -21,6 +21,7 @@ Subtitle-Downloader is a command-line program to download subtitles from the mos
 ```
 pip install -r requriements
 ```
+- For iq.com users, make sure your PC have installed the Chrome browser, the code use selenium and it requires Chrome app.
 
 ## USAGE
 
