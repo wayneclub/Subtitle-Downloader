@@ -142,7 +142,7 @@ def driver_init(headless=True):
         'excludeSwitches', ['enable-automation'])
     driver = webdriver.Chrome('chromedriver', options=options)
     driver.execute_cdp_cmd('Network.setUserAgentOverride', {
-                           "userAgent": get_user_agent})
+                           "userAgent": get_user_agent()})
     driver.set_page_load_timeout(120)
     return driver
 
