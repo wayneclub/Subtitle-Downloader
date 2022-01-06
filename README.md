@@ -1,4 +1,4 @@
-# Subtitle-Downloader
+# Subtitle Downloader
 
 **NON-COMMERCIAL USE ONLY**
 
