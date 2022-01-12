@@ -66,7 +66,8 @@ def convert_subtitle(folder_path="", platform="", lang=""):
                         Path(subtitle).suffix, '.srt')
                     convert_utf8(subtitle)
                     subs = pysubs2.load(subtitle)
-                    subs = format_subtitle(subs)
+                    if '.zh-Hant' in subtitle_name:
+                        subs = format_subtitle(subs)
                     subs.save(subtitle_name)
                     os.remove(subtitle)
                     logger.info(os.path.basename(subtitle_name))
@@ -78,7 +79,8 @@ def convert_subtitle(folder_path="", platform="", lang=""):
                 Path(folder_path).suffix, '.srt')
             convert_utf8(folder_path)
             subs = pysubs2.load(folder_path)
-            subs = format_subtitle(subs)
+            if '.zh-Hant' in subtitle_name:
+                subs = format_subtitle(subs)
             subs.save(subtitle_name)
             os.remove(folder_path)
             logger.info(os.path.basename(subtitle_name))
@@ -158,7 +160,8 @@ def merge_subtitle_fragments(folder_path="", file_name="", lang="", display=Fals
         file_path = os.path.join(
             Path(folder_path).parent.absolute(), file_name)
         subs.sort()
-        subs = format_subtitle(subs)
+        if '.zh-Hant' in file_path:
+            subs = format_subtitle(subs)
         subs.save(file_path)
         logger.info(file_name)
         if os.path.exists(folder_path):
