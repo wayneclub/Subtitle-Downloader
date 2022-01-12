@@ -17,6 +17,7 @@ from services.friday import Friday
 from services.linetv import LineTV
 from services.kktv import KKTV
 from services.viu import Viu
+from services.netflix import Netflix
 
 if __name__ == "__main__":
     _ = get_locale('main')
@@ -119,6 +120,8 @@ if __name__ == "__main__":
         r'https:\/\/www\.hbogoasia\..+', args.url)
     viu_search = re.search(
         r'https:\/\/www.viu.com\/ott\/.+', args.url)
+    netflix_search = re.search(
+        r'https:\/\/www.netflix.com\/.+', args.url)
 
     if kktv_search:
         kktv = KKTV(args)
@@ -141,6 +144,9 @@ if __name__ == "__main__":
     elif viu_search:
         viu = Viu(args)
         viu.main()
+    elif netflix_search:
+        netflix = Netflix(args)
+        netflix.main()
     else:
         logging.info(
             _("Only support downloading subtitles from Disney Plus, HBOGO Asia, KKTV, LineTV, friDay Video, iq.com, and Viu"))

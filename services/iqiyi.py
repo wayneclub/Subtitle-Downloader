@@ -131,14 +131,12 @@ class IQIYI(Service):
             if os.path.exists(folder_path):
                 shutil.rmtree(folder_path)
 
-            self.logger.debug('episode_list: %s', episode_list)
             languages = set()
             subtitles = []
             if len(episode_list) > 0:
                 driver = driver_init()
                 lang_paths = set()
                 for episode in episode_list:
-                    self.logger.debug(episode)
                     if 'payMarkFont' in episode and episode['payMarkFont'] == 'Preview':
                         break
                     if 'order' in episode:

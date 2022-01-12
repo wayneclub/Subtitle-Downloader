@@ -61,6 +61,30 @@ class Viu(Service):
                 self._("\nSubtitle available languages: %s"), available_languages)
             exit(0)
 
+    def get_region(self):
+        region = ''
+        area_id = ''
+        language_flag_id = ''
+        region_search = re.search(r'\/ott\/(.+?)\/(.+?)\/', self.url)
+        if region_search:
+            region = region_search.group(1)
+            language = region_search.group(2)
+            if region == 'sg':
+                area_id = 2
+                language_flag_id = ''
+                if 'zh' in language:
+                    language_flag_id = '2'
+                else:
+                    language_flag_id = '3'
+            else:
+                region = 'hk'
+                area_id = 1
+                if 'zh' in language:
+                    language_flag_id = '1'
+                else:
+                    language_flag_id = '3'
+        return region, area_id, language_flag_id
+
     def download_subtitle(self):
         product_id_search = re.search(r'vod\/(\d+)\/', self.url)
         product_id = product_id_search.group(1)
@@ -73,23 +97,16 @@ class Viu(Service):
             language_flag_id = match.group(2)
             area_id = match.group(3)
         else:
-            if self.region and self.region.lower() == 'sg':
-                region = 'sg'
-                area_id = '2'
-            else:
-                region = 'hk'
-                area_id = '1'
-
-            if self.default_language and 'zh' in self.default_language:
-                language_flag_id = '1'
-            else:
-                language_flag_id = '3'
+            region, area_id, language_flag_id = self.get_region()
+        self.logger.debug(
+            "region: %s, area_id: %s, language_flag_id: %s", region, area_id, language_flag_id)
 
         meta_url = self.api['ott'].format(
             region=region, area_id=area_id, language_flag_id=language_flag_id, product_id=product_id)
         self.logger.debug(meta_url)
         data = http_request(
             session=self.session, url=meta_url, method=HTTPMethod.GET)['data']
+        self.logger.debug(data)
 
         title = data['series']['name']
         if data['series']['name'].split(' ')[-1].isdecimal():
