@@ -5,6 +5,7 @@ __pycache__/
 *.srt
 *.vtt
 *.log
+cookies.txt
 *.zip
 __tmp__/
 test.py
