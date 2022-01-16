@@ -5,7 +5,6 @@
 This module is to download subtitle from KKTV、LineTV、FriDay.
 """
 
-import re
 import argparse
 import logging
 from datetime import datetime
@@ -107,44 +106,28 @@ if __name__ == "__main__":
     logging.info(
         'ip: %s (%s)', ip['ip'], ip['country'])
 
-    kktv_search = re.search(
-        r'https:\/\/www\.kktv\.me\/titles\/.+', args.url)
-    linetv_search = re.search(
-        r'https:\/\/www\.linetv\.tw\/drama\/.+?\/eps\/1', args.url)
-    friday_search = re.search(
-        r'https:\/\/video\.friday\.tw\/(drama|anime|movie|show)\/detail\/.+', args.url)
-    iqiyi_search = re.search(r'https:\/\/www\.iq\.com', args.url)
-    disney_search = re.search(
-        r'https:\/\/www\.disneyplus\.com\/.*(series|movies)\/.+', args.url)
-    hbogoasia_search = re.search(
-        r'https:\/\/www\.hbogoasia\..+', args.url)
-    viu_search = re.search(
-        r'https:\/\/www.viu.com\/ott\/.+', args.url)
-    netflix_search = re.search(
-        r'https:\/\/www.netflix.com\/.+', args.url)
-
-    if kktv_search:
+    if 'kktv' in args.url:
         kktv = KKTV(args)
         kktv.main()
-    elif linetv_search:
+    elif 'linetv' in args.url:
         linetv = LineTV(args)
         linetv.main()
-    elif friday_search:
+    elif 'video.friday' in args.url:
         friday = Friday(args)
         friday.main()
-    elif iqiyi_search:
+    elif 'iq.com' in args.url:
         iqiyi = IQIYI(args)
         iqiyi.main()
-    elif disney_search:
+    elif 'disneyplus' in args.url:
         disney_plus = DisneyPlus(args)
         disney_plus.main()
-    elif hbogoasia_search:
+    elif 'hbogoasia' in args.url:
         hbogoasia = HBOGOAsia(args)
         hbogoasia.main()
-    elif viu_search:
+    elif 'viu.com' in args.url:
         viu = Viu(args)
         viu.main()
-    elif netflix_search:
+    elif 'netflix.com' in args.url:
         netflix = Netflix(args)
         netflix.main()
     else:
