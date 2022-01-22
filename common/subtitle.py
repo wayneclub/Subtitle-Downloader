@@ -160,7 +160,7 @@ def merge_subtitle_fragments(folder_path="", file_name="", lang="", display=Fals
         file_path = os.path.join(
             Path(folder_path).parent.absolute(), file_name)
         subs.sort()
-        if '.zh-Hant' in file_path:
+        if '.zh-Hant' in file_path or '.cmn-Hant' in file_path:
             subs = format_subtitle(subs)
         subs.save(file_path)
         logger.info(file_name)
@@ -190,8 +190,8 @@ def format_subtitle(subs):
             text = re.sub(r',([\u4E00-\u9FFF]+)', '，\\1', text)
             text = re.sub(r'([\u4E00-\u9FFF]+),', '\\1，', text)
 
-        text = text.replace('  ', ' ')
         text = text.replace('  ', ' ')
+        text = text.replace('  ', ' ')
 
         sub.text = text.strip()
 

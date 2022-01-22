@@ -39,6 +39,7 @@ class Platform:
     DISNEY = "Disney+"
     HBOGO = "HBOGO"
     VIU = "Viu"
+    ITUNES = "iTunes"
 
 
 def get_locale(name, lang=""):
@@ -213,7 +214,7 @@ def download_files(files):
         if 'url' in file and 'name' in file and 'path' in file:
             if 'segment' in file and file['segment']:
                 extension = Path(file['name']).suffix
-                sequence = str(lang_paths.count(file['path'])).zfill(2)
+                sequence = str(lang_paths.count(file['path'])).zfill(3)
                 file_name = os.path.join(file['path'], file['name'].replace(
                     extension, f'-seg_{sequence}{extension}'))
                 lang_paths.append(file['path'])

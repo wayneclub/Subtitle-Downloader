@@ -17,6 +17,7 @@ from services.linetv import LineTV
 from services.kktv import KKTV
 from services.viu import Viu
 from services.netflix import Netflix
+from services.itunes import iTunes
 
 if __name__ == "__main__":
     _ = get_locale('main')
@@ -130,6 +131,9 @@ if __name__ == "__main__":
     elif 'netflix.com' in args.url:
         netflix = Netflix(args)
         netflix.main()
+    elif 'itunes.apple.com' in args.url:
+        itunes = iTunes(args)
+        itunes.main()
     else:
         logging.info(
             _("Only support downloading subtitles from Disney Plus, HBOGO Asia, KKTV, LineTV, friDay Video, iq.com, and Viu"))

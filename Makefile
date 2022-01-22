@@ -10,3 +10,4 @@ Subtitle-Downloader:
 	msgfmt -o locales/zh-Hant/LC_MESSAGES/services.kktv.mo locales/zh-Hant/LC_MESSAGES/services.kktv
 	msgfmt -o locales/zh-Hant/LC_MESSAGES/services.linetv.mo locales/zh-Hant/LC_MESSAGES/services.linetv
 	msgfmt -o locales/zh-Hant/LC_MESSAGES/services.friday.mo locales/zh-Hant/LC_MESSAGES/services.friday
+	msgfmt -o locales/zh-Hant/LC_MESSAGES/services.itunes.mo locales/zh-Hant/LC_MESSAGES/services.itunes
