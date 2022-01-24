@@ -14,10 +14,36 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: services/catchplay.py:60
+#: services/catchplay.py:118
 #, python-format
 msgid ""
 "\n"
 "Download: %s\n"
 "---------------------------------------------------------------"
 msgstr "\n下載：%s\n---------------------------------------------------------------"
+
+#: services/catchplay.py:133
+#, python-format
+msgid ""
+"\n"
+"%s total: %s season(s)"
+msgstr "\n%s 共有：%s 季"
+
+#: services/catchplay.py:149
+#, python-format
+msgid ""
+"\n"
+"Season %s total: %s episode(s)\tdownload all episodes\n"
+"---------------------------------------------------------------"
+msgstr "\n第 %s 季 共有：%s 集\t下載全集\n---------------------------------------------------------------"
+
+#: services/catchplay.py:153
+#, python-format
+msgid "Finding %s ..."
+msgstr "尋找 %s ..."
+
+#: services/catchplay.py:262
+msgid ""
+"\n"
+"Sorry, there's no embeded subtitles in this video!"
+msgstr "\n抱歉，此劇只有硬字幕，可去其他串流平台查看"
