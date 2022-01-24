@@ -40,6 +40,7 @@ class Platform:
     HBOGO = "HBOGO"
     VIU = "Viu"
     ITUNES = "iTunes"
+    CATCHPLAY = 'CatchPlay'
 
 
 def get_locale(name, lang=""):
@@ -56,7 +57,7 @@ def get_locale(name, lang=""):
         return gettext.gettext
 
 
-def http_request(session=requests.Session(), url="", method="", headers="", kwargs="", raw=False):
+def http_request(session=requests.Session(), url="", method="", headers="", kwargs="", cookies=None, raw=False):
 
     if headers:
         session.headers = headers
@@ -64,6 +65,10 @@ def http_request(session=requests.Session(), url="", method="", headers="", kwar
         session.headers = {
             'User-Agent': get_user_agent()
         }
+
+    if cookies:
+        session.cookies = requests.utils.cookiejar_from_dict(
+            cookies, cookiejar=None, overwrite=True)
 
     session.timeout = 10
     adapter = HTTPAdapter(max_retries=Retry(total=5, backoff_factor=2))
@@ -169,6 +174,21 @@ def get_network_url(driver, search_url, lang=""):
 
 def kill_process():
     os.system('killall chromedriver > /dev/null 2>&1')
+
+
+def import_credential():
+    if os.path.basename(os.getcwd()) == 'Subtitle-Downloader':
+        credential_path = os.path.join(
+            os.getcwd(), 'configs/my_credential.json')
+    else:
+        credential_path = os.path.join(
+            os.getcwd(), 'Subtitle-Downloader/configs/my_credential.json')
+
+    if not os.path.exists(credential_path):
+        credential_path = credential_path.replace(
+            'my_credential.json', 'credential.json')
+
+    return orjson.loads(Path(credential_path).read_text())
 
 
 def get_ip_location():

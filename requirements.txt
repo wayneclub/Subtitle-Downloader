@@ -7,3 +7,7 @@ pysubs2
 requests
 selenium
 chromedriver-binary-auto
+aiohttp
+aiohttp_socks
+argparse
+pycryptodome

@@ -1,11 +1,15 @@
 .DS_Store
 __pycache__/
+__tmp__/
+logs/
 *.pyc
 *.pot
 *.srt
 *.vtt
 *.log
-cookies.txt
+cookies_*.txt
 *.zip
-__tmp__/
+*.js
+*.html
+my_credential.json
 test.py
