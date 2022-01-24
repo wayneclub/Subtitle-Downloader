@@ -132,6 +132,11 @@ python subtitle_downloader.py https://www.disneyplus.com/series/loki/6pARMvILBGz
 2. Run Subtitle_Downloader.bat
 ```
 
+## CatchPlay
+
+1. Install https://chrome.google.com/webstore/detail/get-cookiestxt/bgaddhkoddajcdgocldbbfleckgcbcid
+2. Login CatchPlay, and use this plugin download cookies.txt (Don't modify anything even the file name)
+3. Put cookie.txt into Subtitle-Downloader/configs/cookies
 
 > 目前只支持從
 > 1. KKTV 下載電影、劇集、綜藝、動漫字幕
