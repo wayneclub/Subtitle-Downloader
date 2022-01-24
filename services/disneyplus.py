@@ -100,7 +100,7 @@ class DisneyPlus(Service):
                             m3u8_url = self.get_m3u8_url(media_id)
                             self.logger.debug(m3u8_url)
 
-                            file_name = f'{title}.S{season_name}E{episode_name}.WEB-DL.Disney+.vtt'
+                            file_name = f'{title}.S{season_name}E{episode_name}.WEB-DL.{Platform.DISNEY}.vtt'
                             subtitle_list, audio_list = self.parse_m3u(
                                 m3u8_url)
 
@@ -137,7 +137,7 @@ class DisneyPlus(Service):
             media_id = data['mediaMetadata']['mediaId']
             m3u8_url = self.get_m3u8_url(media_id)
 
-            file_name = f'{title}.{release_year}.WEB-DL.Disney+.vtt'
+            file_name = f'{title}.{release_year}.WEB-DL.{Platform.DISNEY}.vtt'
             subtitle_list, audio_list = self.parse_m3u(m3u8_url)
 
             self.logger.info(

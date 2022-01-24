@@ -264,16 +264,14 @@ class CatchPlay(Service):
 
         track = [sub_track_index]
         Downloader(self.logger, args).download_streams(streams, track)
-        seg_folder = os.path.join(
+        segments_path = os.path.join(
             folder_path, f"{file_name.replace('.vtt', '')}_subtitle_WVTT_zh-TW")
-        sub_lang = self.get_language_code(seg_folder.split('_')[-1])
-        segments_path = seg_folder.replace(
-            '_subtitle_WVTT_zh-TW', f'.{sub_lang}')
-        os.rename(seg_folder, segments_path)
-        os.remove(f"{segments_path.replace(sub_lang, '')}mpd")
-        self.extract_sub(segments_path)
+        sub_lang = self.get_language_code(segments_path.split('_')[-1])
+        file_name = os.path.join(
+            folder_path, file_name.replace(f'.{Platform.CATCHPLAY}', ''))
+        self.extract_sub(file_name, sub_lang, segments_path)
 
-    def extract_sub(self, segments_path):
+    def extract_sub(self, file_name, sub_lang, segments_path):
         class Attr(object):
             def __init__(self):
                 self.type = 'wvtt'
@@ -283,6 +281,10 @@ class CatchPlay(Service):
                 self.segment_time = 0
         args = Attr()
         parse(args)
+        os.rename(
+            file_name, f'{file_name}.{Platform.CATCHPLAY}.{sub_lang}.vtt')
+
+        os.remove(f"{segments_path.replace('_subtitle_WVTT_zh-TW', '')}.mpd")
         if os.path.exists(segments_path):
             shutil.rmtree(segments_path)
 
