@@ -139,13 +139,14 @@ python subtitle_downloader.py https://www.disneyplus.com/series/loki/6pARMvILBGz
 3. Put cookie.txt into Subtitle-Downloader/configs/cookies
 
 > 目前只支持從
-> 1. KKTV 下載電影、劇集、綜藝、動漫字幕
-> 2. LineTV 下載劇集、綜藝字幕
-> 3. FriDay影音 下載劇集、電影、綜藝、動漫字幕
-> 4. 愛奇藝 下載劇集
-> 4. Disney+ 下載電影、劇集
-> 5. HBOGO Asia 下載電影、劇集
-> 6. Viu 下載劇集
+> 1. KKTV 下載電影、影集、綜藝、動漫字幕
+> 2. LineTV 下載影集、綜藝字幕
+> 3. FriDay影音 下載電影、影集、綜藝、動漫字幕
+> 4. 愛奇藝 下載電影、劇集
+> 5. Disney+ 下載電影、影集
+> 6. HBOGO Asia 下載電影、影集
+> 7. Viu 下載電影、影集
+> 8. CatchPlay 下載電影、影集字幕
 > 
 > 請確認網站網址無誤
 
