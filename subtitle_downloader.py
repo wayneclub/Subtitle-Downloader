@@ -19,6 +19,8 @@ from services.viu import Viu
 from services.netflix import Netflix
 from services.itunes import iTunes
 from services.catchplay import CatchPlay
+from services.wetv import WeTV
+
 
 if __name__ == "__main__":
     _ = get_locale('main')
@@ -138,6 +140,9 @@ if __name__ == "__main__":
     elif 'catchplay.com' in args.url:
         catchplay = CatchPlay(args)
         catchplay.main()
+    elif 'wetv.vip' in args.url:
+        wetv = WeTV(args)
+        wetv.main()
     else:
         logging.info(
             _("Only support downloading subtitles from Disney Plus, HBOGO Asia, KKTV, LineTV, friDay Video, iq.com, Viu, CatchPlay, and iTunes"))
