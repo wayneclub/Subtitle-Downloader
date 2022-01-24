@@ -9,5 +9,4 @@ selenium
 chromedriver-binary-auto
 aiohttp
 aiohttp_socks
-argparse
 pycryptodome
