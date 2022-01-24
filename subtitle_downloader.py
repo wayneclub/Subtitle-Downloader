@@ -2,7 +2,7 @@
 # coding: utf-8
 
 """
-This module is to download subtitle from KKTV、LineTV、FriDay.
+This module is to download subtitle from stream services.
 """
 
 import argparse
@@ -140,4 +140,4 @@ if __name__ == "__main__":
         catchplay.main()
     else:
         logging.info(
-            _("Only support downloading subtitles from Disney Plus, HBOGO Asia, KKTV, LineTV, friDay Video, iq.com, and Viu"))
+            _("Only support downloading subtitles from Disney Plus, HBOGO Asia, KKTV, LineTV, friDay Video, iq.com, Viu, CatchPlay, and iTunes"))
