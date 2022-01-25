@@ -7,6 +7,7 @@ This module is to download subtitle from Friday影音
 
 import logging
 import os
+from platform import release
 import re
 import shutil
 import orjson
@@ -40,9 +41,9 @@ class WeTV(Service):
             'ID': 'id',
             'PT': 'pt',
             'ES': 'es',
-            '韓語': 'ko',
-            '越南語': 'vi',
-            '阿拉伯語': 'ar',
+            'KO': 'ko',
+            'VI': 'vi',
+            'AR': 'ar',
         }
 
         if language_code.get(lang):
@@ -73,107 +74,145 @@ class WeTV(Service):
                 self._("\nSubtitle available languages: %s"), available_languages)
             exit(0)
 
-    def download_subtitle(self):
-        """Download subtitle from friDay"""
+    def movie_subtitle(self, data):
+        title = data['videoInfo']['title']
+        self.logger.info("\n%s", title)
 
-        response = http_request(session=self.session,
-                                url=self.url, method=HTTPMethod.GET, raw=True)
-        match = re.search(
-            r'<script id=\"__NEXT_DATA__" type=\"application/json\">(.+?)<\/script>', response)
-        if match:
-            data = orjson.loads(match.group(1).strip())[
-                'props']['pageProps']['data']
-            data = orjson.loads(data)
-            title = data['coverInfo']['title']
+        release_year = data['videoInfo']['publish_date'][:4]
 
-            if data['coverInfo']['is_area_limit'] == 1:
+        folder_path = os.path.join(
+            self.output, f'{title}.{release_year}')
+        if os.path.exists(folder_path):
+            shutil.rmtree(folder_path)
+
+        file_name = f'{title}.{release_year}.WEB-DL.{Platform.WETV}.vtt'
+        self.logger.info(
+            self._("\nDownload: %s\n---------------------------------------------------------------"), file_name)
+
+        movie_url = self.api['play'].format(
+            series_id=data['videoInfo']['cover_list'][0], episode_id=data['videoInfo']['vid'])
+        driver = driver_init()
+
+        driver.get(movie_url)
+
+        getvinfo_url = get_network_url(
+            driver=driver, search_url=r"https:\/\/play.wetv.vip\/getvinfo\?", lang=self.locale)
+        self.logger.debug(getvinfo_url)
+
+        movie_data = http_request(session=self.session,
+                                  url=getvinfo_url, method=HTTPMethod.GET, raw=True)
+        movie_data = orjson.loads(
+            re.sub(r'txplayerJsonpCallBack_getinfo_\d+\(({.+})\)', '\\1', movie_data))
+
+        driver.quit()
+
+        languages = set()
+        subtitles = []
+        if 'sfl' in movie_data:
+            movie_data = movie_data['sfl']
+            self.logger.debug(movie_data)
+            self.get_all_languages(movie_data)
+
+            subs, lang_paths = self.get_subtitle(
+                movie_data, folder_path, file_name)
+            subtitles += subs
+            languages = set.union(
+                languages, lang_paths)
+
+            if subtitles and languages:
+                download_files(subtitles)
+
+                for lang_path in sorted(languages):
+                    convert_subtitle(
+                        folder_path=lang_path, lang=self.locale)
+                convert_subtitle(folder_path=folder_path,
+                                 platform=Platform.WETV, lang=self.locale)
+
+    def series_subtitle(self, data):
+        title = data['coverInfo']['title']
+        season_search = re.search(r'(.+)第(.+)季', title)
+        if season_search:
+            title = season_search.group(1).strip()
+            season_name = convert_chinese_number(
+                season_search.group(2))
+        else:
+            season_name = '01'
+
+        self.logger.info("\n%s", title)
+
+        series_id = data['coverInfo']['cover_id']
+        current_eps = data['coverInfo']['episode_updated_country']
+        episode_num = data['coverInfo']['episode_all']
+
+        episode_list = data['videoList']
+
+        if self.last_episode:
+            episode_list = [list(episode_list)[-1]]
+            self.logger.info(self._("\nSeason %s total: %s episode(s)\tdownload season %s last episode\n---------------------------------------------------------------"),
+                             int(season_name), current_eps, int(season_name))
+        else:
+            if current_eps == episode_num:
+                self.logger.info(self._("\nSeason %s total: %s episode(s)\tdownload all episodes\n---------------------------------------------------------------"),
+                                 int(season_name),
+                                 episode_num)
+            else:
                 self.logger.info(
-                    self._("\nSorry, this video is not allow in your region!"))
-                exit(0)
+                    self._(
+                        "\nSeason %s total: %s episode(s)\tupdate to episode %s\tdownload all episodes\n---------------------------------------------------------------"),
+                    int(season_name),
+                    episode_num,
+                    current_eps)
 
-            season_search = re.search(r'(.+)第(.+)季', title)
-            if season_search:
-                title = season_search.group(1).strip()
-                season_name = convert_chinese_number(
-                    season_search.group(2))
-            else:
-                season_name = '01'
+        folder_path = os.path.join(
+            self.output, f'{title}.S{season_name}')
+        if os.path.exists(folder_path):
+            shutil.rmtree(folder_path)
 
-            self.logger.info("\n%s", title)
+        if len(episode_list) > 0:
+            driver = driver_init()
+            languages = set()
+            subtitles = []
+            for episode in episode_list:
+                episode_name = episode['episode']
+                episode_id = episode['vid']
+                episode_url = self.api['play'].format(
+                    series_id=series_id, episode_id=episode_id)
+                self.logger.debug(episode_url)
 
-            series_id = data['coverInfo']['cover_id']
-            current_eps = data['coverInfo']['episode_updated_country']
-            episode_num = data['coverInfo']['episode_all']
+                file_name = f'{title}.S{season_name}E{episode_name}.WEB-DL.{Platform.WETV}.vtt'
+                self.logger.info(
+                    self._("Finding %s ..."), file_name)
 
-            episode_list = data['videoList']
+                driver.get(episode_url)
 
-            if self.last_episode:
-                episode_list = [list(episode_list)[-1]]
-                self.logger.info(self._("\nSeason %s total: %s episode(s)\tdownload season %s last episode\n---------------------------------------------------------------"),
-                                 int(season_name), current_eps, int(season_name))
-            else:
-                if current_eps == episode_num:
-                    self.logger.info(self._("\nSeason %s total: %s episode(s)\tdownload all episodes\n---------------------------------------------------------------"),
-                                     int(season_name),
-                                     episode_num)
-                else:
-                    self.logger.info(
-                        self._(
-                            "\nSeason %s total: %s episode(s)\tupdate to episode %s\tdownload all episodes\n---------------------------------------------------------------"),
-                        int(season_name),
-                        episode_num,
-                        current_eps)
+                getvinfo_url = get_network_url(
+                    driver=driver, search_url=r"https:\/\/play.wetv.vip\/getvinfo\?", lang=self.locale)
+                self.logger.debug(getvinfo_url)
+                episode_data = http_request(session=self.session,
+                                            url=getvinfo_url, method=HTTPMethod.GET, raw=True)
+                episode_data = orjson.loads(
+                    re.sub(r'txplayerJsonpCallBack_getinfo_\d+\(({.+})\)', '\\1', episode_data))
 
-            folder_path = os.path.join(
-                self.output, f'{title}.S{season_name}')
-            if os.path.exists(folder_path):
-                shutil.rmtree(folder_path)
+                if 'sfl' in episode_data:
+                    episode_data = episode_data['sfl']
+                    self.logger.debug(episode_data)
+                    self.get_all_languages(episode_data)
 
-            if len(episode_list) > 0:
-                driver = driver_init()
-                languages = set()
-                subtitles = []
-                for episode in episode_list:
-                    episode_name = episode['episode']
-                    episode_id = episode['vid']
-                    episode_url = self.api['play'].format(
-                        series_id=series_id, episode_id=episode_id)
-                    self.logger.debug(episode_url)
+                    subs, lang_paths = self.get_subtitle(
+                        episode_data, folder_path, file_name)
+                    subtitles += subs
+                    languages = set.union(
+                        languages, lang_paths)
 
-                    file_name = f'{title}.S{season_name}E{episode_name}.WEB-DL.{Platform.WETV}.vtt'
-                    self.logger.info(
-                        self._("Finding %s ..."), file_name)
+            driver.quit()
+            if subtitles and languages:
+                download_files(subtitles)
 
-                    driver.get(episode_url)
-
-                    getvinfo_url = get_network_url(
-                        driver=driver, search_url=r"https:\/\/play.wetv.vip\/getvinfo\?", lang=self.locale)
-                    self.logger.debug(getvinfo_url)
-                    episode_data = http_request(session=self.session,
-                                                url=getvinfo_url, method=HTTPMethod.GET, raw=True)
-                    episode_data = orjson.loads(
-                        re.sub(r'txplayerJsonpCallBack_getinfo_\d+\(({.+})\)', '\\1', episode_data))
-
-                    if 'sfl' in episode_data:
-                        episode_data = episode_data['sfl']
-                        self.logger.debug(episode_data)
-                        self.get_all_languages(episode_data)
-
-                        subs, lang_paths = self.get_subtitle(
-                            episode_data, folder_path, file_name)
-                        subtitles += subs
-                        languages = set.union(
-                            languages, lang_paths)
-
-                driver.quit()
-                if subtitles and languages:
-                    download_files(subtitles)
-
-                    for lang_path in sorted(languages):
-                        convert_subtitle(
-                            folder_path=lang_path, lang=self.locale)
-                    convert_subtitle(folder_path=folder_path,
-                                     platform=Platform.WETV, lang=self.locale)
+                for lang_path in sorted(languages):
+                    convert_subtitle(
+                        folder_path=lang_path, lang=self.locale)
+                convert_subtitle(folder_path=folder_path,
+                                 platform=Platform.WETV, lang=self.locale)
 
     def get_subtitle(self, data, folder_path, file_name):
 
@@ -202,6 +241,28 @@ class WeTV(Service):
                 subtitle['url'] = subtitle_link
                 subtitles.append(subtitle)
         return subtitles, lang_paths
+
+    def download_subtitle(self):
+        """Download subtitle from WeTV"""
+
+        response = http_request(session=self.session,
+                                url=self.url, method=HTTPMethod.GET, raw=True)
+        match = re.search(
+            r'<script id=\"__NEXT_DATA__" type=\"application/json\">(.+?)<\/script>', response)
+        if match:
+            data = orjson.loads(match.group(1).strip())[
+                'props']['pageProps']['data']
+            data = orjson.loads(data)
+
+            if data['coverInfo']['is_area_limit'] == 1:
+                self.logger.info(
+                    self._("\nSorry, this video is not allow in your region!"))
+                exit(0)
+
+            if data['coverInfo']['type'] == 1:
+                self.movie_subtitle(data)
+            else:
+                self.series_subtitle(data)
 
     def main(self):
         self.get_language_list()

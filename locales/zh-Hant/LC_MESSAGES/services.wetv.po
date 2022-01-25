@@ -27,7 +27,14 @@ msgid ""
 "Subtitle available languages: %s"
 msgstr "\n提供的字幕語言：%s"
 
-#: services/wetv.py:90
+#: services/wetv.py:89
+msgid ""
+"\n"
+"Download: %s\n"
+"---------------------------------------------------------------"
+msgstr "\n下載：%s\n---------------------------------------------------------------"
+
+#: services/wetv.py:258
 #, python-format
 msgid ""
 "\n"

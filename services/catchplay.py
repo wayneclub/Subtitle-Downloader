@@ -64,7 +64,7 @@ class CatchPlay(Service):
             for cookie in cookiejar:
                 cookies[cookie.name] = cookie.value
 
-            self.save(cookies)
+            self.save_cookies(cookies)
 
         with open(self.config["cookies_file"], "rb") as file:
             content = file.read().decode("utf-8")
@@ -84,7 +84,7 @@ class CatchPlay(Service):
 
         return cookies
 
-    def save(self, cookies):
+    def save_cookies(self, cookies):
         cookie_data = {}
         for name, value in cookies.items():
             cookie_data[name] = [value, 0]
