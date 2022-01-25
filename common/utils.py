@@ -41,6 +41,7 @@ class Platform:
     VIU = "Viu"
     ITUNES = "iTunes"
     CATCHPLAY = 'CatchPlay'
+    WETV = 'WeTV'
 
 
 def get_locale(name, lang=""):

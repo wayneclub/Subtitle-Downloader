@@ -92,6 +92,7 @@ class IQIYI(Service):
                     self.logger.info(
                         self._("\nThis video is only allows in:\n%s"), ', '.join(allow_regions))
                     exit(0)
+
                 if info['videoType'] != 'singleVideo':
                     episode_num = info['originalTotal']
 
@@ -139,7 +140,6 @@ class IQIYI(Service):
                         shutil.rmtree(folder_path)
 
                     if len(episode_list) > 0:
-                        lang_paths = set()
                         for episode in episode_list:
                             if 'payMarkFont' in episode and episode['payMarkFont'] == 'Preview':
                                 break

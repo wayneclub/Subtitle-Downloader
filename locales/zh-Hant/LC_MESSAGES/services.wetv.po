@@ -1,0 +1,64 @@
+# Subtitle-Downloader
+# Copyright (C) 2021
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-12-30 23:11+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Wayne <me@wayneclub.com>\n"
+"Language-Team: wayneclub <info@wayneclub.com>\n"
+"Language: zh-Hant\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: services/wetv.py:62
+msgid ""
+"\n"
+"Sorry, there's no embeded subtitles in this video!"
+msgstr "\n抱歉，此劇只有硬字幕，可去其他串流平台查看"
+
+#: services/wetv.py:73
+#, python-format
+msgid ""
+"\n"
+"Subtitle available languages: %s"
+msgstr "\n提供的字幕語言：%s"
+
+#: services/wetv.py:90
+#, python-format
+msgid ""
+"\n"
+"Sorry, this video is not allow in your region!"
+msgstr "\n你所在的地區無法下載，可用VPN切換到其他地區"
+
+#: services/wetv.py:107
+#, python-format
+msgid ""
+"\n"
+"Season %s total: %s episode(s)\tdownload season %s last episode\n"
+"---------------------------------------------------------------"
+msgstr "\n第 %s 季 共有：%s 集\t下載第 %s 季 最後一集\n---------------------------------------------------------------"
+
+#: services/wetv.py:111
+#, python-format
+msgid ""
+"\n"
+"Season %s total: %s episode(s)\tdownload all episodes\n"
+"---------------------------------------------------------------"
+msgstr "\n第 %s 季 共有：%s 集\t下載全集\n---------------------------------------------------------------"
+
+#: services/wetv.py:117
+#, python-format
+msgid ""
+"\n"
+"Season %s total: %s episode(s)\tupdate to episode %s\tdownload all episodes\n"
+"---------------------------------------------------------------"
+msgstr "\n第 %s 季 共有：%s 集\t更新至 第 %s 集\t下載全集\n---------------------------------------------------------------"
+
+#: services/wetv.py:140
+#, python-format
+msgid "Finding %s ..."
+msgstr "尋找 %s ..."
