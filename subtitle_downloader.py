@@ -145,4 +145,4 @@ if __name__ == "__main__":
         wetv.main()
     else:
         logging.info(
-            _("Only support downloading subtitles from Disney Plus, HBOGO Asia, KKTV, LineTV, friDay Video, iq.com, Viu, CatchPlay, and iTunes"))
+            _("Only support downloading subtitles from Disney Plus, HBOGO Asia, KKTV, LineTV, friDay Video, iq.com, Viu, CatchPlay, WeTV ,and iTunes."))

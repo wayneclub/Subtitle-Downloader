@@ -73,5 +73,5 @@ msgstr "顯示本訊息，然後結束"
 #: subtitle_Downloader.py:136
 msgid ""
 "Only support downloading subtitles from Disney Plus, HBOGO Asia, KKTV, "
-"LineTV, friDay Video, iq.com, CatchPlay, and iTunes"
-msgstr "目前僅支持從\n1. KKTV\t\t下載電影、影集、綜藝、動漫字幕\n2. LineTV\t下載影集、綜藝字幕\n3. FriDay影音\t下載影集、電影、綜藝、動漫字幕\n4. 愛奇藝\t下載電影、影集\n5. Disney+\t下載電影、影集\n6. HBOGO Asia\t下載電影、影集\n7. Viu\t下載電影、影集\n8. CatchPlay下載電影、影集\n\n請確認網站網址無誤"
+"LineTV, friDay Video, iq.com, CatchPlay, WeTV, and iTunes."
+msgstr "目前僅支持從\n1. KKTV\t\t下載電影、影集、綜藝、動漫字幕\n2. LineTV\t下載影集、綜藝字幕\n3. FriDay影音\t下載影集、電影、綜藝、動漫字幕\n4. 愛奇藝\t下載電影、影集\n5. Disney+\t下載電影、影集\n6. HBOGO Asia\t下載電影、影集\n7. Viu\t下載電影、影集\n8. CatchPlay下載電影、影集\n9. WeTV\n\n請確認網站網址無誤"
