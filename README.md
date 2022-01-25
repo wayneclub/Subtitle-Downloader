@@ -109,6 +109,8 @@ iq.com
 | vi | Vietnamese | 越南文 |
 | th | Thai | 泰文 |
 | id | Indonesian | 印尼文 |
+| es | Spanish | 西班牙文 |
+| ko | Korean | 韓文 |
 | ar | Arabic | 阿拉伯文 |
 
 Viu
@@ -121,6 +123,19 @@ Viu
 | th | Thai | 泰文 |
 | id | Indonesian | 印尼文 |
 | my | Burmese | 緬甸文 |
+
+WeTV
+| Codec | Language | 語言 |
+| --- | --- | --- |
+| en | English | 英文 |
+| zh-Hant | Traditional Chinese | 繁體中文 |
+| zh-Hans | Simplified Chinese | 簡體中文 |
+| ms | Malay | 馬來文 |
+| th | Thai | 泰文 |
+| id | Indonesian | 印尼文 |
+| pt | Português | 葡萄牙文 |
+| es | Spanish | 西班牙文 |
+| ko | Korean | 韓文 |
 
 ```
 python subtitle_downloader.py https://www.disneyplus.com/series/loki/6pARMvILBGzF -slang en,zh-Hant
