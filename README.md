@@ -138,6 +138,9 @@ python subtitle_downloader.py https://www.disneyplus.com/series/loki/6pARMvILBGz
 2. Login CatchPlay, and use this plugin download cookies.txt (Don't modify anything even the file name)
 3. Put cookie.txt into Subtitle-Downloader/configs/cookies
 
+## iq.com and WeTV
+- Make sure Google Chrome Browser is installed on your PC and update it to the latest version.
+
 > 目前只支持從
 > 1. KKTV 下載電影、影集、綜藝、動漫字幕
 > 2. LineTV 下載影集、綜藝字幕
@@ -147,6 +150,7 @@ python subtitle_downloader.py https://www.disneyplus.com/series/loki/6pARMvILBGz
 > 6. HBOGO Asia 下載電影、影集
 > 7. Viu 下載電影、影集
 > 8. CatchPlay 下載電影、影集字幕
+> 9. WeTV 下載電影、影集字幕
 > 
 > 請確認網站網址無誤
 
