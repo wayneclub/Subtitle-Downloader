@@ -150,8 +150,9 @@ python subtitle_downloader.py https://www.disneyplus.com/series/loki/6pARMvILBGz
 ## CatchPlay
 
 1. Install https://chrome.google.com/webstore/detail/get-cookiestxt/bgaddhkoddajcdgocldbbfleckgcbcid
-2. Login CatchPlay, and use this plugin download cookies.txt (Don't modify anything even the file name)
+2. Login CatchPlay, and use this plugin download catchplay.com_cookies.txt (Don't modify anything even the file name)
 3. Put cookie.txt into Subtitle-Downloader/configs/cookies
+4. Make sure the movies or series which you'are going to download is playable in your region.
 
 ## iq.com and WeTV
 - Make sure Google Chrome Browser is installed on your PC and update it to the latest version.
