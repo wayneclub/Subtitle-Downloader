@@ -178,7 +178,7 @@ def kill_process():
 
 
 def import_credential():
-    if os.path.basename(os.getcwd()) == 'Subtitle-Downloader':
+    if 'Subtitle-Downloader' in os.path.basename(os.getcwd()):
         credential_path = os.path.join(
             os.getcwd(), 'configs/my_credential.json')
     else:
