@@ -159,6 +159,7 @@ python subtitle_downloader.py https://www.disneyplus.com/series/loki/6pARMvILBGz
 
 ## FAQ
 - Any issue during downloading subtitles, upload the log file.
+- Make sure the video contains embeded subtitles and it is playable in your region.
 ```
 python subtitle_downloader.py https://www.disneyplus.com/series/loki/6pARMvILBGzF -d
 ```
