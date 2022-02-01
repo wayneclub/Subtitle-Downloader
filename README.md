@@ -158,7 +158,7 @@ python subtitle_downloader.py https://www.disneyplus.com/series/loki/6pARMvILBGz
 4. Make sure the movies or series which you're going to download is playable in your region.
 
 ## iq.com and WeTV
-
+- For iq.com, make your video is playable in your region and use the album page to download subtitles.
 - Make sure Google Chrome Browser is installed on your PC and update it to the latest version.
 
 ## FAQ
