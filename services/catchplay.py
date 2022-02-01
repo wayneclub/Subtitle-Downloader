@@ -259,7 +259,7 @@ class CatchPlay(Service):
             streams) if 'subtitle_WVTT_zh-TW' in f'{stream.get_name()}{stream.get_init_msg(False)}')
         if not sub_track_index:
             self.logger.error(
-                self._("\nSorry, there's no embeded subtitles in this video!"))
+                self._("\nSorry, there's no embedded subtitles in this video!"))
             exit(1)
 
         track = [sub_track_index]

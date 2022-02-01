@@ -58,7 +58,7 @@ class IQIYI(Service):
 
         if not 'stl' in data:
             self.logger.info(
-                self._("\nSorry, there's no embeded subtitles in this video!"))
+                self._("\nSorry, there's no embedded subtitles in this video!"))
             exit(0)
 
         available_languages = tuple(

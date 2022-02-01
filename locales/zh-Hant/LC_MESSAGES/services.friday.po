@@ -69,7 +69,7 @@ msgstr "\n下載：%s\n---------------------------------------------------------
 #: services/friday.py:234 services/friday.py:261
 msgid ""
 "\n"
-"Sorry, there's no embeded subtitles in this video!"
+"Sorry, there's no embedded subtitles in this video!"
 msgstr "\n抱歉，此劇只有硬字幕，可去其他串流平台查看"
 
 #: services/friday.py:237

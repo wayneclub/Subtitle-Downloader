@@ -123,7 +123,7 @@ class KKTV(Service):
 
                             if not episode['subtitles']:
                                 self.logger.info(
-                                    self._("\nSorry, there's no embeded subtitles in this video!"))
+                                    self._("\nSorry, there's no embedded subtitles in this video!"))
                                 exit(0)
 
                             if 'ja' in episode['subtitles']:

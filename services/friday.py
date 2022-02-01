@@ -234,7 +234,7 @@ class Friday(Service):
                             folder_path=folder_path, platform=Platform.FRIDAY, lang=self.locale)
                     else:
                         self.logger.info(
-                            self._("\nSorry, there's no embeded subtitles in this video!"))
+                            self._("\nSorry, there's no embedded subtitles in this video!"))
                         exit(0)
                 else:
                     self.logger.info(self._("\nThe film isn't released."))
@@ -261,7 +261,7 @@ class Friday(Service):
             dual_subtitle_link = self.get_dual_subtitle_link(subtitle_link)
         else:
             self.logger.info(
-                self._("\nSorry, there's no embeded subtitles in this video!"))
+                self._("\nSorry, there's no embedded subtitles in this video!"))
             exit(0)
 
         return subtitle_link, ja_subtitle_link, dual_subtitle_link
