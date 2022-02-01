@@ -73,6 +73,13 @@ class IQIYI(Service):
             exit(0)
 
     def download_subtitle(self):
+        if 'play/' in self.url:
+            id = re.search(
+                r'https://www.iq.com/play/.+\-([^-]+)\?lang=.+', self.url)
+            if not id:
+                id = re.search(r'https://www.iq.com/play/([^-]+)', self.url)
+            self.url = f'https://www.iq.com/album/{id.group(1)}?lang=zh_tw'
+
         response = http_request(session=self.session,
                                 url=self.url, method=HTTPMethod.GET, raw=True)
         match = re.search(r'({\"props\":{.*})', response)
