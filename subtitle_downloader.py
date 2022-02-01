@@ -96,7 +96,7 @@ if __name__ == "__main__":
             level=logging.DEBUG,
             handlers=[
                 logging.FileHandler(
-                    f"Subtitle-Downloader_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.log"),
+                    f"Subtitle-Downloader_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.log", 'w', 'utf-8'),
                 logging.StreamHandler()
             ]
         )
