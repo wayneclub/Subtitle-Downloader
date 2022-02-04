@@ -10,7 +10,7 @@ import os
 import logging
 import shutil
 import orjson
-from common.utils import Platform, get_locale, http_request, HTTPMethod, download_files
+from common.utils import Platform, get_locale, http_request, HTTPMethod, download_files, fix_filename
 from common.subtitle import convert_subtitle, merge_subtitle_fragments
 from services.service import Service
 
@@ -105,6 +105,7 @@ class iTunes(Service):
             title = movie['data']['attributes']['name']
             release_year = movie['data']['attributes']['releaseDate'][:4]
             self.logger.info("\n%s", title)
+            title = fix_filename(title)
 
             folder_path = os.path.join(self.output, f'{title}.{release_year}')
             if os.path.exists(folder_path):

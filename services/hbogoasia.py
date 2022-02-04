@@ -14,7 +14,7 @@ import uuid
 from getpass import getpass
 from pathlib import Path
 from urllib.parse import urlparse
-from common.utils import get_locale, Platform, http_request, HTTPMethod, pretty_print_json, download_files
+from common.utils import get_locale, Platform, http_request, HTTPMethod, pretty_print_json, download_files, fix_filename
 from common.subtitle import convert_subtitle
 from services.service import Service
 
@@ -167,6 +167,7 @@ class HBOGOAsia(Service):
             title = re.sub(r'S\d+', '', title).strip()
             self.logger.info(self._("\n%s total: %s season(s)"),
                              title, len(season_list))
+            title = fix_filename(title)
 
             for season in season_list:
                 season_index = season['seasonNumber']
@@ -219,9 +220,10 @@ class HBOGOAsia(Service):
 
             title = next(title['name'] for title in movie['metadata']
                          ['titleInformations'] if title['lang'] == 'CHN').strip()
-            self.logger.info("\n%s", title)
-
             release_year = movie['metadata']['releaseDate'][:4]
+
+            self.logger.info("\n%s", title)
+            title = fix_filename(title)
 
             folder_path = os.path.join(self.output, f'{title}.{release_year}')
             if os.path.exists(folder_path):

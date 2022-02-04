@@ -11,7 +11,7 @@ import shutil
 from pathlib import Path
 from http.cookiejar import MozillaCookieJar
 import orjson
-from common.utils import get_locale, import_credential, Platform, http_request, HTTPMethod, get_user_agent, download_files
+from common.utils import get_locale, import_credential, Platform, http_request, HTTPMethod, get_user_agent, download_files, fix_filename
 from common.subtitle import convert_subtitle
 from services.service import Service
 from tools.xstream.extractor import Extractor
@@ -106,6 +106,7 @@ class CatchPlay(Service):
         title = data['apolloState'][f'$Program:{program_id}.title']['local']
 
         self.logger.info("\n%s", title)
+        title = fix_filename(title)
 
         release_year = data['apolloState'][f'Program:{program_id}']['releaseYear']
 
@@ -131,6 +132,7 @@ class CatchPlay(Service):
         season_num = data['apolloState'][main_id]['totalChildren']
 
         self.logger.info(self._("\n%s total: %s season(s)"), title, season_num)
+        title = fix_filename(title)
 
         for season in data['apolloState'][main_id]['children']:
             season_id = season['id']

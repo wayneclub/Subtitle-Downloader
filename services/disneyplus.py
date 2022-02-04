@@ -11,7 +11,7 @@ import logging
 import math
 import shutil
 import m3u8
-from common.utils import Platform, get_locale, get_user_agent, http_request, HTTPMethod, download_audio, download_files
+from common.utils import Platform, get_locale, get_user_agent, http_request, HTTPMethod, download_audio, download_files, fix_filename
 from common.subtitle import convert_subtitle, merge_subtitle_fragments
 from services.disneyplus_login import Login
 from services.service import Service
@@ -65,6 +65,7 @@ class DisneyPlus(Service):
 
             self.logger.info(self._("\n%s total: %s season(s)"),
                              title, len(seasons))
+            title = fix_filename(title)
 
             for season in seasons:
                 season_index = season['seasonSequenceNumber']
@@ -126,6 +127,8 @@ class DisneyPlus(Service):
             title = data['text']['title']['full']['program']['default']['content'].strip(
             )
             self.logger.info("\n%s", title)
+            title = fix_filename(title)
+
             folder_path = os.path.join(self.output, title)
             if os.path.exists(folder_path):
                 shutil.rmtree(folder_path)
