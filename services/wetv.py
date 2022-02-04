@@ -12,7 +12,7 @@ import re
 import shutil
 import orjson
 from bs4 import BeautifulSoup
-from common.utils import get_locale, Platform, http_request, HTTPMethod, driver_init, get_network_url, download_files, save_html
+from common.utils import get_locale, Platform, http_request, HTTPMethod, driver_init, get_network_url, download_files, fix_filename
 from common.subtitle import convert_subtitle
 from common.dictionary import convert_chinese_number
 from services.service import Service
@@ -77,6 +77,7 @@ class WeTV(Service):
     def movie_subtitle(self, data):
         title = data['videoInfo']['title']
         self.logger.info("\n%s", title)
+        title = fix_filename(title)
 
         release_year = data['videoInfo']['publish_date'][:4]
 
@@ -139,6 +140,7 @@ class WeTV(Service):
             season_name = '01'
 
         self.logger.info("\n%s", title)
+        title = fix_filename(title)
 
         series_id = data['coverInfo']['cover_id']
         current_eps = data['coverInfo']['episode_updated_country']

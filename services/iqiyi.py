@@ -11,7 +11,7 @@ import os
 import shutil
 import logging
 import orjson
-from common.utils import get_locale, Platform, http_request, HTTPMethod, get_ip_location, driver_init, get_network_url, download_files
+from common.utils import get_locale, Platform, http_request, HTTPMethod, get_ip_location, driver_init, get_network_url, download_files, fix_filename
 from common.subtitle import convert_subtitle
 from common.dictionary import convert_chinese_number
 from services.service import Service
@@ -27,6 +27,7 @@ class IQIYI(Service):
         self.language_list = ()
 
         self.api = {
+            'episode_list': 'https://pcw-api.iq.com/api/episodeListSource/{album_id}?platformId=3&modeCode=id&langCode=zh_tw&deviceId=21fcb553c8e206bb515b497bb6376aa4&endOrder={total}&startOrder={start_order}',
             'meta': 'https://meta.video.iqiyi.com'
         }
 
@@ -41,7 +42,8 @@ class IQIYI(Service):
             '泰語': 'th',
             '印尼語': 'id',
             '阿拉伯語': 'ar',
-            '西班牙語': 'es'
+            '西班牙語': 'es',
+            '葡萄牙語': 'pt'
         }
 
         if language_code.get(lang):
@@ -72,6 +74,157 @@ class IQIYI(Service):
                 self._("\nSubtitle available languages: %s"), available_languages)
             exit(0)
 
+    def movie_subtitle(self, data):
+        driver = driver_init()
+
+        title = data['name'].strip()
+        self.logger.info("\n%s", title)
+        title = fix_filename(title)
+
+        release_year = data['year']
+        folder_path = os.path.join(self.output, title)
+        if os.path.exists(folder_path):
+            shutil.rmtree(folder_path)
+        play_url = re.sub(
+            '^//', 'https://', data['playUrl']).replace('lang=en_us', 'lang=zh_tw').replace('lang=zh_cn', 'lang=zh_tw').strip()
+        self.logger.debug(play_url)
+
+        driver.get(play_url)
+
+        file_name = f'{title}.{release_year}.WEB-DL.{Platform.IQIYI}.vtt'
+
+        self.logger.info(self._(
+            "\nDownload: %s\n---------------------------------------------------------------"), file_name)
+
+        dash_url = get_network_url(
+            driver=driver, search_url=r"https:\/\/cache-video.iq.com\/dash\?", lang=self.locale)
+        self.logger.debug(dash_url)
+
+        movie_data = http_request(session=self.session,
+                                  url=dash_url, method=HTTPMethod.GET)['data']
+
+        languages = set()
+        subtitles = []
+        if 'program' in movie_data:
+            movie_data = movie_data['program']
+
+            self.get_all_languages(movie_data)
+
+            subs, lang_paths = self.get_subtitle(
+                movie_data, folder_path, file_name)
+            subtitles += subs
+            languages = set.union(languages, lang_paths)
+
+        driver.quit()
+        if subtitles and languages:
+            download_files(subtitles)
+
+            for lang_path in sorted(languages):
+                convert_subtitle(
+                    folder_path=lang_path, lang=self.locale)
+            convert_subtitle(folder_path=folder_path,
+                             platform=Platform.IQIYI, lang=self.locale)
+
+    def series_subtitle(self, data):
+
+        title = data['name'].strip()
+        album_id = data['albumId']
+        start_order = data['from']
+
+        episode_num = data['originalTotal']
+
+        if 'maxOrder' in data:
+            current_eps = data['maxOrder']
+        else:
+            current_eps = episode_num
+
+        season_search = re.search(r'(.+)第(.+)季', title)
+        if season_search:
+            title = season_search.group(1).strip()
+            season_name = convert_chinese_number(
+                season_search.group(2))
+        else:
+            season_name = '01'
+
+        self.logger.info("\n%s", title)
+        title = fix_filename(title)
+
+        episode_list = []
+
+        episode_list_url = self.api['episode_list'].format(
+            album_id=album_id, total=current_eps, start_order=start_order)
+        episode_list = http_request(session=self.session,
+                                    url=episode_list_url, method=HTTPMethod.GET)['data']['epg']
+
+        if self.last_episode:
+            episode_list = [list(episode_list)[-1]]
+            self.logger.info(self._("\nSeason %s total: %s episode(s)\tdownload season %s last episode\n---------------------------------------------------------------"),
+                             int(season_name), current_eps, int(season_name))
+        else:
+            if current_eps == episode_num:
+                self.logger.info(self._("\nSeason %s total: %s episode(s)\tdownload all episodes\n---------------------------------------------------------------"),
+                                 int(season_name),
+                                 episode_num)
+            else:
+                self.logger.info(
+                    self._(
+                        "\nSeason %s total: %s episode(s)\tupdate to episode %s\tdownload all episodes\n---------------------------------------------------------------"),
+                    int(season_name),
+                    episode_num,
+                    current_eps)
+
+        folder_path = os.path.join(
+            self.output, f'{title}.S{season_name}')
+        if os.path.exists(folder_path):
+            shutil.rmtree(folder_path)
+
+        if len(episode_list) > 0:
+            driver = driver_init()
+            languages = set()
+            subtitles = []
+
+            for episode in episode_list:
+                if 'payMarkFont' in episode and episode['payMarkFont'] == 'Preview':
+                    break
+                if 'order' in episode:
+                    episode_name = str(episode['order']).zfill(2)
+                if 'playLocSuffix' in episode:
+                    episode_url = f"https://www.iq.com/play/{episode['playLocSuffix']}"
+                    self.logger.debug(episode_url)
+                    driver.get(episode_url)
+
+                    file_name = f'{title}.S{season_name}E{episode_name}.WEB-DL.{Platform.IQIYI}.vtt'
+
+                    self.logger.info(
+                        self._("Finding %s ..."), file_name)
+
+                    dash_url = get_network_url(
+                        driver=driver, search_url=r"https:\/\/cache-video.iq.com\/dash\?", lang=self.locale)
+                    self.logger.debug(dash_url)
+
+                    episode_data = http_request(session=self.session,
+                                                url=dash_url, method=HTTPMethod.GET)['data']
+                    if 'program' in episode_data:
+                        episode_data = episode_data['program']
+
+                        self.get_all_languages(episode_data)
+
+                        subs, lang_paths = self.get_subtitle(
+                            episode_data, folder_path, file_name)
+                        subtitles += subs
+                        languages = set.union(
+                            languages, lang_paths)
+
+            driver.quit()
+            if subtitles and languages:
+                download_files(subtitles)
+
+                for lang_path in sorted(languages):
+                    convert_subtitle(
+                        folder_path=lang_path, lang=self.locale)
+                convert_subtitle(folder_path=folder_path,
+                                 platform=Platform.IQIYI, lang=self.locale)
+
     def download_subtitle(self):
         if 'play/' in self.url:
             id = re.search(
@@ -87,13 +240,10 @@ class IQIYI(Service):
         drama = data['props']['initialState']
 
         if drama and 'album' in drama:
+            self.logger.debug(drama['album'])
             info = drama['album']['videoAlbumInfo']
-            self.logger.debug(info)
+
             if info:
-                title = info['name'].strip()
-                driver = driver_init()
-                languages = set()
-                subtitles = []
                 allow_regions = info['regionsAllowed'].split(',')
                 if not get_ip_location()['country'].lower() in allow_regions:
                     self.logger.info(
@@ -101,135 +251,9 @@ class IQIYI(Service):
                     exit(0)
 
                 if info['videoType'] != 'singleVideo':
-                    episode_num = info['originalTotal']
-
-                    if 'maxOrder' in info:
-                        current_eps = info['maxOrder']
-                    else:
-                        current_eps = episode_num
-
-                    season_search = re.search(r'(.+)第(.+)季', title)
-                    if season_search:
-                        title = season_search.group(1).strip()
-                        season_name = convert_chinese_number(
-                            season_search.group(2))
-                    else:
-                        season_name = '01'
-
-                    self.logger.info("\n%s", title)
-
-                    episode_list = []
-                    if 'cacheAlbumList' in drama['album'] and '1' in drama['album']['cacheAlbumList'] and len(drama['album']['cacheAlbumList']['1']) > 0:
-                        episode_list = drama['album']['cacheAlbumList']['1']
-                    elif 'play' in drama and 'cachePlayList' in drama['play'] and '1' in drama['play']['cachePlayList'] and len(drama['play']['cachePlayList']['1']) > 0:
-                        episode_list = drama['play']['cachePlayList']['1']
-
-                    if self.last_episode:
-                        episode_list = [list(episode_list)[-1]]
-                        self.logger.info(self._("\nSeason %s total: %s episode(s)\tdownload season %s last episode\n---------------------------------------------------------------"),
-                                         int(season_name), current_eps, int(season_name))
-                    else:
-                        if current_eps == episode_num:
-                            self.logger.info(self._("\nSeason %s total: %s episode(s)\tdownload all episodes\n---------------------------------------------------------------"),
-                                             int(season_name),
-                                             episode_num)
-                        else:
-                            self.logger.info(
-                                self._(
-                                    "\nSeason %s total: %s episode(s)\tupdate to episode %s\tdownload all episodes\n---------------------------------------------------------------"),
-                                int(season_name),
-                                episode_num,
-                                current_eps)
-
-                    folder_path = os.path.join(
-                        self.output, f'{title}.S{season_name}')
-                    if os.path.exists(folder_path):
-                        shutil.rmtree(folder_path)
-
-                    if len(episode_list) > 0:
-                        for episode in episode_list:
-                            if 'payMarkFont' in episode and episode['payMarkFont'] == 'Preview':
-                                break
-                            if 'order' in episode:
-                                episode_name = str(episode['order']).zfill(2)
-                            if 'albumPlayUrl' in episode:
-                                episode_url = re.sub(
-                                    '^//', 'https://', episode['albumPlayUrl']).replace('lang=en_us', 'lang=zh_tw').replace('lang=zh_cn', 'lang=zh_tw').strip()
-                                self.logger.debug(episode_url)
-                                driver.get(episode_url)
-
-                                file_name = f'{title}.S{season_name}E{episode_name}.WEB-DL.{Platform.IQIYI}.vtt'
-
-                                self.logger.info(
-                                    self._("Finding %s ..."), file_name)
-
-                                dash_url = get_network_url(
-                                    driver=driver, search_url=r"https:\/\/cache-video.iq.com\/dash\?", lang=self.locale)
-                                self.logger.debug(dash_url)
-
-                                episode_data = http_request(session=self.session,
-                                                            url=dash_url, method=HTTPMethod.GET)['data']
-                                if 'program' in episode_data:
-                                    episode_data = episode_data['program']
-
-                                    self.get_all_languages(episode_data)
-
-                                    subs, lang_paths = self.get_subtitle(
-                                        episode_data, folder_path, file_name)
-                                    subtitles += subs
-                                    languages = set.union(
-                                        languages, lang_paths)
-
-                        # download_files(subtitles)
-
-                        # for lang_path in sorted(languages):
-                        #     convert_subtitle(
-                        #         folder_path=lang_path, lang=self.locale)
-                        # convert_subtitle(folder_path=folder_path,
-                        #                  platform=Platform.IQIYI, lang=self.locale)
-
+                    self.series_subtitle(info)
                 else:
-                    self.logger.info("\n%s", title)
-                    release_year = info['year']
-                    folder_path = os.path.join(self.output, title)
-                    if os.path.exists(folder_path):
-                        shutil.rmtree(folder_path)
-                    play_url = re.sub(
-                        '^//', 'https://', info['playUrl']).replace('lang=en_us', 'lang=zh_tw').replace('lang=zh_cn', 'lang=zh_tw').strip()
-                    self.logger.debug(play_url)
-                    driver.get(play_url)
-
-                    file_name = f'{title}.{release_year}.WEB-DL.{Platform.IQIYI}.vtt'
-
-                    self.logger.info(self._(
-                        "\nDownload: %s\n---------------------------------------------------------------"), file_name)
-
-                    dash_url = get_network_url(
-                        driver=driver, search_url=r"https:\/\/cache-video.iq.com\/dash\?", lang=self.locale)
-                    self.logger.debug(dash_url)
-
-                    movie_data = http_request(session=self.session,
-                                              url=dash_url, method=HTTPMethod.GET)['data']
-                    if 'program' in movie_data:
-                        movie_data = movie_data['program']
-
-                        self.get_all_languages(movie_data)
-
-                        subs, lang_paths = self.get_subtitle(
-                            movie_data, folder_path, file_name)
-                        subtitles += subs
-                        languages = set.union(
-                            languages, lang_paths)
-
-                driver.quit()
-                if subtitles and languages:
-                    download_files(subtitles)
-
-                    for lang_path in sorted(languages):
-                        convert_subtitle(
-                            folder_path=lang_path, lang=self.locale)
-                    convert_subtitle(folder_path=folder_path,
-                                     platform=Platform.IQIYI, lang=self.locale)
+                    self.movie_subtitle(info)
 
     def get_subtitle(self, data, folder_path, file_name):
 

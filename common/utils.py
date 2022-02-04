@@ -150,7 +150,7 @@ def driver_init(headless=True):
     driver = webdriver.Chrome('chromedriver', options=options)
     driver.execute_cdp_cmd('Network.setUserAgentOverride', {
                            "userAgent": get_user_agent()})
-    driver.set_page_load_timeout(120)
+    driver.set_page_load_timeout(3000)
     return driver
 
 
@@ -204,6 +204,10 @@ def save_html(html_source, file='test.html'):
 def pretty_print_json(json_obj):
     return orjson.dumps(
         json_obj, option=orjson.OPT_INDENT_2).decode('utf-8')
+
+
+def fix_filename(name, max_length=255):
+    return re.sub(r'[/\\:|<>"?*\0-\x1f]|^(AUX|COM[1-9]|CON|LPT[1-9]|NUL|PRN)(?![^.])|^\s|[\s.]$', "", name[:max_length], flags=re.IGNORECASE)
 
 
 class DownloadProgressBar(tqdm):
