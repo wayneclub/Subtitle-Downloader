@@ -20,7 +20,7 @@ import orjson
 from tqdm import tqdm
 from selenium import webdriver
 from urllib3.util import Retry
-import chromedriver_binary
+import chromedriver_autoinstaller
 
 
 class HTTPMethod:
@@ -147,10 +147,11 @@ def driver_init(headless=True):
     options.add_experimental_option('prefs', prefs)
     options.add_experimental_option(
         'excludeSwitches', ['enable-automation'])
+    chromedriver_autoinstaller.install()
     driver = webdriver.Chrome('chromedriver', options=options)
     driver.execute_cdp_cmd('Network.setUserAgentOverride', {
                            "userAgent": get_user_agent()})
-    driver.set_page_load_timeout(3000)
+    # driver.set_page_load_timeout(3000)
     return driver
 
 

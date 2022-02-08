@@ -27,7 +27,7 @@ class IQIYI(Service):
         self.language_list = ()
 
         self.api = {
-            'episode_list': 'https://pcw-api.iq.com/api/episodeListSource/{album_id}?platformId=3&modeCode=id&langCode=zh_tw&deviceId=21fcb553c8e206bb515b497bb6376aa4&endOrder={total}&startOrder={start_order}',
+            'episode_list': 'https://pcw-api.iq.com/api/episodeListSource/{album_id}?platformId=3&modeCode={mode_code}&langCode={lang_code}&deviceId=21fcb553c8e206bb515b497bb6376aa4&endOrder={total}&startOrder={start_order}',
             'meta': 'https://meta.video.iqiyi.com'
         }
 
@@ -125,7 +125,7 @@ class IQIYI(Service):
             convert_subtitle(folder_path=folder_path,
                              platform=Platform.IQIYI, lang=self.locale)
 
-    def series_subtitle(self, data):
+    def series_subtitle(self, data, mode_code, lang_code):
 
         title = data['name'].strip()
         album_id = data['albumId']
@@ -152,9 +152,13 @@ class IQIYI(Service):
         episode_list = []
 
         episode_list_url = self.api['episode_list'].format(
-            album_id=album_id, total=current_eps, start_order=start_order)
-        episode_list = http_request(session=self.session,
-                                    url=episode_list_url, method=HTTPMethod.GET)['data']['epg']
+            album_id=album_id, mode_code=mode_code, lang_code=lang_code, total=current_eps, start_order=start_order)
+        self.logger.debug("episode_list_url: %s", episode_list_url)
+        episode_list_data = http_request(session=self.session,
+                                         url=episode_list_url, method=HTTPMethod.GET)
+        self.logger.debug("episode_list: %s", episode_list_data)
+
+        episode_list = episode_list_data['data']['epg']
 
         if self.last_episode:
             episode_list = [list(episode_list)[-1]]
@@ -231,12 +235,16 @@ class IQIYI(Service):
                 r'https://www.iq.com/play/.+\-([^-]+)\?lang=.+', self.url)
             if not id:
                 id = re.search(r'https://www.iq.com/play/([^-]+)', self.url)
-            self.url = f'https://www.iq.com/album/{id.group(1)}?lang=zh_tw'
+            self.url = f'https://www.iq.com/album/{id.group(1)}'
 
         response = http_request(session=self.session,
                                 url=self.url, method=HTTPMethod.GET, raw=True)
         match = re.search(r'({\"props\":{.*})', response)
         data = orjson.loads(match.group(1))
+
+        mode_code = data['props']['initialProps']['pageProps']['modeCode']
+        lang_code = data['props']['initialProps']['pageProps']['langCode']
+
         drama = data['props']['initialState']
 
         if drama and 'album' in drama:
@@ -251,7 +259,7 @@ class IQIYI(Service):
                     exit(0)
 
                 if info['videoType'] != 'singleVideo':
-                    self.series_subtitle(info)
+                    self.series_subtitle(info, mode_code, lang_code)
                 else:
                     self.movie_subtitle(info)
 

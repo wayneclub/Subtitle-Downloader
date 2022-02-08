@@ -7,7 +7,7 @@ pysubs2
 requests
 tqdm
 selenium
-chromedriver-binary-auto
+chromedriver-autoinstaller
 aiohttp
 aiohttp_socks
 pycryptodome
