@@ -10,8 +10,9 @@ import os
 import re
 import shutil
 import orjson
-from common.utils import get_locale, Platform, http_request, HTTPMethod, check_url_exist, download_files
-from common.subtitle import convert_subtitle
+from configs.config import Platform
+from utils.helper import get_locale, check_url_exist, download_files
+from utils.subtitle import convert_subtitle
 from services.service import Service
 
 
@@ -21,105 +22,91 @@ class KKTV(Service):
         self.logger = logging.getLogger(__name__)
         self._ = get_locale(__name__, self.locale)
 
+        self.drama_id = ''
+
         self.api = {
             'play': 'https://www.kktv.me/play/{drama_id}010001'
         }
 
-    def download_subtitle(self):
+    def movie_metadata(self, data):
+        title = data['title'].strip()
+        release_year = data['releaseYear']
 
-        drama_id = os.path.basename(self.url)
+        self.logger.info("\n%s (%s)", title, release_year)
 
-        play_url = self.api['play'].format(drama_id=drama_id)
+        title = self.ripprocess.rename_file_name(f'{title}.{release_year}')
 
-        response = http_request(session=self.session,
-                                url=play_url, method=HTTPMethod.GET, raw=True)
+        folder_path = os.path.join(self.download_path, title)
 
-        match = re.search(r'({\"props\":{.*})', response)
-        data = orjson.loads(match.group(1))
+        episode_id = data['series'][0]['episodes'][0]['id']
 
-        if drama_id in data['props']['initialState']['titles']['byId']:
-            drama = data['props']['initialState']['titles']['byId'][drama_id]
+        file_name = f'{title}.WEB-DL.{Platform.KKTV}.zh-Hant.vtt'
+
+        self.logger.info(
+            self._("\nSorry, there's no embedded subtitles in this video!"))
+        exit(0)
+
+    def series_metadata(self, data):
+
+        season_index = re.search(r'(.+)S(\d+)', data['title'])
+        if season_index:
+            title = season_index.group(1).strip()
+            season_index = int(season_index.group(2))
         else:
-            self.logger.error(self._("\nSeries not found!"))
-            exit(0)
+            title = data['title'].strip()
 
-        if drama:
-            if 'title' in drama:
-                title = drama['title']
+        if 'totalSeriesCount' in data:
+            season_num = data['totalSeriesCount']
 
-            if 'titleType' in drama and drama['titleType'] == 'film':
-                film = True
-            else:
-                film = False
+        self.logger.info("\n%s total: %s season(s)", title, season_num)
 
-            anime = False
-            if 'genres' in drama:
-                for genre in drama['genres']:
-                    if 'title' in genre and genre['title'] == '動漫':
-                        anime = True
+        if 'series' in data:
+            for season in data['series']:
+                if not season_index:
+                    season_index = int(re.findall(
+                        r'第(.+)季', season['title'])[0].strip())
+                if not self.download_season or season_index in self.download_season:
+                    episode_num = len(season['episodes'])
+                    title = self.ripprocess.rename_file_name(
+                        f'{title}.S{str(season_index).zfill(2)}')
+                    folder_path = os.path.join(self.download_path, title)
 
-            if 'totalSeriesCount' in drama:
-                season_num = drama['totalSeriesCount']
+                    if self.last_episode:
+                        self.logger.info("\nSeason %s total: %s episode(s)\tdownload season %s last episode\n---------------------------------------------------------------",
+                                         season_index,
+                                         episode_num,
+                                         season_index)
 
-            if film or anime:
-                self.logger.info("\n%s", title)
-            else:
-                if 'dual_subtitle' in drama['contentLabels']:
-                    self.logger.info(self._("\n%s total: %s season(s) (Provide bilingual subtitles)"),
-                                     title, season_num)
-                else:
-                    self.logger.info(
-                        self._("\n%s total: %s season(s)"), title, season_num)
+                        season['episodes'] = [list(season['episodes'])[-1]]
+                    else:
+                        self.logger.info("\nSeason %s total: %s episode(s)\tdownload all episodes\n---------------------------------------------------------------",
+                                         season_index,
+                                         episode_num)
 
-            if 'series' in drama:
-                for season in drama['series']:
-                    season_index = int(season['title'][1])
-                    if not self.download_season or season_index == self.download_season:
-                        season_name = str(season_index).zfill(2)
-                        episode_num = len(season['episodes'])
+                    last_ep = [ep['title'] for ep in season['episodes']
+                               if re.search(r'第(\d+)[集|話]', ep['title'])][-1]
+                    last_ep = re.findall(r'第(\d+)[集|話]', last_ep)
 
-                        folder_path = os.path.join(self.output, title)
+                    if last_ep:
+                        fill_num = len(str(last_ep[0]))
+                        if fill_num < 2:
+                            fill_num = 2
 
-                        if film:
-                            self.logger.info(self._(
-                                "\nDownload:\n---------------------------------------------------------------"))
-                        elif self.last_episode:
-                            self.logger.info(
-                                self._(
-                                    "\nSeason %s total: %s episode(s)\tdownload season %s last episode\n---------------------------------------------------------------"),
-                                season_index,
-                                episode_num,
-                                season_index)
-
-                            season['episodes'] = [list(season['episodes'])[-1]]
-                            folder_path = f'{folder_path}.S{season_name}'
-                        elif anime:
-                            self.logger.info(
-                                self._(
-                                    "\nTotal: %s episode(s)\tdownload all episodes\n---------------------------------------------------------------"),
-                                episode_num)
+                    languages = set()
+                    subtitles = []
+                    ja_lang = False
+                    ko_lang = False
+                    for episode in season['episodes']:
+                        episode_index = re.findall(
+                            r'第(\d+)[集|話]', episode['title'])
+                        if episode_index:
+                            episode_index = int(episode_index[0])
                         else:
-                            self.logger.info(
-                                self._(
-                                    "\nSeason %s total: %s episode(s)\tdownload all episodes\n---------------------------------------------------------------"),
-                                season_index,
-                                episode_num)
-                            folder_path = f'{folder_path}.S{season_name}'
-
-                        if os.path.exists(folder_path):
-                            shutil.rmtree(folder_path)
-
-                        ja_lang = False
-                        ko_lang = False
-                        languages = set()
-                        subtitles = []
-                        for episode in season['episodes']:
                             episode_index = int(
                                 episode['id'].replace(episode['seriesId'], ''))
-                            if len(season['episodes']) < 100:
-                                episode_name = str(episode_index).zfill(2)
-                            else:
-                                episode_name = str(episode_index).zfill(3)
+
+                        if not self.download_episode or episode_index in self.download_episode:
+                            file_name = f"{title}E{str(episode_index).zfill(fill_num)}.WEB-DL.{Platform.KKTV}.zh-Hant.vtt"
 
                             if not episode['subtitles']:
                                 self.logger.info(
@@ -139,7 +126,7 @@ class KKTV(Service):
                                     episode_link = episode_link_search.group(
                                         1)
                                     epsiode_search = re.search(
-                                        drama_id + '[0-9]{2}([0-9]{4})_', episode_uri)
+                                        self.drama_id + '[0-9]{2}([0-9]{4})_', episode_uri)
                                     if epsiode_search:
                                         subtitle_link = f'https://theater-kktv.cdn.hinet.net{episode_link}_sub/zh-Hant.vtt'
 
@@ -149,24 +136,15 @@ class KKTV(Service):
                                         ko_subtitle_link = subtitle_link.replace(
                                             'zh-Hant.vtt', 'ko.vtt')
 
-                                        if film:
-                                            file_name = f'{title}.WEB-DL.{Platform.KKTV}.zh-Hant.vtt'
-                                        elif anime:
-                                            file_name = f'{title}E{episode_name}.WEB-DL.{Platform.KKTV}.zh-Hant.vtt'
-                                        else:
-                                            file_name = f'{title}.S{season_name}E{episode_name}.WEB-DL.{Platform.KKTV}.zh-Hant.vtt'
-                                            ja_file_name = file_name.replace(
-                                                'zh-Hant.vtt', 'ja.vtt')
-                                            ko_file_name = file_name.replace(
-                                                'zh-Hant.vtt', 'ko.vtt')
+                                        ja_file_name = file_name.replace(
+                                            'zh-Hant.vtt', 'ja.vtt')
+                                        ko_file_name = file_name.replace(
+                                            'zh-Hant.vtt', 'ko.vtt')
 
-                                            ja_folder_path = os.path.join(
-                                                folder_path, 'ja')
-                                            ko_folder_path = os.path.join(
-                                                folder_path, 'ko')
-
-                                        self.logger.info(
-                                            self._("Finding %s ..."), file_name)
+                                        ja_folder_path = os.path.join(
+                                            folder_path, 'ja')
+                                        ko_folder_path = os.path.join(
+                                            folder_path, 'ko')
 
                                         if check_url_exist(subtitle_link):
                                             os.makedirs(
@@ -200,12 +178,39 @@ class KKTV(Service):
                                             subtitle['url'] = ko_subtitle_link
                                             subtitles.append(subtitle)
 
-                        download_files(subtitles)
-                        for lang_path in sorted(languages):
-                            convert_subtitle(
-                                folder_path=lang_path, lang=self.locale)
-                        convert_subtitle(
-                            folder_path=folder_path, platform=Platform.KKTV, lang=self.locale)
+                    self.download_subtitle(
+                        subtitles=subtitles, languages=languages, folder_path=folder_path)
+
+    def download_subtitle(self, subtitles, languages, folder_path):
+        if subtitles and languages:
+            download_files(subtitles)
+            for lang_path in sorted(languages):
+                convert_subtitle(
+                    folder_path=lang_path, lang=self.locale)
+            convert_subtitle(folder_path=folder_path,
+                             platform=Platform.KKTV, lang=self.locale)
+            if self.output:
+                shutil.move(folder_path, self.output)
 
     def main(self):
-        self.download_subtitle()
+        self.drama_id = os.path.basename(self.url)
+
+        play_url = self.api['play'].format(drama_id=self.drama_id)
+
+        res = self.session.get(url=play_url)
+        if res.ok:
+            match = re.search(r'({\"props\":{.*})', res.text)
+            data = orjson.loads(match.group(1))
+
+            if self.drama_id in data['props']['initialState']['titles']['byId']:
+                data = data['props']['initialState']['titles']['byId'][self.drama_id]
+            else:
+                self.logger.error(self._("\nSeries not found!"))
+                exit(0)
+
+            if 'titleType' in data and data['titleType'] == 'film':
+                self.movie_metadata(data)
+            else:
+                self.series_metadata(data)
+        else:
+            self.logger.error(res.text)

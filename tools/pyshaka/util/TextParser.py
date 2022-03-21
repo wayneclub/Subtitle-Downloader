@@ -1,3 +1,6 @@
+import re
+
+
 class TimeContext:
     def __init__(self, **kwargs):
         self.periodStart = kwargs['periodStart'] # tpye: float
@@ -15,10 +18,12 @@ class TextParser:
         return self.position_ == len(self.data_)
 
     def readLine(self):
-        assert 1 == 0, 'not implemented yet'
+        # assert 1 == 0, 'not implemented yet'
+        return self.readRegexReturnCapture_('(.*?)(\n|$)', 1)
 
     def readWord(self):
-        assert 1 == 0, 'not implemented yet'
+        # assert 1 == 0, 'not implemented yet'
+        return self.readRegexReturnCapture_('[^ \t\n]*', 0)
 
     def readRegexReturnCapture_(self, regex: str, index: int):
         if self.atEnd():
@@ -38,4 +43,16 @@ class TextParser:
         return index.results
 
     def indexOf_(self, regex: str):
-        assert 1 == 0, 'not implemented yet'
+        # assert 1 == 0, 'not implemented yet'
+        results = re.search(regex, self.data_[self.position_:])
+        if not results:
+            return
+        else:
+            return IndexOf(results)
+
+
+class IndexOf:
+    def __init__(self, results: re.Match):
+        self.position = results.regs[0][0]
+        self.length = len(results[0])
+        self.results = results

@@ -8,7 +8,7 @@ from tools.pyshaka.util.DataViewReader import DataViewReader, Endianness
 from tools.pyshaka.util.Mp4Parser import Mp4Parser, ParsedBox
 from tools.pyshaka.util.Mp4BoxParsers import Mp4BoxParsers, ParsedTRUNSample
 # from tools.pyshaka.util.StringUtils import StringUtils
-from tools.pyshaka.util.TextParser import TextParser
+# from tools.pyshaka.util.TextParser import TextParser
 from tools.pyshaka.util.TextParser import TimeContext
 from tools.pyshaka.util.exceptions import InvalidMp4VTT
 from tools.pyshaka.log import log
@@ -203,7 +203,7 @@ class Mp4VttParser:
 
     @staticmethod
     def assembleCue_(payload: bytes, _id: str, settings: str, startTime: float, endTime: float):
-        cue = Cue(startTime, endTime, '')
+        cue = Cue(startTime, endTime, '', _settings=settings)
 
         styles = {}
         VttTextParser.parseCueStyles(payload, cue, styles)
@@ -211,15 +211,14 @@ class Mp4VttParser:
         if _id:
             cue.id = _id
 
-        if settings:
-            # TextParser not fully implemented yet
-            parser = TextParser(settings)
-            word = parser.readWord()
-            while word:
-                if not VttTextParser.parseCueSetting(cue, word, VTTRegions=[]):
-                    log.warning(
-                        f'VTT parser encountered an invalid VTT setting: {word}, The setting will be ignored.')
+        # if settings:
+        #     # TextParser not fully implemented yet
+        #     parser = TextParser(settings)
+        #     word = parser.readWord()
+        #     while word:
+        #         if not VttTextParser.parseCueSetting(cue, word, VTTRegions=[]):
+        #             log.warning(f'VTT parser encountered an invalid VTT setting: {word}, The setting will be ignored.')
 
-                parser.skipWhitespace()
-                word = parser.readWord()
+        #         parser.skipWhitespace()
+        #         word = parser.readWord()
         return cue

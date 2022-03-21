@@ -9,9 +9,11 @@ import re
 import os
 import logging
 import shutil
+import sys
 import orjson
-from common.utils import Platform, get_locale, get_user_agent, http_request, HTTPMethod, download_files
-from common.subtitle import convert_subtitle, merge_subtitle_fragments
+from configs.config import Platform
+from utils.helper import get_locale, download_files
+from utils.subtitle import convert_subtitle, merge_subtitle_fragments
 from services.service import Service
 
 
@@ -95,26 +97,22 @@ class Viu(Service):
             'accept': 'application/json; charset=utf-8',
             'content-type': 'application/json; charset=UTF-8',
             'Sec-Fetch-Mode': 'cors',
-            'User-Agent': get_user_agent(),
+            'User-Agent': self.user_agent,
             'Origin': 'https://viu.com',
             'x-session-id': 'ac20455d-5263-45ed-8b07-3e8a215af8fd',
             'x-client': 'browser'
         }
         postdata = {'deviceId': '18b79bc4-73b0-481a-8045-38d4cbc83b07'}
-        kwargs = {'json': postdata}
-        data = http_request(
-            session=self.session, url=self.api['token'], method=HTTPMethod.POST, headers=headers, kwargs=kwargs)
-        self.token = data['token']
+        res = self.session.post(
+            url=self.api['token'], headers=headers, json=postdata)
+        if res.ok:
+            self.token = res.json()['token']
 
-
-    def download_subtitle(self):
-        product_id_search = re.search(r'vod\/(\d+)\/', self.url)
-        if product_id_search:
-            product_id = product_id_search.group(1)
-            response = http_request(
-                session=self.session, url=self.url, method=HTTPMethod.GET, raw=True)
+    def series_metadata(self, product_id):
+        res = self.session.get(url=self.url)
+        if res.ok:
             match = re.search(
-                r'href=\"\/ott\/(.+)\/index\.php\?r=campaign\/connectwithus\&language_flag_id=(\d+)\&area_id=(\d+)\"', response)
+                r'href=\"\/ott\/(.+)\/index\.php\?r=campaign\/connectwithus\&language_flag_id=(\d+)\&area_id=(\d+)\"', res.text)
             if match:
                 region = match.group(1)
                 language_flag_id = match.group(2)
@@ -123,27 +121,36 @@ class Viu(Service):
                 region, area_id, language_flag_id = self.get_region()
             self.logger.debug(
                 "region: %s, area_id: %s, language_flag_id: %s", region, area_id, language_flag_id)
+        else:
+            self.logger.error(res.text)
+            sys.exit(1)
 
-            meta_url = self.api['ott'].format(
-                region=region, area_id=area_id, language_flag_id=language_flag_id, product_id=product_id)
-            self.logger.debug(meta_url)
-            data = http_request(
-                session=self.session, url=meta_url, method=HTTPMethod.GET)['data']
+        meta_url = self.api['ott'].format(
+            region=region, area_id=area_id, language_flag_id=language_flag_id, product_id=product_id)
+        self.logger.debug("meta url: %s", meta_url)
+
+        meta_res = self.session.get(url=meta_url)
+
+        if meta_res.ok:
+            data = meta_res.json()['data']
             self.logger.debug(data)
 
             title = data['series']['name']
             if data['series']['name'].split(' ')[-1].isdecimal():
                 title = title.replace(
                     data['series']['name'].split(' ')[-1], '').strip()
-                season_name = data['series']['name'].split(' ')[-1].zfill(2)
+                season_name = data['series']['name'].split(
+                    ' ')[-1].zfill(2)
             else:
                 season_name = '01'
 
-            self.logger.info(self._("\n%s Season %s"),
-                            title, int(season_name))
+            season_index = int(season_name)
 
-            folder_path = os.path.join(
-                self.output, f'{title}.S{season_name}')
+            self.logger.info(self._("\n%s Season %s"),
+                             title, season_index)
+
+            title = self.ripprocess.rename_file_name(f'{title}.S{season_name}')
+            folder_path = os.path.join(self.download_path, title)
 
             if os.path.exists(folder_path):
                 shutil.rmtree(folder_path)
@@ -156,135 +163,134 @@ class Viu(Service):
             if self.last_episode:
                 episode_list = [list(episode_list)[-1]]
                 self.logger.info(self._("\nSeason %s total: %s episode(s)\tdownload season %s last episode\n---------------------------------------------------------------"),
-                                int(season_name), current_eps, int(season_name))
+                                 season_index, current_eps, season_index)
             else:
                 if current_eps != episode_num:
                     self.logger.info(self._("\nSeason %s total: %s episode(s)\tupdate to episode %s\tdownload all episodes\n---------------------------------------------------------------"),
-                                    int(season_name), episode_num, current_eps)
+                                     season_index, episode_num, current_eps)
                 else:
                     self.logger.info(self._("\nSeason %s total: %s episode(s)\tdownload all episodes\n---------------------------------------------------------------"),
-                                    int(season_name), episode_num)
+                                     season_index, episode_num)
 
             languages = set()
             subtitles = []
             for episode in episode_list:
-                episode_name = str(episode['number']).zfill(2)
+                episode_index = episode['number']
+                if not self.download_season or season_index in self.download_season:
+                    if not self.download_episode or episode_index in self.download_episode:
+                        episode_url = re.sub(r'(.+product_id=).+', '\\1',
+                                             meta_url) + episode['product_id']
 
-                episode_url = re.sub(r'(.+product_id=).+', '\\1',
-                                    meta_url) + episode['product_id']
+                        file_name = f'{title}E{str(episode_index).zfill(2)}.WEB-DL.{Platform.VIU}.vtt'
 
-                file_name = f'{title}.S{season_name}E{episode_name}.WEB-DL.{Platform.VIU}.vtt'
+                        self.logger.info(self._("Finding %s ..."), file_name)
+                        episode_res = self.session.get(url=episode_url)
 
-                self.logger.info(self._("Finding %s ..."), file_name)
-                episode_data = http_request(session=self.session,
-                                            url=episode_url, method=HTTPMethod.GET)['data']['current_product']['subtitle']
+                        if episode_res.ok:
+                            episode_data = episode_res.json(
+                            )['data']['current_product']['subtitle']
 
-                available_languages = tuple([self.get_language_code(sub['code']) for sub in episode_data])
-                self.get_all_languages(available_languages)
+                            available_languages = tuple(
+                                [self.get_language_code(sub['code']) for sub in episode_data])
+                            self.get_all_languages(available_languages)
 
-                subs, lang_paths = self.get_subtitle(
-                    episode_data, folder_path, file_name)
-                subtitles += subs
-                languages = set.union(languages, lang_paths)
+                            subs, lang_paths = self.get_subtitle(
+                                episode_data, folder_path, file_name)
+                            subtitles += subs
+                            languages = set.union(languages, lang_paths)
+                        else:
+                            self.logger.error(episode_res.text)
 
-            download_files(subtitles)
-
-            display = True
-            for lang_path in sorted(languages):
-                if 'tmp' in lang_path:
-                    merge_subtitle_fragments(
-                        folder_path=lang_path, file_name=os.path.basename(lang_path.replace('tmp_', '')), lang=self.locale, display=display)
-                    display = False
-                convert_subtitle(folder_path=lang_path, lang=self.locale)
-
-            convert_subtitle(folder_path=folder_path,
-                            platform=Platform.VIU, lang=self.locale)
+            self.download_subtitle(
+                subtitles=subtitles, languages=languages, folder_path=folder_path)
         else:
-            playlist_id_search = re.search(r'.+playlist-(\d+)', self.url)
-            if playlist_id_search:
-                playlist_id = playlist_id_search.group(1)
-                self.get_token()
-                response = http_request(
-                session=self.session, url=self.url, method=HTTPMethod.GET, raw=True)
-                match = re.search(r'window\.__INITIAL_STATE__=(\{.+?\});', response)
-                if match:
-                    geo_data = orjson.loads(match.group(1))
-                    region = geo_data['config']['location']['countryCode']
-                    geo = geo_data['config']['location']['geo']
-                else:
-                    region = 'ID'
-                    geo = '10'
-                meta_url = self.api['load'].format(
-                region=region, geo=geo, playlist_id=playlist_id)
-                self.logger.debug(meta_url)
-                headers = {
-                    'accept': 'application/json; charset=utf-8',
-                    'authorization': f'Bearer {self.token}',
-                    'content-type': 'application/json; charset=UTF-8',
-                    'Sec-Fetch-Mode': 'cors',
-                    'User-Agent': get_user_agent()
-                }
-                self.logger.debug(meta_url)
-                data = http_request(
-                    session=self.session, url=meta_url, method=HTTPMethod.GET, headers=headers)
-                self.logger.debug(data)
-                data = data['response']['container']
-                self.logger.debug(data)
-                title = data['title']
-                if data['title'].split(' ')[-1].isdecimal():
-                    title = title.replace(
-                        data['title'].split(' ')[-1], '').strip()
-                    season_name = data['title'].split(' ')[-1].zfill(2)
-                else:
-                    season_name = '01'
+            self.logger.error(meta_res.text)
 
-                self.logger.info(self._("\n%s Season %s"),
-                        title, int(season_name))
+    def series_metadata_playlist(self, playlist_id):
+        self.get_token()
+        res = self.session.get(url=self.url)
+        if res.ok:
+            match = re.search(
+                r'window\.__INITIAL_STATE__=(\{.+?\});', res.text)
+            if match:
+                geo_data = orjson.loads(match.group(1))
+                region = geo_data['config']['location']['countryCode']
+                geo = geo_data['config']['location']['geo']
+            else:
+                region = 'ID'
+                geo = '10'
+        else:
+            self.logger.error(res.text)
+            sys.exit(1)
 
-                folder_path = os.path.join(
-                    self.output, f'{title}.S{season_name}')
+        meta_url = self.api['load'].format(
+            region=region, geo=geo, playlist_id=playlist_id)
+        self.logger.debug("meta url: %s", meta_url)
 
-                episode_list = [ep for ep in data['item'] if 'slug' in ep and 'trailer' not in ep['slug'] and 'teaser' not in ep['slug']]
+        headers = {
+            'accept': 'application/json; charset=utf-8',
+            'authorization': f'Bearer {self.token}',
+            'content-type': 'application/json; charset=UTF-8',
+            'Sec-Fetch-Mode': 'cors',
+            'User-Agent': self.user_agent
+        }
 
-                episode_num = len(episode_list)
-                self.logger.info(self._("\nSeason %s total: %s episode(s)\tdownload all episodes\n---------------------------------------------------------------"),
-                                int(season_name), episode_num)
+        meta_res = self.session.get(url=meta_url, headers=headers)
 
-                languages = set()
-                subtitles = []
-                for episode in episode_list:
-                    episode_name = str(episode['episodeno']).zfill(2)
+        if meta_res.ok:
+            data = meta_res.json()
+            self.logger.debug(data)
+            data = data['response']['container']
+            title = data['title']
+            if data['title'].split(' ')[-1].isdecimal():
+                title = title.replace(
+                    data['title'].split(' ')[-1], '').strip()
+                season_name = data['title'].split(' ')[-1].zfill(2)
+            else:
+                season_name = '01'
 
-                    file_name = f'{title}.S{season_name}E{episode_name}.WEB-DL.{Platform.VIU}.vtt'
+            season_index = int(season_name)
 
+            self.logger.info(self._("\n%s Season %s"),
+                             title, season_index)
 
-                    self.logger.info(self._("Finding %s ..."), file_name)
+            title = self.ripprocess.rename_file_name(f'{title}.S{season_name}')
+            folder_path = os.path.join(self.download_path, title)
 
-                    subtitle_data = episode['media']['subtitles']['subtitle']
-                    available_languages = set([self.get_language_code(sub['language']) for sub in subtitle_data])
-                    self.get_all_languages(available_languages)
+            episode_list = [ep for ep in data['item']
+                            if 'slug' in ep and 'trailer' not in ep['slug'] and 'teaser' not in ep['slug']]
 
-                    url_path = episode['urlpath']
+            episode_num = len(episode_list)
+            self.logger.info(self._("\nSeason %s total: %s episode(s)\tdownload all episodes\n---------------------------------------------------------------"),
+                             season_index, episode_num)
 
-                    subs, lang_paths = self.get_subtitle_2(subtitle_data, url_path, folder_path, file_name)
-                    subtitles += subs
-                    languages = set.union(languages, lang_paths)
+            languages = set()
+            subtitles = []
+            for episode in episode_list:
+                episode_index = episode['episodeno']
+                if not self.download_season or season_index in self.download_season:
+                    if not self.download_episode or episode_index in self.download_episode:
 
-                self.logger.debug('subtitles: %s', subtitles)
-                download_files(subtitles)
-                display = True
-                for lang_path in sorted(languages):
-                    if 'tmp' in lang_path:
-                        merge_subtitle_fragments(
-                            folder_path=lang_path, file_name=os.path.basename(lang_path.replace('tmp_', '')), lang=self.locale, display=display)
-                        display = False
-                    convert_subtitle(folder_path=lang_path, lang=self.locale)
+                        file_name = f'{title}E{str(episode_index).zfill(2)}.WEB-DL.{Platform.VIU}.vtt'
 
-                convert_subtitle(folder_path=folder_path,
-                                platform=Platform.VIU, lang=self.locale)
+                        self.logger.info(self._("Finding %s ..."), file_name)
 
+                        subtitle_data = episode['media']['subtitles']['subtitle']
+                        available_languages = set([self.get_language_code(
+                            sub['language']) for sub in subtitle_data])
+                        self.get_all_languages(available_languages)
 
+                        url_path = episode['urlpath']
 
+                        subs, lang_paths = self.get_subtitle_2(
+                            subtitle_data, url_path, folder_path, file_name)
+                        subtitles += subs
+                        languages = set.union(languages, lang_paths)
+
+                        self.download_subtitle(
+                            subtitles=subtitles, languages=languages, folder_path=folder_path)
+        else:
+            self.logger.error(meta_res.text)
 
     def get_subtitle(self, data, folder_path, file_name):
 
@@ -369,6 +375,33 @@ class Viu(Service):
 
         return subtitles, lang_paths
 
+    def download_subtitle(self, subtitles, languages, folder_path):
+        if subtitles and languages:
+            self.logger.debug('subtitles: %s', subtitles)
+            download_files(subtitles)
+            display = True
+            for lang_path in sorted(languages):
+                if 'tmp' in lang_path:
+                    merge_subtitle_fragments(
+                        folder_path=lang_path, file_name=os.path.basename(lang_path.replace('tmp_', '')), lang=self.locale, display=display)
+                    display = False
+                convert_subtitle(
+                    folder_path=lang_path, lang=self.locale)
+
+            convert_subtitle(folder_path=folder_path,
+                             platform=Platform.VIU, lang=self.locale)
+            if self.output:
+                shutil.move(folder_path, self.output)
+
     def main(self):
         self.get_language_list()
-        self.download_subtitle()
+        product_id = re.search(r'vod\/(\d+)\/', self.url)
+        playlist_id = re.search(r'.+playlist-(\d+)', self.url)
+        if product_id:
+            product_id = product_id.group(1)
+            self.series_metadata(product_id=product_id)
+        elif playlist_id:
+            playlist_id = playlist_id.group(1)
+            self.series_metadata_playlist(playlist_id=playlist_id)
+        else:
+            self.logger.error("Please provide valid url!")

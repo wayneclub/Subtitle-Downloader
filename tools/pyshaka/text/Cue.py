@@ -85,7 +85,7 @@ class textDecoration(Enum):
 
 class Cue:
 
-    def __init__(self, startTime: float, endTime: float, payload: str):
+    def __init__(self, startTime: float, endTime: float, payload: str, _settings: str = ''):
         self.startTime = startTime
         self.direction = direction.HORIZONTAL_LEFT_TO_RIGHT
         self.endTime = endTime
@@ -119,6 +119,7 @@ class Cue:
         self.lineBreak = False
         self.spacer = False
         self.cellResolution = {'columns': 32, 'rows': 15}
+        self._settings = _settings
 
     @staticmethod
     def lineBreak(start: float, end: float) -> 'Cue':

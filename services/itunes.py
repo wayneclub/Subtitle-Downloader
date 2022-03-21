@@ -9,9 +9,12 @@ import re
 import os
 import logging
 import shutil
+from urllib.parse import urljoin
+import m3u8
 import orjson
-from common.utils import Platform, get_locale, http_request, HTTPMethod, download_files, fix_filename
-from common.subtitle import convert_subtitle, merge_subtitle_fragments
+from configs.config import Platform
+from utils.helper import get_locale, download_files
+from utils.subtitle import convert_subtitle, merge_subtitle_fragments
 from services.service import Service
 
 
@@ -22,39 +25,45 @@ class iTunes(Service):
         self.logger = logging.getLogger(__name__)
         self._ = get_locale(__name__, self.locale)
 
+        self.api = {
+            'configurations': 'https://tv.apple.com/api/uts/v3/configurations?caller=web&sfh=143470&v=56&pfm=web&locale=zh-tw&ts={time}'
+        }
+
+    def get_configurations(self):
+        res = self.session.get(url=self.api['configurations'])
+        if res.ok:
+            return res.json()['data']['applicationProps']['requiredParamsMap']
+        else:
+            self.logger.error(res.text)
+
     def parse_m3u(self, m3u_link):
-        playlist = http_request(session=self.session,
-                                url=m3u_link, method=HTTPMethod.GET, raw=True)
+
         sub_url_list = []
         languages = set()
-        for subtitle in re.findall(r'.+TYPE=SUBTITLES.+', playlist):
-            subtitle_tag = re.search(
-                r'LANGUAGE=\"([^\"]+)\",.+,FORCED=(NO|YES).*,URI=\"(.+)\"', subtitle)
+        playlists = m3u8.load(m3u_link).playlists
+        for media in playlists[0].media:
+            if media.type == 'SUBTITLES':
+                if media.language:
+                    sub_lang = media.language
+                if media.forced == 'YES':
+                    sub_lang += '-forced'
+                if media.uri:
+                    media_uri = media.uri
 
-            forced = subtitle_tag.group(2)
-            if forced == 'YES':
-                sub_lang = subtitle_tag.group(1) + '-forced'
-            else:
-                sub_lang = subtitle_tag.group(1)
+                sub = {}
+                sub['lang'] = sub_lang
 
-            media_uri = subtitle_tag.group(3)
+                self.logger.debug(media_uri)
 
-            sub = {}
-            sub['lang'] = sub_lang
+                sub['urls'] = []
+                if not sub_lang in languages:
+                    segments = m3u8.load(media_uri)
+                    for uri in segments.files:
+                        sub['urls'].append(urljoin(segments.base_uri, uri))
 
-            self.logger.debug(media_uri)
+                    languages.add(sub_lang)
+                    sub_url_list.append(sub)
 
-            m3u8_data = http_request(
-                session=self.session, url=media_uri, method=HTTPMethod.GET, raw=True)
-
-            sub['urls'] = []
-            if not sub_lang in languages:
-                for segement in re.findall(r'.+\.webvtt', m3u8_data):
-                    sub_url = f'{os.path.dirname(media_uri)}/{segement}'
-                    sub['urls'].append(sub_url)
-
-                languages.add(sub_lang)
-                sub_url_list.append(sub)
         return sub_url_list
 
     def get_subtitle(self, subtitle_list, folder_path, sub_name):
@@ -82,47 +91,65 @@ class iTunes(Service):
                 subtitle['segment'] = True
                 subtitles.append(subtitle)
 
-        self.logger.debug("subtitles: %s", subtitles)
-        download_files(subtitles)
+        self.download_subtitle(subtitles=subtitles,
+                               languages=languages, folder_path=folder_path)
 
-        display = True
-        for lang_path in sorted(languages):
-            if 'tmp' in lang_path:
-                merge_subtitle_fragments(
-                    folder_path=lang_path, file_name=os.path.basename(lang_path.replace('tmp_', '')), lang=self.locale, display=display)
-                display = False
-
-    def download_subtitle(self):
-
-        movie_id = os.path.basename(self.url).replace('id', '')
-        metadata = http_request(session=self.session,
-                                url=self.url, method=HTTPMethod.GET, raw=True)
-
-        match = re.search(
-            r'<script type=\"fastboot\/shoebox\" id=\"shoebox-ember-data-store\">(.+?)<\/script>', metadata)
-        if match:
-            movie = orjson.loads(match.group(1).strip())[movie_id]
-            title = movie['data']['attributes']['name']
-            release_year = movie['data']['attributes']['releaseDate'][:4]
-            self.logger.info("\n%s", title)
-            title = fix_filename(title)
-
-            folder_path = os.path.join(self.output, f'{title}.{release_year}')
-            if os.path.exists(folder_path):
-                shutil.rmtree(folder_path)
-            file_name = f'{title}.{release_year}.WEB-DL.{Platform.ITUNES}.vtt'
-
-            self.logger.info(
-                self._("\nDownload: %s\n---------------------------------------------------------------"), file_name)
-
-            offer_id = movie['data']['relationships']['offers']['data'][0]['id']
-            m3u8_url = next(offer['attributes']['assets'][0]['hlsUrl']
-                            for offer in movie['included'] if offer['type'] == 'offer' and offer['id'] == offer_id)
-            self.logger.debug("m3u8_url: %s", m3u8_url)
-            subtitle_list = self.parse_m3u(m3u8_url)
-            self.get_subtitle(subtitle_list, folder_path, file_name)
+    def download_subtitle(self, subtitles, languages, folder_path):
+        if subtitles and languages:
+            self.logger.debug('subtitles: %s', subtitles)
+            download_files(subtitles)
+            display = True
+            for lang_path in sorted(languages):
+                if 'tmp' in lang_path:
+                    merge_subtitle_fragments(
+                        folder_path=lang_path, file_name=os.path.basename(lang_path.replace('tmp_', '')), lang=self.locale, display=display)
+                    display = False
             convert_subtitle(folder_path=folder_path,
                              platform=Platform.ITUNES, lang=self.locale)
+            if self.output:
+                shutil.move(folder_path, self.output)
 
     def main(self):
-        self.download_subtitle()
+        movie_id = os.path.basename(self.url).replace('id', '')
+        headers = {
+            'authority': 'itunes.apple.com',
+            'pragma': 'no-cache',
+            'cache-control': 'no-cache',
+            'upgrade-insecure-requests': '1',
+            'user-agent': self.user_agent,
+            'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+            'sec-gpc': '1',
+            'sec-fetch-site': 'none',
+            'sec-fetch-mode': 'navigate',
+            'sec-fetch-user': '?1',
+            'sec-fetch-dest': 'document',
+            'accept-language': 'zh-TW,zh;q=0.9',
+        }
+        res = self.session.get(url=self.url, headers=headers)
+
+        if res.ok:
+            match = re.search(
+                r'<script type=\"fastboot\/shoebox\" id=\"shoebox-ember-data-store\">(.+?)<\/script>', res.text)
+            if match:
+                movie = orjson.loads(match.group(1).strip())[movie_id]
+                title = movie['data']['attributes']['name']
+                release_year = movie['data']['attributes']['releaseDate'][:4]
+                self.logger.info("\n%s (%s)", title, release_year)
+                title = self.ripprocess.rename_file_name(
+                    f'{title}.{release_year}')
+
+                folder_path = os.path.join(self.download_path, title)
+
+                if os.path.exists(folder_path):
+                    shutil.rmtree(folder_path)
+
+                file_name = f'{title}.WEB-DL.{Platform.ITUNES}.vtt'
+
+                offer_id = movie['data']['relationships']['offers']['data'][0]['id']
+                m3u8_url = next(offer['attributes']['assets'][0]['hlsUrl']
+                                for offer in movie['included'] if offer['type'] == 'offer' and offer['id'] == offer_id)
+                self.logger.debug("m3u8_url: %s", m3u8_url)
+                subtitle_list = self.parse_m3u(m3u8_url)
+                self.get_subtitle(subtitle_list, folder_path, file_name)
+            else:
+                self.logger.error("No subtitles found!")

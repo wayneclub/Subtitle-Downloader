@@ -7,14 +7,15 @@ This module is to download subtitle from Friday影音
 
 import logging
 import os
-from platform import release
 import re
 import shutil
+from urllib.parse import urljoin
+import m3u8
 import orjson
-from bs4 import BeautifulSoup
-from common.utils import get_locale, Platform, http_request, HTTPMethod, driver_init, get_network_url, download_files, fix_filename
-from common.subtitle import convert_subtitle
-from common.dictionary import convert_chinese_number
+from configs.config import Platform
+from utils.helper import get_locale, driver_init, get_network_url, download_files
+from utils.subtitle import convert_subtitle
+from utils.dictionary import convert_chinese_number
 from services.service import Service
 
 
@@ -76,17 +77,16 @@ class WeTV(Service):
 
     def movie_subtitle(self, data):
         title = data['videoInfo']['title']
-        self.logger.info("\n%s", title)
-        title = fix_filename(title)
-
         release_year = data['videoInfo']['publish_date'][:4]
+        self.logger.info("\n%s (%s)", title, release_year)
 
-        folder_path = os.path.join(
-            self.output, f'{title}.{release_year}')
+        title = self.ripprocess.rename_file_name(f'{title}.{release_year}')
+
+        folder_path = os.path.join(self.download_path, title)
         if os.path.exists(folder_path):
             shutil.rmtree(folder_path)
 
-        file_name = f'{title}.{release_year}.WEB-DL.{Platform.WETV}.vtt'
+        file_name = f'{title}.WEB-DL.{Platform.WETV}.vtt'
         self.logger.info(
             self._("\nDownload: %s\n---------------------------------------------------------------"), file_name)
 
@@ -100,34 +100,29 @@ class WeTV(Service):
             driver=driver, search_url=r"https:\/\/play.wetv.vip\/getvinfo\?", lang=self.locale)
         self.logger.debug(getvinfo_url)
 
-        movie_data = http_request(session=self.session,
-                                  url=getvinfo_url, method=HTTPMethod.GET, raw=True)
-        movie_data = orjson.loads(
-            re.sub(r'txplayerJsonpCallBack_getinfo_\d+\(({.+})\)', '\\1', movie_data))
+        res = self.session.get(url=getvinfo_url)
+        if res.ok:
+            callback = re.sub(r'.+?\(({.+})\)', '\\1', res.text)
+            if callback:
+                movie_data = orjson.loads(callback)
+                driver.quit()
 
-        driver.quit()
+                languages = set()
+                subtitles = []
+                if 'sfl' in movie_data:
+                    movie_data = movie_data['sfl']
+                    self.logger.debug(movie_data)
+                    self.get_all_languages(movie_data)
 
-        languages = set()
-        subtitles = []
-        if 'sfl' in movie_data:
-            movie_data = movie_data['sfl']
-            self.logger.debug(movie_data)
-            self.get_all_languages(movie_data)
+                    subs, lang_paths = self.get_subtitle(
+                        movie_data, folder_path, file_name)
+                    subtitles += subs
+                    languages = set.union(languages, lang_paths)
 
-            subs, lang_paths = self.get_subtitle(
-                movie_data, folder_path, file_name)
-            subtitles += subs
-            languages = set.union(
-                languages, lang_paths)
-
-            if subtitles and languages:
-                download_files(subtitles)
-
-                for lang_path in sorted(languages):
-                    convert_subtitle(
-                        folder_path=lang_path, lang=self.locale)
-                convert_subtitle(folder_path=folder_path,
-                                 platform=Platform.WETV, lang=self.locale)
+                    self.download_subtitle(
+                        subtitles=subtitles, languages=languages, folder_path=folder_path)
+        else:
+            self.logger.error(res.text)
 
     def series_subtitle(self, data):
         title = data['coverInfo']['title']
@@ -139,8 +134,9 @@ class WeTV(Service):
         else:
             season_name = '01'
 
+        season_index = int(season_name)
+
         self.logger.info("\n%s", title)
-        title = fix_filename(title)
 
         series_id = data['coverInfo']['cover_id']
         current_eps = data['coverInfo']['episode_updated_country']
@@ -151,22 +147,23 @@ class WeTV(Service):
         if self.last_episode:
             episode_list = [list(episode_list)[-1]]
             self.logger.info(self._("\nSeason %s total: %s episode(s)\tdownload season %s last episode\n---------------------------------------------------------------"),
-                             int(season_name), current_eps, int(season_name))
+                             season_index, current_eps, season_index)
         else:
             if current_eps == episode_num:
                 self.logger.info(self._("\nSeason %s total: %s episode(s)\tdownload all episodes\n---------------------------------------------------------------"),
-                                 int(season_name),
+                                 season_index,
                                  episode_num)
             else:
                 self.logger.info(
                     self._(
                         "\nSeason %s total: %s episode(s)\tupdate to episode %s\tdownload all episodes\n---------------------------------------------------------------"),
-                    int(season_name),
+                    season_index,
                     episode_num,
                     current_eps)
 
-        folder_path = os.path.join(
-            self.output, f'{title}.S{season_name}')
+        title = self.ripprocess.rename_file_name(
+            f'{title}.S{season_name}')
+        folder_path = os.path.join(self.download_path, title)
         if os.path.exists(folder_path):
             shutil.rmtree(folder_path)
 
@@ -175,46 +172,46 @@ class WeTV(Service):
             languages = set()
             subtitles = []
             for episode in episode_list:
-                episode_name = episode['episode']
-                episode_id = episode['vid']
-                episode_url = self.api['play'].format(
-                    series_id=series_id, episode_id=episode_id)
-                self.logger.debug(episode_url)
+                episode_index = int(episode['episode'])
+                if not self.download_season or season_index in self.download_season:
+                    if not self.download_episode or episode_index in self.download_episode:
+                        episode_id = episode['vid']
+                        episode_url = self.api['play'].format(
+                            series_id=series_id, episode_id=episode_id)
+                        self.logger.debug(episode_url)
 
-                file_name = f'{title}.S{season_name}E{episode_name}.WEB-DL.{Platform.WETV}.vtt'
-                self.logger.info(
-                    self._("Finding %s ..."), file_name)
+                        file_name = f'{title}E{str(episode_index).zfill(2)}.WEB-DL.{Platform.WETV}.vtt'
+                        self.logger.info(
+                            self._("Finding %s ..."), file_name)
 
-                driver.get(episode_url)
+                        driver.get(episode_url)
 
-                getvinfo_url = get_network_url(
-                    driver=driver, search_url=r"https:\/\/play.wetv.vip\/getvinfo\?", lang=self.locale)
-                self.logger.debug(getvinfo_url)
-                episode_data = http_request(session=self.session,
-                                            url=getvinfo_url, method=HTTPMethod.GET, raw=True)
-                episode_data = orjson.loads(
-                    re.sub(r'txplayerJsonpCallBack_getinfo_\d+\(({.+})\)', '\\1', episode_data))
+                        getvinfo_url = get_network_url(
+                            driver=driver, search_url=r"https:\/\/play.wetv.vip\/getvinfo\?", lang=self.locale)
+                        self.logger.debug("getvinfo url: %s", getvinfo_url)
+                        res = self.session.get(url=getvinfo_url)
+                        if res.ok:
+                            callback = re.sub(
+                                r'.+?\(({.+})\)', '\\1', res.text)
+                            if callback:
+                                episode_data = orjson.loads(callback)
 
-                if 'sfl' in episode_data:
-                    episode_data = episode_data['sfl']
-                    self.logger.debug(episode_data)
-                    self.get_all_languages(episode_data)
+                                if 'sfl' in episode_data:
+                                    episode_data = episode_data['sfl']
+                                    self.logger.debug(episode_data)
+                                    self.get_all_languages(episode_data)
 
-                    subs, lang_paths = self.get_subtitle(
-                        episode_data, folder_path, file_name)
-                    subtitles += subs
-                    languages = set.union(
-                        languages, lang_paths)
+                                    subs, lang_paths = self.get_subtitle(
+                                        episode_data, folder_path, file_name)
+                                    subtitles += subs
+                                    languages = set.union(
+                                        languages, lang_paths)
+                        else:
+                            self.logger.error(res.text)
 
             driver.quit()
-            if subtitles and languages:
-                download_files(subtitles)
-
-                for lang_path in sorted(languages):
-                    convert_subtitle(
-                        folder_path=lang_path, lang=self.locale)
-                convert_subtitle(folder_path=folder_path,
-                                 platform=Platform.WETV, lang=self.locale)
+            self.download_subtitle(
+                subtitles=subtitles, languages=languages, folder_path=folder_path)
 
     def get_subtitle(self, data, folder_path, file_name):
 
@@ -231,6 +228,8 @@ class WeTV(Service):
                 lang_paths.add(lang_folder_path)
 
                 subtitle_link = sub['url']
+                if '.m3u8' in subtitle_link:
+                    subtitle_link = self.parse_m3u(subtitle_link)
                 subtitle_file_name = file_name.replace(
                     '.vtt', f'.{sub_lang}.vtt')
 
@@ -244,28 +243,41 @@ class WeTV(Service):
                 subtitles.append(subtitle)
         return subtitles, lang_paths
 
-    def download_subtitle(self):
-        """Download subtitle from WeTV"""
+    def parse_m3u(self, m3u_link):
+        segments = m3u8.load(m3u_link)
+        return urljoin(segments.base_uri, segments.files[0])
 
-        response = http_request(session=self.session,
-                                url=self.url, method=HTTPMethod.GET, raw=True)
-        match = re.search(
-            r'<script id=\"__NEXT_DATA__" type=\"application/json\">(.+?)<\/script>', response)
-        if match:
-            data = orjson.loads(match.group(1).strip())[
-                'props']['pageProps']['data']
-            data = orjson.loads(data)
-
-            if data['coverInfo']['is_area_limit'] == 1:
-                self.logger.info(
-                    self._("\nSorry, this video is not allow in your region!"))
-                exit(0)
-
-            if data['coverInfo']['type'] == 1:
-                self.movie_subtitle(data)
-            else:
-                self.series_subtitle(data)
+    def download_subtitle(self, subtitles, languages, folder_path):
+        if subtitles and languages:
+            download_files(subtitles)
+            for lang_path in sorted(languages):
+                convert_subtitle(
+                    folder_path=lang_path, lang=self.locale)
+            convert_subtitle(folder_path=folder_path,
+                             platform=Platform.WETV, lang=self.locale)
+            if self.output:
+                shutil.move(folder_path, self.output)
 
     def main(self):
+        """Download subtitle from WeTV"""
         self.get_language_list()
-        self.download_subtitle()
+        res = self.session.get(url=self.url)
+        if res.ok:
+            match = re.search(
+                r'<script id=\"__NEXT_DATA__" type=\"application/json\">(.+?)<\/script>', res.text)
+            if match:
+                data = orjson.loads(match.group(1).strip())[
+                    'props']['pageProps']['data']
+                data = orjson.loads(data)
+
+                if data['coverInfo']['is_area_limit'] == 1:
+                    self.logger.info(
+                        self._("\nSorry, this video is not allow in your region!"))
+                    exit(0)
+
+                if data['coverInfo']['type'] == 1:
+                    self.movie_subtitle(data)
+                else:
+                    self.series_subtitle(data)
+        else:
+            self.logger.error(res.text)

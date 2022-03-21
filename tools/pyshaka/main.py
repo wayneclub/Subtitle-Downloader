@@ -159,12 +159,18 @@ def parse(args: CmdArgs):
     # 先用列表放内容 最后join
     contents = ["WEBVTT"]  # type: List[str]
     for cue in cues_fix:
-        contents.append(
-            f'{gentm(cue.startTime)} --> {gentm(cue.endTime)}\n{cue.payload}')
+        settings = cue._settings
+        if settings:
+            settings = ' ' + settings
+            contents.append(
+                f'{gentm(cue.startTime)} --> {gentm(cue.endTime)}{settings}\n{cue.payload}')
+        else:
+            contents.append(
+                f'{gentm(cue.startTime)} --> {gentm(cue.endTime)}\n{cue.payload}')
     content = '\n\n'.join(contents)
     segments_path.with_suffix(".vtt").write_text(content, encoding='utf-8')
-    log.info(f'{len(cues_fix)} lines of subtitle was founded.')
-    log.info(f'write to {segments_path.with_suffix(".vtt").resolve()}')
+    log.debug(f'{len(cues_fix)} lines of subtitle was founded.')
+    log.debug(f'write to {segments_path.with_suffix(".vtt").resolve()}')
 
 
 def main():

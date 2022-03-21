@@ -7,8 +7,10 @@ This module is default service
 import locale
 import logging
 import os
+from natsort import natsorted
 import requests
-from common.utils import get_ip_location
+from configs.config import Config
+from utils.ripprocess import ripprocess
 
 
 class Service(object):
@@ -19,23 +21,46 @@ class Service(object):
         if args.output:
             self.output = args.output.strip()
         else:
-            self.output = os.getcwd()
+            self.output = None
 
         if args.season:
-            self.download_season = int(args.season)
+            self.download_season = EpisodesNumbersHandler(
+                args.season).get_episodes()
         else:
-            self.download_season = None
+            self.download_season = []
+
+        if args.episode:
+            self.download_episode = EpisodesNumbersHandler(
+                args.episode).get_episodes()
+        else:
+            self.download_episode = []
 
         self.last_episode = args.last_episode
 
         self.locale = args.locale
 
+        self.config = Config()
+        self.session = requests.Session()
+        self.user_agent = self.config.get_user_agent()
+        self.session.headers = {
+            'user-agent': self.user_agent
+        }
+
+        self.ip_info = args.proxy
+        self.proxy = self.ip_info['proxy']
+        if self.proxy:
+            self.session.proxies.update(self.proxy)
+        else:
+            self.proxy = ''
+
         if args.region:
             self.region = args.region.upper()
         else:
-            self.region = get_ip_location()['country']
+            self.region = self.ip_info['country']
 
-        self.session = requests.Session()
+        self.ripprocess = ripprocess()
+
+        self.download_path = self.config.paths()['downloads']
 
         self.default_language = self.get_default_language(self.locale)
 
@@ -46,3 +71,54 @@ class Service(object):
             return 'zh-Hant'
         else:
             return 'en'
+
+
+class EpisodesNumbersHandler(object):
+    def __init__(self, episodes):
+        self.episodes = episodes
+
+    def number_range(self, start: int, end: int):
+        if list(range(start, end + 1)) != []:
+            return list(range(start, end + 1))
+
+        if list(range(end, start + 1)) != []:
+            return list(range(end, start + 1))
+
+        return [start]
+
+    def list_number(self, number: str):
+        if number.isdigit():
+            return [int(number)]
+
+        if number.strip() == "~" or number.strip() == "":
+            return self.number_range(1, 999)
+
+        if "-" in number:
+            start, end = number.split("-")
+            if start.strip() == "" or end.strip() == "":
+                raise ValueError("wrong number: {}".format(number))
+            return self.number_range(int(start), int(end))
+
+        if "~" in number:
+            start, _ = number.split("~")
+            if start.strip() == "":
+                raise ValueError("wrong number: {}".format(number))
+            return self.number_range(int(start), 999)
+
+        return
+
+    def sort_numbers(self, numbers):
+        sorted_numbers = []
+        for number in numbers.split(","):
+            sorted_numbers += self.list_number(number.strip())
+
+        return natsorted(list(set(sorted_numbers)))
+
+    def get_episodes(self):
+        return (
+            self.sort_numbers(
+                str(self.episodes).lstrip("0")
+            )
+            if self.episodes
+            else self.sort_numbers("~")
+        )
