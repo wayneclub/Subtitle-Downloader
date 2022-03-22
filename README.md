@@ -164,6 +164,15 @@ python subtitle_downloader.py https://www.disneyplus.com/series/loki/6pARMvILBGz
 3. Put cookie.txt into Subtitle-Downloader/configs/cookies
 4. Make sure the movies or series which you're going to download is playable in your region.
 
+## Now E
+
+1. Install https://chrome.google.com/webstore/detail/get-cookiestxt/bgaddhkoddajcdgocldbbfleckgcbcid
+2. Login NowE, and use this plugin download nowe.com_cookies.txt (Don't modify anything even the file name)
+3.  Copy user-agent from login browser (https://www.whatsmyua.info/) and paste it in CREDENTIAL[Platform.NOWE] user_agent
+3. Put cookie.txt into Subtitle-Downloader/configs/cookies
+4. Make sure the movies or series which you're going to download is playable in your region.
+
+
 ## iq.com and WeTV
 - For iq.com, make your video is playable in your region and use the album page to download subtitles.
 - Make sure Google Chrome Browser is installed on your PC and update it to the latest version.
