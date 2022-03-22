@@ -2,6 +2,7 @@ lxml
 beautifulsoup4
 chardet
 m3u8
+natsort
 orjson
 pysubs2
 requests
