@@ -9,7 +9,7 @@ import argparse
 import logging
 from datetime import datetime
 import os
-from configs.config import Config
+from configs.config import Config, script_name, __version__
 from services.kktv import KKTV
 from services.linetv import LineTV
 from services.friday import Friday
@@ -108,6 +108,13 @@ if __name__ == "__main__":
         action='help',
         default=argparse.SUPPRESS,
         help=_("show this help message and exit")
+    )
+    parser.add_argument(
+        '-v',
+        '--version',
+        action='version',
+        version='{script_name} {version}'.format(
+            script_name=script_name, version=__version__)
     )
 
     args = parser.parse_args()

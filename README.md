@@ -28,6 +28,9 @@ pip install -r requriements
 
 ```
 python download_subtitle.py URL [OPTIONS]
+
+eg.
+python download_subtitle.py URL -s 1 -e 1-10
 ```
 
 ## OPTIONS
@@ -36,6 +39,8 @@ python download_subtitle.py URL [OPTIONS]
   -h, --help                    show this help message and exit
 
   -s --season                   download season [0-9]
+
+  -e --episode                  download episode [0-9]
 
   -l, --last-episode            download last episode
 
@@ -50,6 +55,8 @@ python download_subtitle.py URL [OPTIONS]
                                 all: download all available languages
 
   -alang, --audio-language      languages of audio-tracks; use commas to separate multiple languages
+
+  -p, --proxy                   proxy
 ```
 
 ## Subtitle Languages
@@ -181,7 +188,7 @@ python subtitle_downloader.py https://www.disneyplus.com/series/loki/6pARMvILBGz
 > 7. Viu 下載電影、影集
 > 8. CatchPlay 下載電影、影集字幕
 > 9. WeTV 下載電影、影集字幕
->
+> 10. NOW E 下載電影、影集字幕
 > 請確認網站網址無誤
 
 ![alt text](https://github.com/wayneclub/Subtitle-Downloader/blob/main/guide.png?raw=true)
