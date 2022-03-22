@@ -126,11 +126,16 @@ class WeTV(Service):
 
     def series_subtitle(self, data):
         title = data['coverInfo']['title']
+
         season_search = re.search(r'(.+)第(.+)季', title)
+        season_search_eng = re.search(r'(.+) S(\d+)', title)
         if season_search:
             title = season_search.group(1).strip()
             season_name = convert_chinese_number(
                 season_search.group(2))
+        elif season_search_eng:
+            title = season_search_eng.group(1).strip()
+            season_name = season_search_eng.group(2).strip()
         else:
             season_name = '01'
 
