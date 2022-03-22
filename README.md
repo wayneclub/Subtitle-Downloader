@@ -27,16 +27,16 @@ pip install -r requriements
 ## USAGE
 
 ```
-python download_subtitle.py URL [OPTIONS]
+python subtitle_downloader.py URL [OPTIONS]
 
 e.g. Download season 1 episode 1-10
-python download_subtitle.py URL -s 1 -e 1-10
+python subtitle_downloader.py URL -s 1 -e 1-10
 
 e.g. Download season 1 episode 1,3,5
-python download_subtitle.py URL -s 1 -e 1,3,5
+python subtitle_downloader.py URL -s 1 -e 1,3,5
 
 e.g. Download season 1 with proxy (clash)
-python download_subtitle.py URL -p http://127.0.0.1:7890
+python subtitle_downloader.py URL -p http://127.0.0.1:7890
 ```
 
 ## OPTIONS
