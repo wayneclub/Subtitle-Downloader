@@ -92,20 +92,19 @@ def archive_subtitle(path, platform="", lang=""):
     Archive subtitles
     """
 
-    if [f for f in glob.glob(os.path.join(path, '*.srt')) if os.path.isfile(f)]:
-        _ = get_locale(__name__, lang)
-        logger.info(
-            _("\nArchive subtitles:\n---------------------------------------------------------------"))
+    _ = get_locale(__name__, lang)
+    logger.info(
+        _("\nArchive subtitles:\n---------------------------------------------------------------"))
 
-        if platform:
-            zipname = os.path.basename(f'{path}.WEB-DL.{platform}')
-        else:
-            zipname = os.path.basename(f'{path}.WEB-DL')
+    if platform:
+        zipname = os.path.basename(f'{path}.WEB-DL.{platform}')
+    else:
+        zipname = os.path.basename(f'{path}.WEB-DL')
 
-        path = os.path.normpath(path)
-        logger.info("%s.zip", zipname)
+    path = os.path.normpath(path)
+    logger.info("%s.zip", zipname)
 
-        shutil.make_archive(zipname, 'zip', path)
+    shutil.make_archive(zipname, 'zip', path)
 
 
 def ms_to_timestamp(ms: int) -> str:

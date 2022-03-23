@@ -50,8 +50,9 @@ class DisneyPlus(Service):
         if not self.subtitle_language:
             self.subtitle_language = 'zh-Hant'
 
-        self.language_list = tuple([
-            language for language in self.subtitle_language.split(',')])
+        if self.subtitle_language != 'all':
+            self.language_list = tuple([
+                language for language in self.subtitle_language.split(',')])
 
     def movie_subtitle(self):
         movie_url = self.api['DmcVideo'].format(
@@ -200,22 +201,6 @@ class DisneyPlus(Service):
             self.logger.error(res.text)
             sys.exit(1)
 
-    def get_all_languages(self, data):
-        available_languages = []
-        for lang, forced in re.findall(
-                r'.+TYPE=SUBTITLES.+LANGUAGE=\"([^\"]+)\".+,FORCED=(.+),', data):
-            if forced == 'YES':
-                lang += '-forced'
-            available_languages.append(lang)
-
-        if 'all' in self.language_list:
-            self.language_list = available_languages
-
-        if not set(self.language_list).intersection(set(available_languages)):
-            self.logger.error(
-                self._("\nSubtitle available languages: %s"), available_languages)
-            sys.exit(0)
-
     def parse_m3u(self, m3u_link):
         base_url = os.path.dirname(m3u_link)
         sub_url_list = []
@@ -223,6 +208,7 @@ class DisneyPlus(Service):
         audio_url_list = []
 
         playlists = m3u8.load(m3u_link).playlists
+        self.logger.debug("playlists: %s", playlists)
 
         quality_list = [
             playlist.stream_info.bandwidth for playlist in playlists]
@@ -235,7 +221,7 @@ class DisneyPlus(Service):
                 if media.forced == 'YES':
                     sub_lang += '-forced'
 
-                if sub_lang in self.language_list:
+                if not self.language_list or sub_lang in self.language_list:
                     sub = {}
                     sub['lang'] = sub_lang
 
