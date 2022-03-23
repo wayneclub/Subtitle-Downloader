@@ -4,17 +4,13 @@
 """
 This module is to download subtitle from rip media streams
 """
-from email import header
 import logging
 import os
 import shutil
-import sys
 import re
 import glob
-from subprocess import check_output
 from pathlib import Path
-from urllib.parse import urlparse, urljoin
-import time
+from urllib.parse import urlparse
 import requests
 import orjson
 from configs.config import Config
@@ -22,6 +18,61 @@ from utils.subtitle import convert_subtitle, merge_subtitle_fragments
 from tools.XstreamDL_CLI.extractor import Extractor
 from tools.XstreamDL_CLI.downloader import Downloader
 from tools.pyshaka.main import parse
+
+
+class xstreamArgs(object):
+    def __init__(self, save_dir, url_patch, headers, proxy, debug):
+        self.speed_up = True
+        self.speed_up_left = 10
+        self.live = False
+        self.compare_with_url = False
+        self.dont_split_discontinuity = False
+        self.name_from_url = False
+        self.live_duration = 0.0
+        self.live_utc_offset = 0
+        self.live_refresh_interval = 3
+        self.name = 'dash'
+        self.base_url = ''
+        self.ad_keyword = ''
+        self.resolution = ''
+        self.best_quality = False
+        self.video_only = False
+        self.audio_only = False
+        self.all_videos = False
+        self.all_audios = False
+        self.service = ''
+        self.save_dir = Path(save_dir)
+        self.select = False
+        self.multi_s = False
+        self.disable_force_close = True
+        self.limit_per_host = 10
+        self.headers = headers
+        self.url_patch = url_patch
+        self.overwrite = False
+        self.raw_concat = False
+        self.disable_auto_concat = False
+        self.enable_auto_delete = True
+        self.disable_auto_decrypt = False
+        self.key = None
+        self.b64key = None
+        self.hexiv = None
+        self.proxy = proxy
+        self.disable_auto_exit = False
+        self.parse_only = False
+        self.show_init = False
+        self.index_to_name = False
+        self.log_level = 'DEBUG' if debug else 'INFO'
+        self.redl_code = []
+        self.hide_load_metadata = True
+
+
+class pyshakaArgs(object):
+    def __init__(self, segments_path, debug):
+        self.type = 'wvtt'
+        self.init_path = os.path.join(segments_path, 'init.mp4')
+        self.segments_path = segments_path
+        self.debug = debug
+        self.segment_time = 0
 
 
 class ripprocess(object):
@@ -36,7 +87,7 @@ class ripprocess(object):
 
         os.makedirs(folder_path, exist_ok=True)
 
-        if not header:
+        if not headers:
             headers = {
                 'user-agent': self.user_agent
             }
@@ -46,46 +97,11 @@ class ripprocess(object):
         else:
             url_patch = ""
 
-        class Args(object):
-            def __init__(self, url_patch, headers, proxy, debug):
-                self.proxy = proxy
-                self.headers = headers
-                self.base_url = ''
-                self.name = 'dash'
-                self.name_from_url = ''
-                self.url_patch = url_patch
-                self.live = False
-                self.parse_only = False
-                self.multi_s = False
-                self.select = False
-                self.save_dir = Path(folder_path)
-                self.limit_per_host = 10
-                self.disable_force_close = True
-                self.disable_auto_concat = True
-                self.disable_auto_decrypt = False
-                self.speed_up = True
-                self.speed_up_left = 10
-                self.best_quality = False
-                self.show_init = False
-                self.index_to_name = False
-                self.redl_code = []
-                self.resolution = ''
-                self.audio_only = False
-                self.video_only = False
-                self.overwrite = False
-                self.enable_auto_delete = False
-                self.hide_load_metadata = True
-                self.all_videos = False
-                self.all_audios = False
-                self.ad_keyword = ''
-                self.key = None
-                self.b64key = None
-                self.hexiv = None
-                self.raw_concat = None
-                self.log_level = 'DEBUG' if debug else 'INFO'
+        args = xstreamArgs(save_dir=folder_path, url_patch=url_patch,
+                           headers=headers, proxy=proxy, debug=debug)
 
-        args = Args(url_patch=url_patch, headers=headers,
-                    proxy=proxy, debug=debug)
+        args.disable_auto_concat = True
+        args.enable_auto_delete = False
 
         extractor = Extractor(args)
         streams = extractor.fetch_metadata(url)
@@ -145,14 +161,7 @@ class ripprocess(object):
         return convert_subtitle(folder_path=folder_path)
 
     def extract_sub(self, segments_path, debug):
-        class Attr(object):
-            def __init__(self, segments_path, debug):
-                self.type = 'wvtt'
-                self.init_path = os.path.join(segments_path, 'init.mp4')
-                self.segments_path = segments_path
-                self.debug = debug
-                self.segment_time = 0
-        args = Attr(segments_path, debug)
+        args = pyshakaArgs(segments_path, debug)
         parse(args)
 
     def get_time_scale(self, mpd_url, headers):
