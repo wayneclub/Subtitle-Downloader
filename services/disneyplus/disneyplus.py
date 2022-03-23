@@ -228,9 +228,10 @@ class DisneyPlus(Service):
             playlist.stream_info.bandwidth for playlist in playlists]
         best_quality = quality_list.index(max(quality_list))
 
-        for media in playlists[best_quality].media:
-            if media.type == 'SUBTITLE' and not 'Audio Description' in media.name:
+        # for media in playlists[best_quality].media:
+        #     if media.type == 'SUBTITLE' and not 'Audio Description' in media.name:
         exit()
+
         if res.ok:
             playlist = res.text
             self.get_all_languages(playlist)
