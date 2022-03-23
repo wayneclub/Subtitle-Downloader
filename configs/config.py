@@ -65,9 +65,7 @@ CREDENTIAL[Platform.NOWE] = {
 }
 
 VPN = {
-    "proxies": (
-        "http://127.0.0.1:7890",
-    ),
+    "proxies": "http://127.0.0.1:7890",
     "nordvpn": {
         "port": "80",
         # Advanced configuration (https://my.nordaccount.com/dashboard/nordvpn/)

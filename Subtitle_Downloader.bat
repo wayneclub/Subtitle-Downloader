@@ -1,5 +1,6 @@
 @@ECHO OFF
-
+cls
+:start
 set/p url="url: "
 
 @REM Output directory
@@ -8,9 +9,11 @@ set output=""
 set email=""
 set password=""
 @REM ["en", "zh-Hant", "zh-HK", "zh-Hans", "all"]
-set language="zh-Hant"
+set slang="zh-Hant"
 
-python subtitle_downloader.py %url% -o %output% -email %email% -password %password% -slang %language%
+set proxy=""
+
+python subtitle_downloader.py %url% -o %output% -email %email% -password %password% -slang %slang% -p %proxy%
 pause
 
-@@ECHO OFF
+goto start

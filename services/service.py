@@ -50,6 +50,7 @@ class Service(object):
         self.proxy = self.ip_info['proxy']
         if self.proxy:
             self.session.proxies.update(self.proxy)
+            self.proxy = list(self.proxy.values())[0]
         else:
             self.proxy = ''
 
