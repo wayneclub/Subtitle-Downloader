@@ -4,6 +4,7 @@
 """
 This module is to download subtitle from rip media streams
 """
+from email import header
 import logging
 import os
 import shutil
@@ -34,6 +35,11 @@ class ripprocess(object):
         self.logger.info("\nDownloading subtitles...")
 
         os.makedirs(folder_path, exist_ok=True)
+
+        if not header:
+            headers = {
+                'user-agent': self.user_agent
+            }
 
         if url_patch:
             url_patch = f"?{urlparse(url).query}"

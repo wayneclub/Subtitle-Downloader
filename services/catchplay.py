@@ -226,7 +226,7 @@ class CatchPlay(Service):
                 self.logger.debug('mpd_url: %s', mpd_url)
                 os.makedirs(folder_path, exist_ok=True)
                 self.ripprocess.download_subtitles_from_mpd(
-                    url=mpd_url, title=file_name.replace('.vtt', ''), folder_path=folder_path, proxy=self.proxy)
+                    url=mpd_url, title=file_name.replace('.vtt', ''), folder_path=folder_path)
         else:
             self.logger.error(res.text)
 

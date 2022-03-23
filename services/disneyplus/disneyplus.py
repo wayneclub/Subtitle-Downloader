@@ -156,6 +156,11 @@ class DisneyPlus(Service):
                                     subtitle_list, audio_list = self.parse_m3u(
                                         m3u8_url)
 
+                                    if not subtitle_list:
+                                        self.logger.error(
+                                            "No subtitles found!")
+                                        sys.exit(1)
+
                                     self.logger.info(
                                         self._("\nDownload: %s\n---------------------------------------------------------------"), file_name)
 
@@ -212,13 +217,24 @@ class DisneyPlus(Service):
 
     def parse_m3u(self, m3u_link):
         base_url = os.path.dirname(m3u_link)
-        res = self.session.get(url=m3u_link)
+        # res = self.session.get(url=m3u_link)
 
         sub_url_list = []
         audio_url_list = []
+
+        playlists = m3u8.load(m3u_link).playlists
+
+        quality_list = [
+            playlist.stream_info.bandwidth for playlist in playlists]
+        best_quality = quality_list.index(max(quality_list))
+
+        for media in playlists[best_quality].media:
+            if media.type == 'SUBTITLE' and not 'Audio Description' in media.name:
+        exit()
         if res.ok:
             playlist = res.text
             self.get_all_languages(playlist)
+            print(playlist)
 
             for subtitle in re.findall(r'.+TYPE=SUBTITLES,GROUP-ID=\"sub-main\".+', playlist):
                 subtitle_tag = re.search(

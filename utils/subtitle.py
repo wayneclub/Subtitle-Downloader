@@ -91,7 +91,8 @@ def archive_subtitle(path, platform="", lang=""):
     """
     Archive subtitles
     """
-    if glob.glob(os.path.join(path, '*.srt')):
+
+    if [f for f in glob.glob(os.path.join(path, '*.srt')) if os.path.isfile(f)]:
         _ = get_locale(__name__, lang)
         logger.info(
             _("\nArchive subtitles:\n---------------------------------------------------------------"))

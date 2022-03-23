@@ -194,7 +194,7 @@ class NowE(Service):
             timescale = self.ripprocess.get_time_scale(mpd_url, headers)
 
             self.ripprocess.download_subtitles_from_mpd(
-                url=mpd_url, title=title, folder_path=folder_path, proxy=self.proxy, timescale=timescale)
+                url=mpd_url, title=title, folder_path=folder_path, timescale=timescale)
 
             convert_subtitle(folder_path=folder_path,
                              platform=Platform.NOWE, lang=self.locale)
