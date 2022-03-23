@@ -11,6 +11,7 @@ import logging
 import math
 import shutil
 import sys
+from urllib.parse import urljoin
 import m3u8
 from configs.config import Platform
 from utils.helper import get_locale, download_audio, download_files, fix_filename
@@ -217,9 +218,8 @@ class DisneyPlus(Service):
 
     def parse_m3u(self, m3u_link):
         base_url = os.path.dirname(m3u_link)
-        # res = self.session.get(url=m3u_link)
-
         sub_url_list = []
+        languages = set()
         audio_url_list = []
 
         playlists = m3u8.load(m3u_link).playlists
@@ -228,73 +228,38 @@ class DisneyPlus(Service):
             playlist.stream_info.bandwidth for playlist in playlists]
         best_quality = quality_list.index(max(quality_list))
 
-        # for media in playlists[best_quality].media:
-        #     if media.type == 'SUBTITLE' and not 'Audio Description' in media.name:
-        exit()
-
-        if res.ok:
-            playlist = res.text
-            self.get_all_languages(playlist)
-            print(playlist)
-
-            for subtitle in re.findall(r'.+TYPE=SUBTITLES,GROUP-ID=\"sub-main\".+', playlist):
-                subtitle_tag = re.search(
-                    r'LANGUAGE=\"(.+)\",.+,FORCED=(NO|YES).*,URI=\"(.+)\"', subtitle)
-
-                forced = subtitle_tag.group(2)
-                if forced == 'YES':
-                    sub_lang = subtitle_tag.group(1) + '-forced'
-                else:
-                    sub_lang = subtitle_tag.group(1)
-
-                media_uri = subtitle_tag.group(3)
+        for media in playlists[best_quality].media:
+            if media.type == 'SUBTITLES' and media.group_id == 'sub-main':
+                if media.language:
+                    sub_lang = media.language
+                if media.forced == 'YES':
+                    sub_lang += '-forced'
 
                 if sub_lang in self.language_list:
                     sub = {}
                     sub['lang'] = sub_lang
 
-                    sub_m3u8 = f'{base_url}/{media_uri}'
-                    self.logger.debug(sub_m3u8)
-                    m3u8_res = self.session.get(url=sub_m3u8)
-
-                    if m3u8_res.ok:
-                        m3u8_data = m3u8_res.text
-
-                        sub['urls'] = []
-                        for segement in re.findall(r'.+\-MAIN\/.+\.vtt', m3u8_data):
-                            sub_url = f'{base_url}/r/{segement}'
-                            self.logger.debug(sub_url)
-                            sub['urls'].append(sub_url)
+                    sub_m3u8 = urljoin(media.base_uri, media.uri)
+                    sub['urls'] = []
+                    if not sub_lang in languages:
+                        segments = m3u8.load(sub_m3u8)
+                        for uri in segments.files:
+                            sub['urls'].append(urljoin(segments.base_uri, uri))
+                        languages.add(sub_lang)
                         sub_url_list.append(sub)
-                    else:
-                        self.logger.error(m3u8_res.text)
+            if self.audio_language and media.type == 'AUDIO' and not 'Audio Description' in media.name:
+                audio = {}
+                if media.group_id == 'eac-3':
+                    audio['url'] = f'{base_url}/{media.uri}'
+                    audio['extension'] = '.eac3'
+                elif media.group_id == 'aac-128k':
+                    audio['url'] = f'{base_url}/{media.uri}'
+                    audio['extension'] = '.aac'
+                audio['lang'] = media.language
+                self.logger.debug(audio['url'])
+                audio_url_list.append(audio)
 
-            if self.audio_language:
-                playlists = m3u8.loads(playlist).playlists
-                quality_list = [
-                    playlist.stream_info.bandwidth for playlist in playlists]
-                best_quality = quality_list.index(max(quality_list))
-
-                self.logger.debug('best_quality: %s',
-                                  playlists[best_quality].stream_info)
-
-                for media in playlists[best_quality].media:
-                    if media.type == 'AUDIO' and not 'Audio Description' in media.name:
-                        audio = {}
-                        if media.group_id == 'eac-3':
-                            audio['url'] = f'{base_url}/{media.uri}'
-                            audio['extension'] = '.eac3'
-                        elif media.group_id == 'aac-128k':
-                            audio['url'] = f'{base_url}/{media.uri}'
-                            audio['extension'] = '.aac'
-                        audio['lang'] = media.language
-                        self.logger.debug(audio['url'])
-                        audio_url_list.append(audio)
-
-            return sub_url_list, audio_url_list
-        else:
-            self.logger.error(res.text)
-            sys.exit(1)
+        return sub_url_list, audio_url_list
 
     def get_subtitle(self, subtitle_list, program_type, folder_path, sub_name):
 

@@ -30,7 +30,7 @@ class Platform:
     VIU = "Viu"
     NOWE = 'NowE'
     NETFLIX = "Netflix"
-    DISNEYPLUS = "Disney+"
+    DISNEYPLUS = "DisneyPlus"
     HBOGO = "HBOGO"
     APPLETV = 'AppleTV'
     ITUNES = "iTunes"
