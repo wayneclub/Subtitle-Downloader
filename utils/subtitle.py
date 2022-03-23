@@ -4,6 +4,7 @@
 """
 This module is to handle subtitle.
 """
+import glob
 import re
 import logging
 import os
@@ -90,19 +91,20 @@ def archive_subtitle(path, platform="", lang=""):
     """
     Archive subtitles
     """
-    _ = get_locale(__name__, lang)
-    logger.info(
-        _("\nArchive subtitles:\n---------------------------------------------------------------"))
+    if glob.glob(os.path.join(path, '*.srt')):
+        _ = get_locale(__name__, lang)
+        logger.info(
+            _("\nArchive subtitles:\n---------------------------------------------------------------"))
 
-    if platform:
-        zipname = os.path.basename(f'{path}.WEB-DL.{platform}')
-    else:
-        zipname = os.path.basename(f'{path}.WEB-DL')
+        if platform:
+            zipname = os.path.basename(f'{path}.WEB-DL.{platform}')
+        else:
+            zipname = os.path.basename(f'{path}.WEB-DL')
 
-    path = os.path.normpath(path)
-    logger.info("%s.zip", zipname)
+        path = os.path.normpath(path)
+        logger.info("%s.zip", zipname)
 
-    shutil.make_archive(zipname, 'zip', path)
+        shutil.make_archive(zipname, 'zip', path)
 
 
 def ms_to_timestamp(ms: int) -> str:
@@ -150,7 +152,7 @@ def merge_subtitle_fragments(folder_path="", file_name="", lang="", display=Fals
     Merge subtitle fragments
     """
     _ = get_locale(__name__, lang)
-    if os.path.exists(folder_path):
+    if os.path.exists(folder_path) and glob.glob(os.path.join(folder_path, '*.srt')) + glob.glob(os.path.join(folder_path, '*.vtt')):
         if display:
             logger.info(_(
                 "\nMerge segments：\n---------------------------------------------------------------"))
