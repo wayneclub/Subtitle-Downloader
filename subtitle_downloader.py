@@ -183,5 +183,5 @@ if __name__ == "__main__":
         logging.info(
             _("Only support downloading subtitles from Disney Plus, HBOGO Asia, KKTV, LineTV, friDay Video, iq.com, Viu, CatchPlay, WeTV ,and iTunes."))
 
-    logging.info("\nStream-Downloader took %s seconds",
+    logging.info("\n%s took %s seconds", script_name,
                  int(float((datetime.now() - start).total_seconds())))

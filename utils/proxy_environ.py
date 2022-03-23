@@ -31,6 +31,7 @@ class proxy_env(object):
         self.logger = logging.getLogger(__name__)
         self.args = args
         self.vpn = Config().vpn()
+        self.session = requests.session()
 
     def Load(self):
         proxies = None
@@ -108,12 +109,9 @@ class proxy_env(object):
         if proxy:
             scheme = ('http', 'https')['https' in proxy]
             proxies = {scheme: proxy}
-            res = requests.get('https://ipinfo.io/json',
-                               proxies=proxies,
-                               timeout=5)
-        else:
-            res = requests.get('https://ipinfo.io/json',
-                               timeout=5)
+            self.session.proxies = proxies
+
+        res = self.session.get('https://ipinfo.io/json', timeout=5)
 
         if res.ok:
             ip_info = res.json()
