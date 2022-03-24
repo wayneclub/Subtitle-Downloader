@@ -10,7 +10,7 @@ import shutil
 import re
 import glob
 from pathlib import Path
-from urllib.parse import urlparse
+from urllib.parse import urljoin, urlparse
 import requests
 import orjson
 from configs.config import Config
@@ -22,7 +22,7 @@ from tools.pyshaka.main import parse
 
 class xstreamArgs(object):
     def __init__(self, save_dir, url_patch, headers, proxy, debug):
-        self.speed_up = True
+        self.speed_up = False
         self.speed_up_left = 10
         self.live = False
         self.compare_with_url = False
@@ -157,8 +157,6 @@ class ripprocess(object):
                 shutil.rmtree(path)
             else:
                 os.remove(path)
-
-        return convert_subtitle(folder_path=folder_path)
 
     def extract_sub(self, segments_path, debug):
         args = pyshakaArgs(segments_path, debug)

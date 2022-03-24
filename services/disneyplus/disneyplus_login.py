@@ -252,6 +252,7 @@ class Login(object):
 
     def get_auth_token(self):
         client_id, client_apikey = self.client_info()
+        print(client_apikey)
         assertion = self.assertion(client_apikey)
         access_token = self.access_token(client_apikey, assertion)
         id_token = self.login(access_token)

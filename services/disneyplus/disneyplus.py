@@ -43,7 +43,7 @@ class DisneyPlus(Service):
             'DmcSeriesBundle': 'https://disney.content.edge.bamgrid.com/svc/content/DmcSeriesBundle/version/5.1/region/{region}/audience/false/maturity/1850/language/{language}/encodedSeriesId/{series_id}',
             'DmcEpisodes': 'https://disney.content.edge.bamgrid.com/svc/content/DmcEpisodes/version/5.1/region/{region}/audience/false/maturity/1850/language/{language}/seasonId/{season_id}/pageSize/30/page/{page}',
             'DmcVideo': 'https://disney.content.edge.bamgrid.com/svc/content/DmcVideoBundle/version/5.1/region/{region}/audience/false/maturity/1850/language/{language}/encodedFamilyId/{family_id}',
-            'playback': 'https://disney.playback.edge.bamgrid.com/media/{media_id}/scenarios/restricted-drm-ctr-sw'
+            'playback': 'https://disney.playback.edge.bamgrid.com/media/{media_id}/scenarios/tvs-drm-cbcs'
         }
 
     def get_language_list(self):
