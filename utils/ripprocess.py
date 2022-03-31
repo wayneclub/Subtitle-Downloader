@@ -10,11 +10,11 @@ import shutil
 import re
 import glob
 from pathlib import Path
-from urllib.parse import urljoin, urlparse
+from urllib.parse import urlparse
 import requests
 import orjson
 from configs.config import Config
-from utils.subtitle import convert_subtitle, merge_subtitle_fragments
+from utils.subtitle import merge_subtitle_fragments
 from tools.XstreamDL_CLI.extractor import Extractor
 from tools.XstreamDL_CLI.downloader import Downloader
 from tools.pyshaka.main import parse

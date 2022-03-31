@@ -67,7 +67,7 @@ class DisneyPlus(Service):
             self.logger.info("\n%s", title)
             title = fix_filename(title)
 
-            folder_path = os.path.join(self.output, title)
+            folder_path = os.path.join(self.download_path, title)
             if os.path.exists(folder_path):
                 shutil.rmtree(folder_path)
 

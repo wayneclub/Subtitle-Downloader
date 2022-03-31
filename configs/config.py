@@ -29,7 +29,6 @@ class Platform:
     WETV = 'WeTV'
     VIU = "Viu"
     NOWE = 'NowE'
-    NETFLIX = "Netflix"
     DISNEYPLUS = "DisneyPlus"
     HBOGO = "HBOGO"
     APPLETV = 'AppleTV'
@@ -63,6 +62,7 @@ CREDENTIAL[Platform.NOWE] = {
     # Copy user-agent from login browser (https://www.whatsmyua.info/)
     "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36"
 }
+
 
 VPN = {
     "proxies": "http://127.0.0.1:7890",
