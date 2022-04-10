@@ -139,7 +139,7 @@ def convert_list_to_subtitle(subs):
 
 def merge_same_subtitle(subs):
     for i, sub in enumerate(subs):
-        if i > 0 and sub.text == subs[i-1].text and sub.start - subs[i-1].end <= 200:
+        if i > 0 and sub.text == subs[i-1].text and sub.start - subs[i-1].end <= 20:
             subs[i-1].end = sub.end
             subs.pop(i)
         elif sub.text == '':
