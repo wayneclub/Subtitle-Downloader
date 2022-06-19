@@ -161,6 +161,7 @@ class Stream:
     def dump_segments(self):
         self.calc()
         ''' 保存分段信息 '''
+        # 这里的 self.get_name() 好像有种情况下会调用当前类的方法 而不是重写后的方法
         self.save_dir = self.save_dir.parent / self.get_name()
         if self.save_dir.exists() is False:
             self.save_dir.mkdir()

@@ -207,6 +207,7 @@ class HLSStream(Stream):
 
     def set_origin_url(self, home_url: str, base_url: str, uri: str):
         # 某些标签 应该被视作一个新的Stream 所以要设置其对应的原始链接
+        # if uri:
         if uri.startswith('http://') or uri.startswith('https://') or uri.startswith('ftp://'):
             self.origin_url = uri
         elif uri.startswith('/'):

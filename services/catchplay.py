@@ -66,8 +66,8 @@ class CatchPlay(Service):
             sys.exit(1)
 
     def movie_subtitle(self, data, program_id):
-        title = data['apolloState'][f'$Program:{program_id}.title']['local']
-        english_title = data['apolloState'][f'$Program:{program_id}.title']['eng']
+        title = data['apolloState'][f'Program:{program_id}']['title']['local']
+        english_title = data['apolloState'][f'Program:{program_id}']['title']['eng']
         release_year = data['apolloState'][f'Program:{program_id}']['releaseYear']
         self.logger.info("\n%s (%s) [%s]", title, english_title, release_year)
 
@@ -95,18 +95,18 @@ class CatchPlay(Service):
 
     def series_subtitle(self, data, program_id):
         main_program = 'getMainProgram({\"id\":\"' + program_id + '\"})'
-        main_id = data['apolloState']['ROOT_QUERY'][main_program]['id']
-        title = data['apolloState'][f'${main_id}.title']['local']
-        english_title = data['apolloState'][f'${main_id}.title']['eng']
+        main_id = data['apolloState']['ROOT_QUERY'][main_program]['__ref']
+        title = data['apolloState'][main_id]['title']['local']
+        english_title = data['apolloState'][main_id]['title']['eng']
         season_num = data['apolloState'][main_id]['totalChildren']
 
         self.logger.info("\n%s (%s) total: %s season(s)",
                          title, english_title, season_num)
 
         for season in data['apolloState'][main_id]['children']:
-            season_id = season['id']
+            season_id = season['__ref']
             season_index = int(
-                data['apolloState'][f'${season_id}.title']['short'].replace('S', ''))
+                data['apolloState'][season_id]['title']['short'].replace('S', ''))
 
             if not self.download_season or season_index in self.download_season:
                 title = self.ripprocess.rename_file_name(
@@ -133,7 +133,7 @@ class CatchPlay(Service):
                 for episode_index, episode in enumerate(episode_list, start=1):
                     if not self.download_episode or episode_index in self.download_episode:
                         file_name = f'{title}E{str(episode_index).zfill(2)}.WEB-DL.{Platform.CATCHPLAY}.vtt'
-                        episode_id = episode['id'].replace('Program:', '')
+                        episode_id = episode['__ref'].replace('Program:', '')
                         play_video_id, play_token = self.get_vcms_access_token(
                             episode_id)
                         if play_video_id and play_token:

@@ -104,7 +104,7 @@ class IQIYI(Service):
 
         res = self.session.get(url=dash_url)
         if res.ok:
-            movie_data = res.jsom()['data']
+            movie_data = res.json()['data']
             languages = set()
             subtitles = []
             if 'program' in movie_data:

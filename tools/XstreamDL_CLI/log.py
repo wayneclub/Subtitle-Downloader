@@ -75,9 +75,9 @@ def setup_logger(name: str, level: str = 'INFO') -> logging.Logger:
         ch.setLevel(logging.ERROR)
     else:
         ch.setLevel(logging.DEBUG)
+
     ch.setFormatter(formatter)
     # logger.setLevel(logging.DEBUG)
-    logger.setLevel(logging.INFO)
     logger.addHandler(ch)
     log_file_path = log_folder_path / f'{name}-{log_time}.log'
     fh = logging.FileHandler(

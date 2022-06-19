@@ -22,7 +22,8 @@ class HLSParser(BaseParser):
         streams = []
         sindex = 0
         stream = HLSStream(sindex, uri_item, self.args.save_dir, parent_stream)
-        stream.set_origin_url(uri_item.home_url, uri_item.base_url, uri)
+        stream.set_origin_url(home_url=uri_item.home_url,
+                              base_url=uri_item.base_url, uri=uri)
         lines = [line.strip() for line in content.split('\n')]
         offset = 0
         last_segment_xkey = None  # type: XKey
@@ -32,6 +33,7 @@ class HLSParser(BaseParser):
         while offset < len(lines):
             segment = stream.segments[-1]
             line = lines[offset]
+            line = line.replace(', ', ',')
             # 分段标准tag参考 -> https://tools.ietf.org/html/rfc8216#section-4.3.2
             if line == '':
                 pass
@@ -106,13 +108,15 @@ class HLSParser(BaseParser):
                 pass
             elif line.startswith('#EXT-X-MEDIA'):
                 # 外挂媒体 视为单独的一条流
-                sindex += 1
-                stream.set_tag('#EXT-X-MEDIA')
-                stream.set_media(uri_item.home_url, uri_item.base_url, line)
-                content_is_master_type = True
-                streams.append(stream)
-                stream = HLSStream(
-                    sindex, uri_item, self.args.save_dir, parent_stream)
+                if "URI=" in line:
+                    sindex += 1
+                    stream.set_tag('#EXT-X-MEDIA')
+                    stream.set_media(uri_item.home_url,
+                                     uri_item.base_url, line)
+                    content_is_master_type = True
+                    streams.append(stream)
+                    stream = HLSStream(
+                        sindex, uri_item, self.args.save_dir, parent_stream)
             # elif line.startswith('#EXT-X-STREAM-INF'):
             elif line.startswith('#EXT-X-') and 'STREAM-INF' in line:
                 stream.set_tag('#EXT-X-STREAM-INF')

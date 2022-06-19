@@ -74,6 +74,8 @@ class XKey(X):
         data:text/plain;base64,AAAASnBzc2gAAAAA7e+LqXnWSs6jyCfc1R0h7QAAACoSEKg079lX5xeK9g/zZPwXENESEKg079lX5xeK9g/zZPwXENFI88aJmwY=
         skd://a834efd957e7178af60ff364fc1710d1
         '''
+        if self.uri is None:
+            return '', self.uri
         if self.uri.startswith('data:text/plain;base64,'):
             return 'base64', self.uri.split(',', maxsplit=1)[-1]
         elif self.uri.startswith('skd://'):
