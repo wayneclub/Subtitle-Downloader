@@ -175,7 +175,7 @@ class Viu(Service):
             languages = set()
             subtitles = []
             for episode in episode_list:
-                episode_index = episode['number']
+                episode_index = int(episode['number'])
                 if not self.download_season or season_index in self.download_season:
                     if not self.download_episode or episode_index in self.download_episode:
                         episode_url = re.sub(r'(.+product_id=).+', '\\1',
@@ -267,7 +267,7 @@ class Viu(Service):
             languages = set()
             subtitles = []
             for episode in episode_list:
-                episode_index = episode['episodeno']
+                episode_index = int(episode['episodeno'])
                 if not self.download_season or season_index in self.download_season:
                     if not self.download_episode or episode_index in self.download_episode:
 

@@ -198,7 +198,7 @@ class HBOGOAsia(Service):
                              title, len(season_list))
 
             for season in season_list:
-                season_index = season['seasonNumber']
+                season_index = int(season['seasonNumber'])
                 if not self.download_season or season_index in self.download_season:
                     season_url = self.api['tvepisode'].format(
                         parent_id=season['contentId'], territory=self.territory)
@@ -221,7 +221,7 @@ class HBOGOAsia(Service):
                         languages = set()
                         subtitles = []
                         for episode in episode_list['results']:
-                            episode_index = episode['episodeNumber']
+                            episode_index = int(episode['episodeNumber'])
                             if not self.download_episode or episode_index in self.download_episode:
                                 content_id = episode['contentId']
 

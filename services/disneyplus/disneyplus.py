@@ -117,7 +117,7 @@ class DisneyPlus(Service):
             title = fix_filename(title)
 
             for season in seasons:
-                season_index = season['seasonSequenceNumber']
+                season_index = int(season['seasonSequenceNumber'])
                 if not self.download_season or season_index in self.download_season:
                     episode_num = season['episodes_meta']['hits']
 
@@ -146,7 +146,8 @@ class DisneyPlus(Service):
                             episode_data = episode_res.json(
                             )['data']['DmcEpisodes']['videos']
                             for episode in episode_data:
-                                episode_index = episode['episodeSequenceNumber']
+                                episode_index = int(
+                                    episode['episodeSequenceNumber'])
                                 if not self.download_episode or episode_index in self.download_episode:
                                     episode_name = str(episode_index).zfill(2)
                                     program_type = episode['programType']

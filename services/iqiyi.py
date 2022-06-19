@@ -194,7 +194,7 @@ class IQIYI(Service):
                     if 'payMarkFont' in episode and episode['payMarkFont'] == 'Preview':
                         break
                     if 'order' in episode:
-                        episode_index = episode['order']
+                        episode_index = int(episode['order'])
                         if not self.download_season or season_index in self.download_season:
                             if not self.download_episode or episode_index in self.download_episode:
                                 if 'playLocSuffix' in episode:

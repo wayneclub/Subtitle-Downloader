@@ -117,7 +117,7 @@ class NowE(Service):
 
     def series_metadata(self, data):
         title = data['episode'][0]['brandName']
-        season_index = data['episode'][0]['seasonNum']
+        season_index = int(data['episode'][0]['seasonNum'])
 
         self.logger.info("\n%s Season %s", title, season_index)
         title = self.ripprocess.rename_file_name(
@@ -145,7 +145,7 @@ class NowE(Service):
                              episode_num)
 
         for episode in episode_list:
-            episode_index = episode['episodeNum']
+            episode_index = int(episode['episodeNum'])
             if not self.download_season or season_index in self.download_season:
                 if not self.download_episode or episode_index in self.download_episode:
                     content_id = episode['episodeId']

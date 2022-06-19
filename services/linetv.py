@@ -77,7 +77,7 @@ class LineTV(Service):
                 subtitles = []
                 for episode in data['eps_info']:
                     if 'number' in episode:
-                        episode_index = episode['number']
+                        episode_index = int(episode['number'])
                         if not self.download_season or season_index in self.download_season:
                             if not self.download_episode or episode['episode_index'] in self.download_episode:
                                 subtitle_link = self.api['sub_1'].format(
