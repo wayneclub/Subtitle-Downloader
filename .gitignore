@@ -12,3 +12,4 @@ cookies_*.txt
 *.js
 *.html
 test.py
+.vscode/
