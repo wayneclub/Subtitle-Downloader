@@ -39,7 +39,7 @@ class NowE(Service):
     def update_session(self):
 
         headers = {
-            'user-agent': self.credential['user_agent']
+            'user-agent': self.user_agent
         }
 
         cookies = self.cookies.get_cookies()
@@ -74,7 +74,7 @@ class NowE(Service):
 
     def get_metadata(self, content_id):
         headers = {
-            'user-agent': self.credential['user_agent']
+            'user-agent': self.user_agent
         }
 
         payload = {
@@ -165,7 +165,7 @@ class NowE(Service):
     def download_subtitle(self, content_id, title, folder_path):
 
         headers = {
-            'user-agent': self.credential['user_agent']
+            'user-agent': self.user_agent
         }
 
         cookies = self.cookies.get_cookies()

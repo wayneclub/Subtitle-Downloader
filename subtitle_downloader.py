@@ -15,6 +15,7 @@ from services.linetv import LineTV
 from services.friday import Friday
 from services.catchplay import CatchPlay
 from services.iqiyi import IQIYI
+from services.nowplayer import NowPlayer
 from services.wetv import WeTV
 from services.viu import Viu
 from services.nowe import NowE
@@ -170,6 +171,9 @@ if __name__ == "__main__":
     elif 'nowe.com' in args.url:
         nowe = NowE(args)
         nowe.main()
+    elif 'nowplayer' in args.url:
+        nowplayer = NowPlayer(args)
+        nowplayer.main()
     elif 'disneyplus' in args.url:
         disney_plus = DisneyPlus(args)
         disney_plus.main()

@@ -29,6 +29,7 @@ class Platform:
     WETV = 'WeTV'
     VIU = "Viu"
     NOWE = 'NowE'
+    NOWPLAYER = 'NowPlayer'
     DISNEYPLUS = "DisneyPlus"
     HBOGO = "HBOGO"
     APPLETV = 'AppleTV'
@@ -59,8 +60,11 @@ CREDENTIAL[Platform.HBOGO] = {
 CREDENTIAL[Platform.NOWE] = {
     "cookies_file": f"{PATHS['cookies']}/cookies_nowe.txt",
     "cookies_txt": f"{PATHS['cookies']}/nowe.com_cookies.txt",
-    # Copy user-agent from login browser (https://www.whatsmyua.info/)
-    "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36"
+}
+
+CREDENTIAL[Platform.NOWPLAYER] = {
+    "cookies_file": f"{PATHS['cookies']}/cookies_nowplayer.txt",
+    "cookies_txt": f"{PATHS['cookies']}/now.com_cookies.txt",
 }
 
 
