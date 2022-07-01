@@ -10,14 +10,19 @@ import os
 import shutil
 import platform
 import logging
+import sys
 import uuid
 from getpass import getpass
 from pathlib import Path
 from urllib.parse import urlparse
 from configs.config import Platform
-from utils.helper import get_locale, download_files
+from utils.helper import driver_init, get_locale, download_files
 from utils.subtitle import convert_subtitle
 from services.service import Service
+
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.common.by import By
 
 
 class HBOGOAsia(Service):
@@ -34,6 +39,7 @@ class HBOGOAsia(Service):
 
         self.language_list = ()
         self.device_id = str(uuid.uuid4())
+        self.origin = ""
         self.territory = ""
         self.channel_partner_id = ""
         self.session_token = ""
@@ -79,9 +85,9 @@ class HBOGOAsia(Service):
                 self.territory = data['territory']
                 self.logger.debug(self.territory)
             else:
-                self.logger.info(
+                self.logger.error(
                     self._("\nOut of service!"))
-                exit(0)
+                sys.exit(0)
         else:
             self.logger.error(res.text)
 
@@ -93,6 +99,11 @@ class HBOGOAsia(Service):
         else:
             username = input(self._("HBOGO Asia username: "))
             password = getpass(self._("HBOGO Asia password: "))
+
+        headers = {
+            'origin': self.origin,
+            'referer': self.origin
+        }
 
         payload = {
             'contactPassword': password.strip(),
@@ -109,7 +120,7 @@ class HBOGOAsia(Service):
 
         auth_url = self.api['login']
 
-        res = self.session.post(url=auth_url, json=payload)
+        res = self.session.post(url=auth_url, headers=headers, json=payload)
         if res.ok:
             data = res.json()
             self.logger.debug(data)
@@ -121,6 +132,7 @@ class HBOGOAsia(Service):
                 self._("\nSuccessfully logged in. Welcome %s!"), user_name.strip())
         else:
             self.logger.error(res.text)
+            sys.exit(1)
 
     def remove_device(self):
         delete_url = self.api['device']
@@ -145,7 +157,7 @@ class HBOGOAsia(Service):
         if not set(self.language_list).intersection(set(available_languages)):
             self.logger.error(
                 self._("\nSubtitle available languages: %s"), available_languages)
-            exit(0)
+            sys.exit(0)
 
     def movie_subtitle(self, movie_url, content_id):
         res = self.session.get(url=movie_url)
@@ -287,6 +299,9 @@ class HBOGOAsia(Service):
                         subtitle['url'] = subtitle_link
                         subtitles.append(subtitle)
             return subtitles, lang_paths
+        else:
+            self.logger.error(res.text)
+            sys.exit(1)
 
     def download_subtitle(self, subtitles, folder_path, languages=None):
         if subtitles:
@@ -301,8 +316,32 @@ class HBOGOAsia(Service):
                 shutil.move(folder_path, self.output)
 
     def main(self):
+        self.origin = f"https://{urlparse(self.url).netloc}"
+
         self.get_language_list()
         self.get_territory()
+
+        # nowe
+        # driver = driver_init(False)
+        # nowe_login = 'https://signin.nowe.com/ottidform/landing?lang=zh&template=HBO&redirect=https%3A%2F%2Fsaml.nowe.com%2Fidp_hbo%2Fgenerateresponseprepareforlogin%3Frequest_id%3DbKj2m8rsSyTAvkvjI5kUUGAw39nHhdv4sswc%21KjMADv9OtAMTtAapFss9qcjIcnn%26request_issuer%3DkOtAqX%21uHX0PC%212zarYbeWxtT4E-XWJzM90VvcgjJ3qTVvCv65FB2nEAVkP7Bg69%26request_issuerTime%3DoK1CXyT-lKroIfEUjA5EOg..%26RelayState%3DW-dZed54pHrrTr9jXdq6Fni6z6MVm9vZwEmEmXeDJsw.'
+        # driver.get(nowe_login)
+        # email = self.username
+        # password = self.password
+
+        # wait = WebDriverWait(driver, 10)
+        # wait.until(EC.visibility_of_element_located(
+        #     (By.ID, "psdInput"))).send_keys(email)
+
+        # wait.until(EC.element_to_be_clickable(
+        #     (By.ID, "confirmBtn"))).click()
+
+        # wait.until(EC.visibility_of_element_located(
+        #     (By.ID, "psdInput"))).send_keys(password)
+
+        # wait.until(EC.element_to_be_clickable(
+        #     (By.ID, "confirmBtn"))).click()
+        # driver.quit()
+
         self.login()
         if '/sr' in self.url:
             series_id_regex = re.search(
@@ -314,7 +353,7 @@ class HBOGOAsia(Service):
                 self.series_subtitle(series_url)
             else:
                 self.logger.error(self._("\nSeries not found!"))
-                exit(1)
+                sys.exit(1)
         else:
             content_id = os.path.basename(self.url)
             movie_url = self.api['movie'].format(
