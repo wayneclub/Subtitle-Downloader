@@ -9,6 +9,7 @@ import logging
 import os
 import re
 import shutil
+import sys
 from urllib.parse import urljoin
 import m3u8
 import orjson
@@ -60,9 +61,9 @@ class WeTV(Service):
     def get_all_languages(self, data):
 
         if not 'fi' in data:
-            self.logger.info(
+            self.logger.error(
                 self._("\nSorry, there's no embedded subtitles in this video!"))
-            exit(0)
+            sys.exit(0)
 
         available_languages = tuple(
             [self.get_language_code(sub['lang']) for sub in data['fi']])
@@ -73,7 +74,7 @@ class WeTV(Service):
         if not set(self.language_list).intersection(set(available_languages)):
             self.logger.error(
                 self._("\nSubtitle available languages: %s"), available_languages)
-            exit(0)
+            sys.exit(0)
 
     def movie_subtitle(self, data):
         title = data['videoInfo']['title']
@@ -278,7 +279,7 @@ class WeTV(Service):
                 if data['coverInfo']['is_area_limit'] == 1:
                     self.logger.info(
                         self._("\nSorry, this video is not allow in your region!"))
-                    exit(0)
+                    sys.exit(0)
 
                 if data['coverInfo']['type'] == 1:
                     self.movie_subtitle(data)

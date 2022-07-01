@@ -26,6 +26,7 @@ class Friday(Service):
         self._ = get_locale(__name__, self.locale)
 
         self.api = {
+            'title': 'https://video.friday.tw/api2/content/get?contentId={content_id}&contentType={content_type}&srcRecommendId=-1&recommendId=-1&eventPageId=&offset=0&length=1',
             'episode_list': 'https://video.friday.tw/api2/episode/list?contentId={content_id}&contentType={content_type}&offset=0&length=40&mode=2',
             'sub': 'https://sub.video.friday.tw/{sid}.cht.vtt'
         }
@@ -41,10 +42,10 @@ class Friday(Service):
         if program.get(content_type):
             return program.get(content_type)
 
-    def movie_metadata(self, data, media_info, original_title):
-
-        title = data['name'].strip()
-        release_year = data['datePublished']
+    def movie_metadata(self, data):
+        title = data['chineseName'].strip()
+        original_title = data['englishName'].replace('，', ',')
+        release_year = data['year']
 
         self.logger.info("\n%s (%s) [%s]", title, original_title, release_year)
 
@@ -56,7 +57,7 @@ class Friday(Service):
         self.logger.info("\n%s", title)
 
         subtitle_link = self.api['sub'].format(
-            sid=media_info['streaming_id'])
+            sid=data['streamingId'])
         self.logger.debug(subtitle_link)
 
         file_name = f"{title}.WEB-DL.{Platform.FRIDAY}.zh-Hant.vtt"
@@ -78,9 +79,9 @@ class Friday(Service):
                                    folder_path=folder_path)
 
         else:
-            self.logger.info(
+            self.logger.error(
                 self._("\nSorry, there's no embedded subtitles in this video!"))
-            exit(0)
+            sys.exit(0)
 
     def filter_episode_list(self, data):
         episode_list = []
@@ -134,13 +135,14 @@ class Friday(Service):
 
         return season_list, episode_list
 
-    def series_metadata(self, data, media_info, original_title):
+    def series_metadata(self, data):
         """Download subtitle from friDay"""
 
-        title = re.sub(r'(.+?)(第.+[季|彈])*', '\\1', data['name']).strip()
+        title = re.sub(r'(.+?)(第.+[季|彈])*', '\\1', data['chineseName']).strip()
+        original_title = data['englishName'].replace('，', ',')
 
         episode_list_url = self.api['episode_list'].format(
-            content_id=media_info['content_id'], content_type=media_info['content_type'])
+            content_id=data['contentId'], content_type=data['contentType'])
         self.logger.debug(episode_list_url)
 
         res = self.session.get(url=episode_list_url)
@@ -265,9 +267,9 @@ class Friday(Service):
             ja_subtitle_link = self.get_ja_subtitle_link(subtitle_link)
             dual_subtitle_link = self.get_dual_subtitle_link(subtitle_link)
         else:
-            self.logger.info(
+            self.logger.error(
                 self._("\nSorry, there's no embedded subtitles in this video!"))
-            exit(0)
+            sys.exit(0)
 
         return subtitle_link, ja_subtitle_link, dual_subtitle_link
 
@@ -297,48 +299,28 @@ class Friday(Service):
         """Download subtitle from friDay"""
 
         content_search = re.search(
-            r'https:\/\/video\.friday\.tw\/(drama|anime|movie|show)\/detail\/(.+)', self.url)
+            r'https:\/\/video\.friday\.tw\/(drama|anime|movie|show)\/detail\/(\d+)', self.url)
 
-        if not content_search:
+        if content_search:
+            content_id = content_search.group(2)
+            content_type = self.get_content_type(content_search.group(1))
+        else:
             self.logger.error("\nCan't detect content id: %s", self.url)
             sys.exit(-1)
 
-        content_type = self.get_content_type(content_search.group(1))
-        content_id = content_search.group(2)
-
-        res = self.session.get(url=self.url)
-
+        res = self.session.get(self.api['title'].format(
+            content_id=content_id, content_type=content_type))
         if res.ok:
-            original_title = re.findall(
-                r'<h2 class=\"title-eng\">(.+)<\/h2>', res.text)[0].strip().replace('，', ',')
+            data = res.json()
+            if data.get('data'):
+                data = data['data']['content']
+            else:
+                self.logger.error(data['message'])
+                sys.exit(-1)
 
-            web_content = BeautifulSoup(res.text, 'lxml')
-
-            match = web_content.findAll(
-                'script', attrs={'type': 'application/ld+json'})
-
-            if match and len(match) > 1:
-                data = orjson.loads(str(match[1].string))
-
-                if content_type == 1:
-                    play_url = re.findall(r'"(/player\?sid=.+")', res.text)
-                    if play_url:
-                        query = parse_qs(urlparse(play_url[0]).query)
-                        media_info = {
-                            'streaming_id': query['sid'][0],
-                            'streaming_type': query['stype'][0],
-                            'content_type':  query['ctype'][0],
-                            'content_id':  query['cid'][0],
-                            'subtitle':  query['subtitle'][0]
-                        }
-                    else:
-                        self.logger.error("\nThe film hasn't released.")
-                        sys.exit()
-
-                    self.movie_metadata(data, media_info, original_title)
-                else:
-                    media_info = {
-                        'content_type': content_type,
-                        'content_id': content_id,
-                    }
-                    self.series_metadata(data, media_info, original_title)
+            if content_type == 1:
+                self.movie_metadata(data)
+            else:
+                self.series_metadata(data)
+        else:
+            self.logger.error(res.text)

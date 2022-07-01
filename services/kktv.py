@@ -9,6 +9,7 @@ import logging
 import os
 import re
 import shutil
+import sys
 import orjson
 from configs.config import Platform
 from utils.helper import get_locale, check_url_exist, download_files
@@ -42,9 +43,9 @@ class KKTV(Service):
 
         file_name = f'{title}.WEB-DL.{Platform.KKTV}.zh-Hant.vtt'
 
-        self.logger.info(
+        self.logger.error(
             self._("\nSorry, there's no embedded subtitles in this video!"))
-        exit(0)
+        sys.exit(0)
 
     def series_metadata(self, data):
 
@@ -109,9 +110,9 @@ class KKTV(Service):
                             file_name = f"{title}E{str(episode_index).zfill(fill_num)}.WEB-DL.{Platform.KKTV}.zh-Hant.vtt"
 
                             if not episode['subtitles']:
-                                self.logger.info(
+                                self.logger.error(
                                     self._("\nSorry, there's no embedded subtitles in this video!"))
-                                exit(0)
+                                sys.exit(0)
 
                             if 'ja' in episode['subtitles']:
                                 ja_lang = True
@@ -206,7 +207,7 @@ class KKTV(Service):
                 data = data['props']['initialState']['titles']['byId'][self.drama_id]
             else:
                 self.logger.error(self._("\nSeries not found!"))
-                exit(0)
+                sys.exit(0)
 
             if 'titleType' in data and data['titleType'] == 'film':
                 self.movie_metadata(data)

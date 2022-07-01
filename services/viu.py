@@ -66,7 +66,7 @@ class Viu(Service):
         if not set(self.language_list).intersection(set(available_languages)):
             self.logger.error(
                 self._("\nSubtitle available languages: %s"), available_languages)
-            exit(0)
+            sys.exit(0)
 
     def get_region(self):
         region = ''

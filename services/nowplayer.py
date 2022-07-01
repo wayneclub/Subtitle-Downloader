@@ -91,7 +91,7 @@ class NowPlayer(Service):
         if res.ok:
             data = res.json()[0]
             title = data['brandName']
-            season_index = data['episode'][0]['seasonNum']
+            season_index = int(data['episode'][0]['seasonNum'])
             if season_index == 0:
                 season_index = 1
 
@@ -118,7 +118,7 @@ class NowPlayer(Service):
                                  episode_num)
 
             for episode in episode_list:
-                episode_index = episode['episodeNum']
+                episode_index = int(episode['episodeNum'])
                 if not self.download_season or season_index in self.download_season:
                     if not self.download_episode or episode_index in self.download_episode:
                         content_id = episode['episodeId']

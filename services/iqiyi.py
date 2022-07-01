@@ -60,9 +60,9 @@ class IQIYI(Service):
     def get_all_languages(self, data):
 
         if not 'stl' in data:
-            self.logger.info(
+            self.logger.error(
                 self._("\nSorry, there's no embedded subtitles in this video!"))
-            exit(0)
+            sys.exit(0)
 
         available_languages = tuple(
             [self.get_language_code(sub['_name']) for sub in data['stl']])
@@ -73,7 +73,7 @@ class IQIYI(Service):
         if not set(self.language_list).intersection(set(available_languages)):
             self.logger.error(
                 self._("\nSubtitle available languages: %s"), available_languages)
-            exit(0)
+            sys.exit(0)
 
     def movie_subtitle(self, data):
         driver = driver_init()
@@ -313,7 +313,7 @@ class IQIYI(Service):
                     if not self.region.lower() in allow_regions:
                         self.logger.info(
                             self._("\nThis video is only allows in:\n%s"), ', '.join(allow_regions))
-                        exit(0)
+                        sys.exit(0)
 
                     if info['videoType'] != 'singleVideo':
                         self.series_subtitle(info, mode_code, lang_code)

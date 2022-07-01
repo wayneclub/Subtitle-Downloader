@@ -190,16 +190,16 @@ def main():
     if args.help:
         print_version()
         parser.print_help()
-        sys.exit()
+        sys.exit(0)
     if args.version:
         print_version()
-        sys.exit()
+        sys.exit(0)
     if len(args.URI) == 0:
         try:
             uri = input(
                 'Paste your URL/FILE/FOLDER string at the end of commands, plz.\nCtrl C to exit or input here:')
         except KeyboardInterrupt:
-            sys.exit()
+            sys.exit(0)
         if uri.strip() != '':
             args.URI.append(uri.strip())
     if len(args.URI) == 0:

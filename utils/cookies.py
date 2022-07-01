@@ -46,7 +46,7 @@ class Cookies(object):
                 client_id,
                 os.path.basename(self.credential['cookies_file']))
             os.remove(self.credential['cookies_file'])
-            sys.exit()
+            sys.exit(0)
 
         cookies = orjson.loads(content)['cookies']
         for cookie in cookies:
