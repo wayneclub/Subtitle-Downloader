@@ -100,7 +100,7 @@ def get_network_url(driver, search_url, lang=""):
 
         if delay > 60:
             logger.error(_("\nTimeout, please retry."))
-            exit(1)
+            sys.exit(1)
     return url
 
 
