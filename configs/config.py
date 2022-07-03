@@ -57,6 +57,11 @@ CREDENTIAL[Platform.HBOGO] = {
     "password": "",
 }
 
+CREDENTIAL[Platform.IQIYI] = {
+    "cookies_file": f"{PATHS['cookies']}/cookies_iqiyi.txt",
+    "cookies_txt": f"{PATHS['cookies']}/iq.com_cookies.txt",
+}
+
 CREDENTIAL[Platform.NOWE] = {
     "cookies_file": f"{PATHS['cookies']}/cookies_nowe.txt",
     "cookies_txt": f"{PATHS['cookies']}/nowe.com_cookies.txt",
@@ -87,7 +92,8 @@ VPN = {
     },
 }
 
-USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.53 Safari/537.36"
+# Copy user-agent from login browser (https://www.whatsmyua.info/)
+USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.53 Safari/537.36"
 
 ISO_6391 = {
     'cht': 'zh-Hant',

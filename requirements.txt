@@ -12,3 +12,5 @@ chromedriver-autoinstaller
 aiohttp
 aiohttp_socks
 pycryptodome
+node-vm2
+cn2an

@@ -14,7 +14,7 @@ from services.kktv import KKTV
 from services.linetv import LineTV
 from services.friday import Friday
 from services.catchplay import CatchPlay
-from services.iqiyi import IQIYI
+from services.iqiyi.iqiyi import IQIYI
 from services.nowplayer import NowPlayer
 from services.wetv import WeTV
 from services.viu import Viu

@@ -13,10 +13,10 @@ import sys
 from urllib.parse import urljoin
 import m3u8
 import orjson
+from cn2an import cn2an
 from configs.config import Platform
 from utils.helper import get_locale, driver_init, get_network_url, download_files
 from utils.subtitle import convert_subtitle
-from utils.dictionary import convert_chinese_number
 from services.service import Service
 
 
@@ -132,7 +132,7 @@ class WeTV(Service):
         season_search_eng = re.search(r'(.+) S(\d+)', title)
         if season_search:
             title = season_search.group(1).strip()
-            season_name = convert_chinese_number(
+            season_name = cn2an(
                 season_search.group(2))
         elif season_search_eng:
             title = season_search_eng.group(1).strip()

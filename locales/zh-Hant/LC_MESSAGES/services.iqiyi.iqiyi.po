@@ -14,20 +14,20 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: services/iqiyi.py:61
+#: services/iqiyi/iqiyi.py:61
 msgid ""
 "\n"
 "Sorry, there's no embedded subtitles in this video!"
 msgstr "\n抱歉，此劇只有硬字幕，可去其他串流平台查看"
 
-#: services/iqiyi.py:72
+#: services/iqiyi/iqiyi.py:72
 #, python-format
 msgid ""
 "\n"
 "Subtitle available languages: %s"
 msgstr "\n提供的字幕語言：%s"
 
-#: services/iqiyi.py:90
+#: services/iqiyi/iqiyi.py:90
 #, python-format
 msgid ""
 "\n"
@@ -35,7 +35,7 @@ msgid ""
 "%s"
 msgstr "\n你所在的地區無法下載，可用VPN換區到以下地區：\n%s"
 
-#: services/iqiyi.py:116
+#: services/iqiyi/iqiyi.py:116
 #, python-format
 msgid ""
 "\n"
@@ -43,7 +43,7 @@ msgid ""
 "---------------------------------------------------------------"
 msgstr "\n第 %s 季 共有：%s 集\t下載第 %s 季 最後一集\n---------------------------------------------------------------"
 
-#: services/iqiyi.py:120
+#: services/iqiyi/iqiyi.py:120
 #, python-format
 msgid ""
 "\n"
@@ -51,7 +51,7 @@ msgid ""
 "---------------------------------------------------------------"
 msgstr "\n第 %s 季 共有：%s 集\t下載全集\n---------------------------------------------------------------"
 
-#: services/iqiyi.py:126
+#: services/iqiyi/iqiyi.py:126
 #, python-format
 msgid ""
 "\n"
@@ -59,7 +59,7 @@ msgid ""
 "---------------------------------------------------------------"
 msgstr "\n第 %s 季 共有：%s 集\t更新至 第 %s 集\t下載全集\n---------------------------------------------------------------"
 
-#: services/iqiyi.py:157
+#: services/iqiyi/iqiyi.py:157
 #, python-format
 msgid "Finding %s ..."
 msgstr "尋找 %s ..."

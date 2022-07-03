@@ -13,9 +13,9 @@ import sys
 from urllib.parse import quote
 from time import strftime, localtime
 import orjson
+from cn2an import cn2an
 from configs.config import Platform
 from utils.helper import get_locale, check_url_exist, download_files
-from utils.dictionary import convert_chinese_number
 from utils.subtitle import convert_subtitle
 from services.service import Service
 
@@ -37,7 +37,7 @@ class LineTV(Service):
                 r'(.+?)第(.+?)季', data['drama_name'])
             if season_search:
                 title = season_search.group(1).strip()
-                season_name = convert_chinese_number(
+                season_name = cn2an(
                     season_search.group(2))
             else:
                 title = data['drama_name'].strip()
