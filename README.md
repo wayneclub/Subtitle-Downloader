@@ -174,7 +174,7 @@ python subtitle_downloader.py https://www.disneyplus.com/series/loki/6pARMvILBGz
 
 1. Install https://chrome.google.com/webstore/detail/get-cookiestxt/bgaddhkoddajcdgocldbbfleckgcbcid
 2. Login NowE, and use this plugin download nowe.com_cookies.txt (Don't modify anything even the file name)
-3.  Copy user-agent from login browser (https://www.whatsmyua.info/) and paste it in Subtitle-Downloader/configs/config.py (CREDENTIAL[Platform.NOWE] user_agent)
+3. Copy user-agent from login browser (https://www.whatsmyua.info/) and paste it in Subtitle-Downloader/configs/config.py (USER_AGENT). The user-agent must be same as login browser user-agent.
 3. Put cookie.txt into Subtitle-Downloader/configs/cookies
 4. Make sure the movies or series which you're going to download is playable in your region.
 
