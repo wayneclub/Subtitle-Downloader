@@ -68,7 +68,7 @@ class Service(object):
     def get_default_language(self, lang=""):
         current_locale = locale.getdefaultlocale()[0]
 
-        if 'zh' in current_locale or (lang and 'zh' in lang):
+        if current_locale and ('zh' in current_locale or (lang and 'zh' in lang)):
             return 'zh-Hant'
         else:
             return 'en'

@@ -27,7 +27,7 @@ def get_locale(name, lang=""):
     if lang and 'zh' in lang:
         current_locale = 'zh'
 
-    if 'zh' in current_locale:
+    if current_locale and 'zh' in current_locale:
         locale_ = gettext.translation(
             name, localedir='locales', languages=['zh-Hant'])
         locale_.install()
