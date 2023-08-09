@@ -163,16 +163,23 @@ python subtitle_downloader.py https://www.disneyplus.com/series/loki/6pARMvILBGz
 2. Run Subtitle_Downloader.bat
 ```
 
+## Friday Video
+
+1. Install https://chrome.google.com/webstore/detail/get-cookiestxt-locally/cclelndahbckbenkjhflpdbgdldlbecc
+2. Login Friday Video, and use this plugin download video.friday.tw_cookies.txt (Don't modify anything even the file name)
+3. Put cookie.txt into Subtitle-Downloader/configs/cookies
+4. Make sure the movies or series which you're going to download is playable in your region.
+
 ## CatchPlay
 
-1. Install https://chrome.google.com/webstore/detail/get-cookiestxt/bgaddhkoddajcdgocldbbfleckgcbcid
+1. Install https://chrome.google.com/webstore/detail/get-cookiestxt-locally/cclelndahbckbenkjhflpdbgdldlbecc
 2. Login CatchPlay, and use this plugin download catchplay.com_cookies.txt (Don't modify anything even the file name)
 3. Put cookie.txt into Subtitle-Downloader/configs/cookies
 4. Make sure the movies or series which you're going to download is playable in your region.
 
 ## Now E
 
-1. Install https://chrome.google.com/webstore/detail/get-cookiestxt/bgaddhkoddajcdgocldbbfleckgcbcid
+1. Install https://chrome.google.com/webstore/detail/get-cookiestxt-locally/cclelndahbckbenkjhflpdbgdldlbecc
 2. Login NowE, and use this plugin download nowe.com_cookies.txt (Don't modify anything even the file name)
 3. Copy user-agent from login browser (https://www.whatsmyua.info/) and paste it in Subtitle-Downloader/configs/config.py (USER_AGENT). The user-agent must be same as login browser user-agent.
 3. Put cookie.txt into Subtitle-Downloader/configs/cookies
@@ -180,7 +187,7 @@ python subtitle_downloader.py https://www.disneyplus.com/series/loki/6pARMvILBGz
 
 ## iq.com
 
-1. Install https://chrome.google.com/webstore/detail/get-cookiestxt/bgaddhkoddajcdgocldbbfleckgcbcid
+1. Install https://chrome.google.com/webstore/detail/get-cookiestxt-locally/cclelndahbckbenkjhflpdbgdldlbecc
 2. Use this plugin download iq.com_cookies.txt (Don't modify anything even the file name)
 3. Put cookie.txt into Subtitle-Downloader/configs/cookies
 4. Make sure the movies or series which you're going to download is playable in your region.
