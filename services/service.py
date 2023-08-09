@@ -7,6 +7,7 @@ This module is default service
 import locale
 import logging
 import os
+import ssl
 from natsort import natsorted
 import requests
 from configs.config import Config
@@ -14,6 +15,7 @@ from utils.ripprocess import ripprocess
 
 
 class Service(object):
+
     def __init__(self, args):
         self.logger = logging.getLogger(__name__)
         self.url = args.url.strip()
@@ -41,6 +43,7 @@ class Service(object):
 
         self.config = Config()
         self.session = requests.Session()
+        self.session.mount('https://', TLSAdapter())
         self.user_agent = self.config.get_user_agent()
         self.session.headers = {
             'user-agent': self.user_agent
@@ -73,6 +76,13 @@ class Service(object):
         else:
             return 'en'
 
+class TLSAdapter(requests.adapters.HTTPAdapter):
+
+    def init_poolmanager(self, *args, **kwargs):
+        ctx = ssl.create_default_context()
+        ctx.set_ciphers('DEFAULT@SECLEVEL=1')
+        kwargs['ssl_context'] = ctx
+        return super(TLSAdapter, self).init_poolmanager(*args, **kwargs)
 
 class EpisodesNumbersHandler(object):
     def __init__(self, episodes):

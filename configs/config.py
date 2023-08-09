@@ -38,6 +38,11 @@ class Platform:
 
 CREDENTIAL = {}
 
+CREDENTIAL[Platform.FRIDAY] = {
+    "cookies_file": f"{PATHS['cookies']}/cookies_friday.txt",
+    "cookies_txt": f"{PATHS['cookies']}/video.friday.tw_cookies.txt"
+}
+
 CREDENTIAL[Platform.CATCHPLAY] = {
     "cookies_file": f"{PATHS['cookies']}/cookies_catchplay.txt",
     "cookies_txt": f"{PATHS['cookies']}/catchplay.com_cookies.txt"
@@ -93,7 +98,7 @@ VPN = {
 }
 
 # Copy user-agent from login browser (https://www.whatsmyua.info/)
-USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.53 Safari/537.36"
+USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36"
 
 ISO_6391 = {
     'cht': 'zh-Hant',

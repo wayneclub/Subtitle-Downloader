@@ -12,9 +12,11 @@ from pathlib import Path
 import re
 from operator import itemgetter
 import multiprocessing
+import sys
 from urllib import request
 from urllib.error import HTTPError, URLError
 import orjson
+import requests
 from tqdm import tqdm
 from selenium import webdriver
 import chromedriver_autoinstaller
@@ -38,20 +40,30 @@ def get_locale(name, lang=""):
 
 def check_url_exist(url, print_error=False):
     """Check url exist"""
-    try:
-        request.urlopen(url)
-    except HTTPError as exception:
-        # Return code error (e.g. 404, 501, ...)
-        if print_error:
-            logger.error("HTTPError: %s", exception.code)
-        return False
-    except URLError as exception:
-        # Not an HTTP-specific error (e.g. connection refused)
-        if print_error:
-            logger.error("URLError: %s", exception.reason)
-        return False
-    else:
+    # try:
+    #     request.urlopen(url)
+    # except HTTPError as exception:
+    #     # Return code error (e.g. 404, 501, ...)
+    #     if print_error:
+    #         logger.error("HTTPError: %s", exception.code)
+    #     return False
+    # except URLError as exception:
+    #     # Not an HTTP-specific error (e.g. connection refused)
+    #     if print_error:
+    #         logger.error("URLError: %s", exception.reason)
+    #     return False
+    # else:
+    #     return True
+
+    #Get Url
+    res = requests.get(url, headers={'User-Agent': Config().get_user_agent()}, stream=True)
+    # if the request succeeds
+    if res.status_code == 200:
         return True
+    else:
+        if print_error:
+            logger.error("%s: is Not reachable, %s - %s", url, res.status_code, res.reason)
+        return False
 
 
 def driver_init(headless=True):
@@ -117,20 +129,24 @@ def fix_filename(name, max_length=255):
     return re.sub(r'[/\\:|<>"?*\0-\x1f]|^(AUX|COM[1-9]|CON|LPT[1-9]|NUL|PRN)(?![^.])|^\s|[\s.]$', "", name[:max_length], flags=re.IGNORECASE)
 
 
-class DownloadProgressBar(tqdm):
-    def update_to(self, b=1, bsize=1, tsize=None):
-        if tsize is not None:
-            self.total = tsize
-        self.update(b * bsize - self.n)
-
 
 def download_file(url, output_path, lang=""):
     _ = get_locale(__name__, lang)
     if check_url_exist(url):
-        with DownloadProgressBar(unit='B', unit_scale=True,
-                                 miniters=1, desc=os.path.basename(output_path)) as t:
-            request.urlretrieve(
-                url, filename=output_path, reporthook=t.update_to)
+
+        resp = requests.get(url, headers={'User-Agent': Config().get_user_agent()}, stream=True)
+        total = int(resp.headers.get('content-length', 0))
+        with open(output_path, 'wb') as file, tqdm(
+            desc=os.path.basename(output_path),
+            total=total,
+            unit='B',
+            unit_scale=True,
+            unit_divisor=1024,
+        ) as bar:
+            for data in resp.iter_content(chunk_size=1024):
+                size = file.write(data)
+                bar.update(size)
+
     else:
         logger.warning(_("\nFile not found!"))
 

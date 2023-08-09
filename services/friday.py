@@ -10,11 +10,10 @@ import os
 import re
 import shutil
 import sys
-from urllib.parse import parse_qs, urlparse
-import orjson
-from bs4 import BeautifulSoup
+import time
 from configs.config import Platform
-from utils.helper import get_locale, check_url_exist, download_files
+from utils.cookies import Cookies
+from utils.helper import get_locale, download_files
 from utils.subtitle import convert_subtitle
 from services.service import Service
 
@@ -25,10 +24,13 @@ class Friday(Service):
         self.logger = logging.getLogger(__name__)
         self._ = get_locale(__name__, self.locale)
 
+        self.credential = self.config.credential(Platform.FRIDAY)
+        self.cookies = Cookies(self.credential)
+
         self.api = {
             'title': 'https://video.friday.tw/api2/content/get?contentId={content_id}&contentType={content_type}&srcRecommendId=-1&recommendId=-1&eventPageId=&offset=0&length=1',
             'episode_list': 'https://video.friday.tw/api2/episode/list?contentId={content_id}&contentType={content_type}&offset=0&length=40&mode=2',
-            'sub': 'https://sub.video.friday.tw/{sid}.cht.vtt'
+            'media_info': 'https://video.friday.tw/api2/streaming/get?streamingId={streaming_id}&streamingType={streaming_type}&contentType={content_type}&contentId={content_id}&clientId={client_id}&haveSubtitle={subtitle}&isEst=false&_={time_stamp}',
         }
 
     def get_content_type(self, content_type):
@@ -54,34 +56,31 @@ class Friday(Service):
         folder_path = os.path.join(
             self.download_path, self.ripprocess.rename_file_name(title))
 
-        self.logger.info("\n%s", title)
-
-        subtitle_link = self.api['sub'].format(
-            sid=data['streamingId'])
-        self.logger.debug(subtitle_link)
+        media_info = {
+            'streaming_id': data['streamingId'],
+            'streaming_type': data['streamingType'],
+            'content_type':  data['contentType'],
+            'content_id':  data['contentId'],
+            'subtitle': False
+        }
 
         file_name = f"{title}.WEB-DL.{Platform.FRIDAY}.zh-Hant.vtt"
 
-        if check_url_exist(subtitle_link):
+        languages = set()
+        subtitles = []
+        subs, lang_paths = self.get_subtitle(media_info=media_info, folder_path=folder_path, file_name=file_name)
+        subtitles += subs
+        languages = set.union(languages, lang_paths)
+
+        if subtitles:
             self.logger.info(
-                self._(
-                    "\nDownload: %s\n---------------------------------------------------------------"),
-                file_name)
-            os.makedirs(folder_path, exist_ok=True)
+            self._(
+                "\nDownload: %s\n---------------------------------------------------------------"),
+            file_name)
 
-            subtitles = []
-            subtitle = dict()
-            subtitle['name'] = file_name
-            subtitle['path'] = folder_path
-            subtitle['url'] = subtitle_link
-            subtitles.append(subtitle)
-            self.download_subtitle(subtitles=subtitles,
-                                   folder_path=folder_path)
+        self.download_subtitle(
+                        subtitles=subtitles, languages=languages, folder_path=folder_path)
 
-        else:
-            self.logger.error(
-                self._("\nSorry, there's no embedded subtitles in this video!"))
-            sys.exit(0)
 
     def filter_episode_list(self, data):
         episode_list = []
@@ -186,6 +185,7 @@ class Friday(Service):
 
             languages = set()
             subtitles = []
+
             for episode in episode_list:
                 if not self.download_season or episode['season_index'] in self.download_season:
                     if not self.download_episode or episode['episode_index'] in self.download_episode:
@@ -200,45 +200,9 @@ class Friday(Service):
                             'subtitle':  'false'
                         }
 
-                        subtitle_link = self.api['sub'].format(
-                            sid=episode['streamingId'])
-
-                        subtitle_link, ja_subtitle_link, dual_subtitle_link = self.get_subtitle_link(
-                            subtitle_link)
-
-                        os.makedirs(folder_path, exist_ok=True)
-                        languages.add(folder_path)
-                        subtitle = dict()
-                        subtitle['name'] = episode['file_name']
-                        subtitle['path'] = folder_path
-                        subtitle['url'] = subtitle_link
-                        subtitles.append(subtitle)
-
-                        if ja_subtitle_link:
-                            ja_folder_path = os.path.join(
-                                folder_path, 'ja')
-                            os.makedirs(ja_folder_path, exist_ok=True)
-                            ja_file_name = episode['file_name'].replace(
-                                '.zh-Hant.vtt', '.ja.vtt')
-                            languages.add(ja_folder_path)
-                            subtitle = dict()
-                            subtitle['name'] = ja_file_name
-                            subtitle['path'] = ja_folder_path
-                            subtitle['url'] = ja_subtitle_link
-                            subtitles.append(subtitle)
-
-                        if dual_subtitle_link:
-                            dual_folder_path = os.path.join(
-                                folder_path, 'dual')
-                            os.makedirs(dual_folder_path, exist_ok=True)
-                            dual_file_name = episode['file_name'].replace(
-                                '.zh-Hant.vtt', '.mul.vtt')
-                            languages.add(dual_folder_path)
-                            subtitle = dict()
-                            subtitle['name'] = dual_file_name
-                            subtitle['path'] = dual_folder_path
-                            subtitle['url'] = dual_subtitle_link
-                            subtitles.append(subtitle)
+                        subs, lang_paths = self.get_subtitle(media_info=media_info, folder_path=folder_path, file_name=file_name)
+                        subtitles += subs
+                        languages = set.union(languages, lang_paths)
 
             self.download_subtitle(
                 subtitles=subtitles, languages=languages, folder_path=folder_path)
@@ -247,41 +211,88 @@ class Friday(Service):
             self.logger.error(res.text)
             sys.exit(1)
 
-    def get_subtitle_link(self, subtitle_link):
-        subtitle_link_2 = subtitle_link.replace(
-            '.cht.vtt', '_80000000_ffffffff.cht.vtt')
-        subtitle_link_3 = subtitle_link.replace(
-            '.cht.vtt', '_ff000000_ffffffff.cht.vtt')
+    def get_media_info(self, media_info):
+        cookies = self.cookies.get_cookies()
 
-        ja_subtitle_link = ''
-        dual_subtitle_link = ''
-        if check_url_exist(subtitle_link):
-            ja_subtitle_link = self.get_ja_subtitle_link(subtitle_link)
-            dual_subtitle_link = self.get_dual_subtitle_link(subtitle_link)
-        elif check_url_exist(subtitle_link_2):
-            subtitle_link = subtitle_link_2
-            ja_subtitle_link = self.get_ja_subtitle_link(subtitle_link)
-            dual_subtitle_link = self.get_dual_subtitle_link(subtitle_link)
-        elif check_url_exist(subtitle_link_3):
-            subtitle_link = subtitle_link_3
-            ja_subtitle_link = self.get_ja_subtitle_link(subtitle_link)
-            dual_subtitle_link = self.get_dual_subtitle_link(subtitle_link)
+        client_id = cookies['uid']
+        client_device_id = cookies['udid']
+        x_friday = cookies['x_friday']
+        fet_token = cookies['fetToken']
+        login_access_token = cookies['login_accessToken']
+        id_token = cookies['idToken']
+
+        headers = {
+            'user-agent': self.user_agent,
+            'Cookie': f'udid={client_device_id};x_friday={x_friday};logined=true;uid={client_id};login_accessToken={login_access_token};idToken={id_token};fetToken={fet_token};'
+        }
+
+        media_info_url = self.api['media_info'].format(streaming_id=media_info['streaming_id'],
+                                                       streaming_type=media_info['streaming_type'],
+                                                       content_type=media_info['content_type'],
+                                                       content_id=media_info['content_id'],
+                                                       subtitle=media_info['subtitle'],
+                                                       client_id=client_id,
+                                                       time_stamp=int(time.time())*1000)
+
+        res = self.session.get(
+            url=media_info_url, headers=headers)
+        if res.ok:
+            if 'redirectUri' in res.text:
+                self.logger.debug(res.text)
+                self.logger.info(
+                    "\nLogin access token (%s) is expired!\nPlease log out (https://video.friday.tw/logout), login, and re-download cookies", login_access_token)
+                os.remove(self.credential['cookies_file'])
+                sys.exit()
+            else:
+                data = res.json()
+                if 'data' in data:
+                    data = data['data']
+                    self.logger.debug("media_info: %s", data)
+                    return data
+                else:
+                    self.logger.error("Error: %s", data['message'])
+        else:
+            self.logger.error(res.text)
+            sys.exit(1)
+
+
+
+    def get_subtitle(self, media_info, folder_path, file_name):
+        data = self.get_media_info(media_info)
+
+        lang_paths = set()
+        subtitles = []
+
+        if data and 'subtitleList' in data and data['subtitleList']:
+
+            for sub in data['subtitleList']:
+                sub_lang = self.config.get_language_code(
+                os.path.splitext(os.path.basename(sub['url']))[0].split('.')[-1])
+                if sub_lang == 'deu':
+                    sub_lang = 'mul'
+
+                if len(lang_paths) > 1:
+                    lang_folder_path = os.path.join(folder_path, sub_lang)
+                else:
+                    lang_folder_path = folder_path
+                lang_paths.add(lang_folder_path)
+
+                os.makedirs(lang_folder_path,
+                            exist_ok=True)
+
+                subtitles.append({
+                    'name': file_name,
+                    'path': folder_path,
+                    'url': sub['url'].replace('http:', 'https:')
+                })
+
         else:
             self.logger.error(
                 self._("\nSorry, there's no embedded subtitles in this video!"))
             sys.exit(0)
 
-        return subtitle_link, ja_subtitle_link, dual_subtitle_link
+        return subtitles, lang_paths
 
-    def get_ja_subtitle_link(self, subtitle_link):
-        ja_subtitle_link = subtitle_link.replace('.cht.vtt', '.jpn.vtt')
-        if check_url_exist(ja_subtitle_link):
-            return ja_subtitle_link
-
-    def get_dual_subtitle_link(self, subtitle_link):
-        dual_subtitle_link = subtitle_link.replace('.cht.vtt', '.deu.vtt')
-        if check_url_exist(dual_subtitle_link):
-            return dual_subtitle_link
 
     def download_subtitle(self, subtitles, folder_path, languages=None):
         if subtitles:
@@ -298,6 +309,8 @@ class Friday(Service):
     def main(self):
         """Download subtitle from friDay"""
 
+        self.cookies.load_cookies('uid')
+
         content_search = re.search(
             r'https:\/\/video\.friday\.tw\/(drama|anime|movie|show)\/detail\/(\d+)', self.url)
 
@@ -308,7 +321,7 @@ class Friday(Service):
             self.logger.error("\nCan't detect content id: %s", self.url)
             sys.exit(-1)
 
-        res = self.session.get(self.api['title'].format(
+        res = self.session.post(self.api['title'].format(
             content_id=content_id, content_type=content_type))
         if res.ok:
             data = res.json()
