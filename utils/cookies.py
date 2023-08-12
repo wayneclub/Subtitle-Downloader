@@ -20,13 +20,14 @@ class Cookies(object):
     def load_cookies(self, client_id):
         cookies = None
         if not os.path.isfile(self.credential['cookies_file']):
-            if not os.path.exists(self.credential['cookies_txt']) and os.path.exists(os.path.join(os.path.dirname(self.credential['cookies_txt']), 'www.' + os.path.basename(self.credential['cookies_txt']))):
-                self.credential['cookies_txt'] = os.path.join(os.path.dirname(
-                    self.credential['cookies_txt']), 'www.' + os.path.basename(self.credential['cookies_txt']))
-            else:
-                self.logger.error("\nPlease put %s in [configs/cookies] and re-genertate cookie files.",
-                                  os.path.basename(self.credential['cookies_txt']))
-                sys.exit(1)
+            if not os.path.exists(self.credential['cookies_txt']):
+                if os.path.exists(os.path.join(os.path.dirname(self.credential['cookies_txt']), 'www.' + os.path.basename(self.credential['cookies_txt']))):
+                    self.credential['cookies_txt'] = os.path.join(os.path.dirname(
+                        self.credential['cookies_txt']), 'www.' + os.path.basename(self.credential['cookies_txt']))
+                else:
+                    self.logger.error("\nPlease put %s in [configs/cookies] and re-genertate cookie files.",
+                                      os.path.basename(self.credential['cookies_txt']))
+                    sys.exit(1)
 
             cookies = dict()
 
