@@ -326,7 +326,7 @@ class IQIYI(Service):
             "ut": "1",
         }
         url = "/dash?" + urlencode(params)
-        with open(os.path.dirname(__file__).replace('\\', '/') + '/cmd5x.js', 'r', encoding='utf-8') as f:
+        with open(os.path.join(os.path.dirname(__file__).replace('\\', '/'), 'cmd5x.js'), 'r', encoding='utf-8') as f:
             js = f.read()
         module = NodeVM.code(js)
         vf = module.call_member('cmd5x', url)
