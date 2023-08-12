@@ -25,7 +25,12 @@ from configs.config import Config
 
 
 def get_locale(name, lang=""):
-    current_locale = locale.getdefaultlocale()[0]
+
+    if locale.getdefaultlocale():
+        current_locale = locale.getdefaultlocale()[0]
+    else:
+        current_locale = 'en'
+
     if lang and 'zh' in lang:
         current_locale = 'zh'
 
@@ -55,14 +60,16 @@ def check_url_exist(url, print_error=False):
     # else:
     #     return True
 
-    #Get Url
-    res = requests.get(url, headers={'User-Agent': Config().get_user_agent()}, stream=True)
+    # Get Url
+    res = requests.get(
+        url, headers={'User-Agent': Config().get_user_agent()}, stream=True)
     # if the request succeeds
     if res.status_code == 200:
         return True
     else:
         if print_error:
-            logger.error("%s: is Not reachable, %s - %s", url, res.status_code, res.reason)
+            logger.error("%s: is Not reachable, %s - %s",
+                         url, res.status_code, res.reason)
         return False
 
 
@@ -129,12 +136,12 @@ def fix_filename(name, max_length=255):
     return re.sub(r'[/\\:|<>"?*\0-\x1f]|^(AUX|COM[1-9]|CON|LPT[1-9]|NUL|PRN)(?![^.])|^\s|[\s.]$', "", name[:max_length], flags=re.IGNORECASE)
 
 
-
 def download_file(url, output_path, lang=""):
     _ = get_locale(__name__, lang)
     if check_url_exist(url):
 
-        resp = requests.get(url, headers={'User-Agent': Config().get_user_agent()}, stream=True)
+        resp = requests.get(
+            url, headers={'User-Agent': Config().get_user_agent()}, stream=True)
         total = int(resp.headers.get('content-length', 0))
         with open(output_path, 'wb') as file, tqdm(
             desc=os.path.basename(output_path),
