@@ -238,8 +238,7 @@ class CatchPlay(Service):
             match = re.search(
                 r'<script id=\"__NEXT_DATA__" type=\"application/json\">(.+?)<\/script>', res.text)
             if match:
-                data = orjson.loads(match.group(1).strip())[
-                    'props']['pageProps']
+                data = orjson.loads(match.group(1).strip())['props']
                 program_id = os.path.basename(self.url)
                 if data['apolloState'][f'Program:{program_id}']['type'] == 'MOVIE':
                     self.movie_subtitle(data, program_id)
