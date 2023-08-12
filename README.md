@@ -4,7 +4,7 @@
 
 Subtitle-Downloader supports downloading subtitles from Disney Plus, HBOGO Asia, KKTV, LineTV, friDay Video, CatchPlay, iq.com, Viu (support HK and SG without vpn), WeTV, and NowE.
 
-**_Recommend using colab and save time for environmental issues._**
+**_Recommend using colab and save time for environmental issues.(Colab environment is in the US, if you want to use in other region please exexute on local)_**
 
 - English
   <a href="https://colab.research.google.com/drive/1Qu7MHUt4QXym9cNOORCKTezIBYBNNg3V?usp=sharing" target="_blank"><img src="https://colab.research.google.com/assets/colab-badge.svg" title="Open this file in Google Colab" alt="Colab"/></a>
