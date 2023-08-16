@@ -25,12 +25,13 @@ pip install -r requriements
   3. Depend the download platform and modify the text field  (Cick the play button next to it when modified complete)
   4. Download the subtitles from the left side menu
 
-
+  ```
   - English
     <a href="https://colab.research.google.com/drive/1Qu7MHUt4QXym9cNOORCKTezIBYBNNg3V?usp=sharing" target="_blank"><img src="https://colab.research.google.com/assets/colab-badge.svg" title="Open this file in Google Colab" alt="Colab"/></a>
 
   - 中文
     <a href="https://colab.research.google.com/drive/13tv-eT5mx6EWBL_du9Bd2gMQFxT83NCp?usp=sharing" target="_blank"><img src="https://colab.research.google.com/assets/colab-badge.svg" title="Open this file in Google Colab" alt="Colab"/></a>
+  ```
 
 - Local
 
