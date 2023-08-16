@@ -19,10 +19,7 @@ pip install -r requriements
 
 ## USAGE
 
-- Online
-
-**_(Colab environment is in the US, if you want to use in other region please execute on local)_**
-
+- Online **_(Colab environment is in the US, if you want to use in other region please execute on local)_**
   - English
     <a href="https://colab.research.google.com/drive/1Qu7MHUt4QXym9cNOORCKTezIBYBNNg3V?usp=sharing" target="_blank"><img src="https://colab.research.google.com/assets/colab-badge.svg" title="Open this file in Google Colab" alt="Colab"/></a>
 
@@ -31,14 +28,13 @@ pip install -r requriements
 
 - Local
 
-1. Depend on download platform and modify Subtitle-Downloader/configs/config.py
-2. Follow each platform requirements and put cookies.txt into Subtitle-Downloader/configs/cookies
-3. Execute the program with command line
+  1. Depend on download platform and modify Subtitle-Downloader/configs/config.py
+  2. Follow each platform requirements and put cookies.txt into Subtitle-Downloader/configs/cookies
+  3. Execute the program with command line or Subtitle-Downloader.bat (Paste title url)
+  ```
+  python subtitle_downloader.py URL [OPTIONS]
+  ```
 
-```
-python subtitle_downloader.py URL [OPTIONS]
-```
-or Subtitle-Downloader.bat (Type url)
 
 ## OPTIONS
 
