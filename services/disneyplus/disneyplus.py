@@ -182,22 +182,43 @@ class DisneyPlus(Service):
 
     def get_m3u8_url(self, media_id):
         headers = {
-            "accept": "application/vnd.media-service+json; version=2",
-            "User-Agent": self.user_agent,
-            "Sec-Fetch-Mode": "cors",
-            "x-bamsdk-platform": "macintosh",
-            "x-bamsdk-version": '3.10',
-            "Origin": 'https://www.disneyplus.com',
-            "authorization": self.access_token
+            'accept': 'application/vnd.media-service+json; version=6',
+            'User-Agent': self.user_agent,
+            'x-bamsdk-platform': "macOS",
+            'x-bamsdk-version': '23.1',
+            'x-dss-edge-accept': 'vnd.dss.edge+json; version=2',
+            'x-dss-feature-filtering': 'true',
+            'Origin': 'https://www.disneyplus.com',
+            'authorization': self.access_token
         }
         playback_url = self.api['playback'].format(
             media_id=media_id)
         self.logger.debug("playback url: %s", playback_url)
-        res = self.session.get(url=playback_url, headers=headers)
+
+        json_data = {
+            'playback': {
+                'attributes': {
+                    'resolution': {
+                        'max': [
+                            '1920x1080',
+                        ],
+                    },
+                    'protocol': 'HTTPS',
+                    'assetInsertionStrategy': 'SGAI',
+                    'playbackInitiationContext': 'ONLINE',
+                    'frameRates': [
+                        60,
+                    ],
+                    'slugDuration': 'SLUG_500_MS',
+                }
+            },
+        }
+        res = self.session.post(
+            url=playback_url, headers=headers, json=json_data,)
         if res.ok:
-            data = res.json()['stream']['complete']
+            data = res.json()['stream']['sources'][0]['complete']
             self.logger.debug(data)
-            return data
+            return data['url']
         else:
             self.logger.error(res.text)
             sys.exit(1)
