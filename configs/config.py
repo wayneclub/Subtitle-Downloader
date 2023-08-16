@@ -63,8 +63,13 @@ CREDENTIAL[Platform.HBOGO] = {
 }
 
 CREDENTIAL[Platform.IQIYI] = {
-    "cookies_file": f"{PATHS['cookies']}/cookies_iqiyi.txt",
+    "cookies_file": f"{PATHS['cookies']}/cookies_iq.com.txt",
     "cookies_txt": f"{PATHS['cookies']}/iq.com_cookies.txt",
+}
+
+CREDENTIAL[Platform.WETV] = {
+    "cookies_file": f"{PATHS['cookies']}/cookies_wetv.txt",
+    "cookies_txt": f"{PATHS['cookies']}/wetv.vip_cookies.txt",
 }
 
 CREDENTIAL[Platform.NOWE] = {

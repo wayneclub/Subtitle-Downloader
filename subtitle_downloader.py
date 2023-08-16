@@ -16,7 +16,7 @@ from services.friday import Friday
 from services.catchplay import CatchPlay
 from services.iqiyi.iqiyi import IQIYI
 from services.nowplayer import NowPlayer
-from services.wetv import WeTV
+from services.wetv.wetv import WeTV
 from services.viu import Viu
 from services.nowe import NowE
 from services.disneyplus.disneyplus import DisneyPlus

@@ -2,7 +2,7 @@
 # coding: utf-8
 
 """
-This module is to download subtitle from iQIYI
+This module is to download subtitle from iq.com
 """
 
 from hashlib import md5

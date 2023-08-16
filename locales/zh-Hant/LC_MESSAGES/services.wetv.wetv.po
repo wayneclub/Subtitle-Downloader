@@ -14,34 +14,34 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: services/wetv.py:62
+#: services/wetv/wetv.py:62
 msgid ""
 "\n"
 "Sorry, there's no embedded subtitles in this video!"
 msgstr "\n抱歉，此劇只有硬字幕，可去其他串流平台查看"
 
-#: services/wetv.py:73
+#: services/wetv/wetv.py:73
 #, python-format
 msgid ""
 "\n"
 "Subtitle available languages: %s"
 msgstr "\n提供的字幕語言：%s"
 
-#: services/wetv.py:89
+#: services/wetv/wetv.py:89
 msgid ""
 "\n"
 "Download: %s\n"
 "---------------------------------------------------------------"
 msgstr "\n下載：%s\n---------------------------------------------------------------"
 
-#: services/wetv.py:258
+#: services/wetv/wetv.py:258
 #, python-format
 msgid ""
 "\n"
 "Sorry, this video is not allow in your region!"
 msgstr "\n你所在的地區無法下載，可用VPN切換到其他地區"
 
-#: services/wetv.py:107
+#: services/wetv/wetv.py:107
 #, python-format
 msgid ""
 "\n"
@@ -49,7 +49,7 @@ msgid ""
 "---------------------------------------------------------------"
 msgstr "\n第 %s 季 共有：%s 集\t下載第 %s 季 最後一集\n---------------------------------------------------------------"
 
-#: services/wetv.py:111
+#: services/wetv/wetv.py:111
 #, python-format
 msgid ""
 "\n"
@@ -57,7 +57,7 @@ msgid ""
 "---------------------------------------------------------------"
 msgstr "\n第 %s 季 共有：%s 集\t下載全集\n---------------------------------------------------------------"
 
-#: services/wetv.py:117
+#: services/wetv/wetv.py:117
 #, python-format
 msgid ""
 "\n"
@@ -65,7 +65,7 @@ msgid ""
 "---------------------------------------------------------------"
 msgstr "\n第 %s 季 共有：%s 集\t更新至 第 %s 集\t下載全集\n---------------------------------------------------------------"
 
-#: services/wetv.py:140
+#: services/wetv/wetv.py:140
 #, python-format
 msgid "Finding %s ..."
 msgstr "尋找 %s ..."

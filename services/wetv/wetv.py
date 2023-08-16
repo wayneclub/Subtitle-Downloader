@@ -13,8 +13,10 @@ import sys
 from urllib.parse import urljoin
 import m3u8
 import orjson
+from node_vm2 import NodeVM
 from cn2an import cn2an
 from configs.config import Platform
+from utils.cookies import Cookies
 from utils.helper import get_locale, driver_init, get_network_url, download_files
 from utils.subtitle import convert_subtitle
 from services.service import Service
@@ -26,6 +28,9 @@ class WeTV(Service):
         self.logger = logging.getLogger(__name__)
         self._ = get_locale(__name__, self.locale)
         self.subtitle_language = args.subtitle_language
+
+        self.credential = self.config.credential(Platform.WETV)
+        self.cookies = Cookies(self.credential)
 
         self.language_list = ()
 
@@ -219,6 +224,17 @@ class WeTV(Service):
             self.download_subtitle(
                 subtitles=subtitles, languages=languages, folder_path=folder_path)
 
+    def get_ckey(self, vid):
+        cookies = self.cookies.get_cookies()
+
+        guid = cookies['guid']
+        with open(os.path.join(os.path.dirname(__file__).replace('\\', '/'), 'tx.js'), 'r', encoding='utf-8') as f:
+            js = f.read()
+        module = NodeVM.code(js)
+        ckey = module.call_member('getckey', vid, guid)
+        self.logger.debug("cKey: %s", ckey)
+        return ckey
+
     def get_subtitle(self, data, folder_path, file_name):
 
         lang_paths = set()
@@ -267,6 +283,8 @@ class WeTV(Service):
     def main(self):
         """Download subtitle from WeTV"""
         self.get_language_list()
+        self.cookies.load_cookies('guid')
+
         res = self.session.get(url=self.url)
         if res.ok:
             match = re.search(
@@ -275,8 +293,10 @@ class WeTV(Service):
                 data = orjson.loads(match.group(1).strip())[
                     'props']['pageProps']['data']
                 data = orjson.loads(data)
+                print(self.get_ckey(data['videoInfo']['vid']))
+                exit()
 
-                if data['coverInfo']['is_area_limit'] == 1:
+                if data['videoInfo']['is_area_limit'] == 1:
                     self.logger.info(
                         self._("\nSorry, this video is not allow in your region!"))
                     sys.exit(0)
