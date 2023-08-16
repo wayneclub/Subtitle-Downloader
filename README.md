@@ -20,6 +20,12 @@ pip install -r requriements
 ## USAGE
 
 - Online **_(Colab environment is in the US, if you want to use in other region please execute on local)_**
+  1. Connect Colab
+  2. Install the requirements (Click 1st play button)
+  3. Depend the download platform and modify the text field  (Cick the play button next to it when modified complete)
+  4. Download the subtitles from the left side menu
+
+
   - English
     <a href="https://colab.research.google.com/drive/1Qu7MHUt4QXym9cNOORCKTezIBYBNNg3V?usp=sharing" target="_blank"><img src="https://colab.research.google.com/assets/colab-badge.svg" title="Open this file in Google Colab" alt="Colab"/></a>
 
