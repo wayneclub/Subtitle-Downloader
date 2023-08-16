@@ -100,7 +100,7 @@ class WeTV(Service):
             self._("\nDownload: %s\n---------------------------------------------------------------"), file_name)
 
         movie_data = self.get_dash_url(
-            cid=data['videoInfo']['coverList'][0], vid=data['videoInfo']['vid'])
+            cid=data['videoInfo']['coverList'][0], vid=data['videoInfo']['vid'], url=self.url)
 
         languages = set()
         subtitles = []
@@ -182,7 +182,7 @@ class WeTV(Service):
                             self._("Finding %s ..."), file_name)
 
                         episode_data = self.get_dash_url(
-                            cid=series_id, vid=episode_id, url=url)
+                            cid=series_id, vid=episode_id, url=self.url)
 
                         if episode_data:
                             subs, lang_paths = self.get_subtitle(
