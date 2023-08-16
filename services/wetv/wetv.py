@@ -2,24 +2,27 @@
 # coding: utf-8
 
 """
-This module is to download subtitle from Friday影音
+This module is to download subtitle from WeTV
 """
 
 import logging
 import os
+from random import randint
 import re
 import shutil
 import sys
 from urllib.parse import urljoin
 import m3u8
 import orjson
-from node_vm2 import NodeVM
+from time import time
+from requests.utils import cookiejar_from_dict
 from cn2an import cn2an
 from configs.config import Platform
 from utils.cookies import Cookies
-from utils.helper import get_locale, driver_init, get_network_url, download_files
+from utils.helper import get_locale, download_files
 from utils.subtitle import convert_subtitle
 from services.service import Service
+from services.wetv.ckey import CKey
 
 
 class WeTV(Service):
@@ -83,7 +86,7 @@ class WeTV(Service):
 
     def movie_subtitle(self, data):
         title = data['videoInfo']['title']
-        release_year = data['videoInfo']['publish_date'][:4]
+        release_year = data['videoInfo']['videoCheckUpTime'][:4]
         self.logger.info("\n%s (%s)", title, release_year)
 
         title = self.ripprocess.rename_file_name(f'{title}.{release_year}')
@@ -96,39 +99,21 @@ class WeTV(Service):
         self.logger.info(
             self._("\nDownload: %s\n---------------------------------------------------------------"), file_name)
 
-        movie_url = self.api['play'].format(
-            series_id=data['videoInfo']['cover_list'][0], episode_id=data['videoInfo']['vid'])
-        driver = driver_init()
+        movie_data = self.get_dash_url(
+            cid=data['videoInfo']['coverList'][0], vid=data['videoInfo']['vid'])
 
-        driver.get(movie_url)
+        languages = set()
+        subtitles = []
 
-        getvinfo_url = get_network_url(
-            driver=driver, search_url=r"https:\/\/play.wetv.vip\/getvinfo\?", lang=self.locale)
-        self.logger.debug(getvinfo_url)
+        if movie_data:
+            subs, lang_paths = self.get_subtitle(
+                movie_data, folder_path, file_name)
+            subtitles += subs
+            languages = set.union(
+                languages, lang_paths)
 
-        res = self.session.get(url=getvinfo_url)
-        if res.ok:
-            callback = re.sub(r'.+?\(({.+})\)', '\\1', res.text)
-            if callback:
-                movie_data = orjson.loads(callback)
-                driver.quit()
-
-                languages = set()
-                subtitles = []
-                if 'sfl' in movie_data:
-                    movie_data = movie_data['sfl']
-                    self.logger.debug(movie_data)
-                    self.get_all_languages(movie_data)
-
-                    subs, lang_paths = self.get_subtitle(
-                        movie_data, folder_path, file_name)
-                    subtitles += subs
-                    languages = set.union(languages, lang_paths)
-
-                    self.download_subtitle(
-                        subtitles=subtitles, languages=languages, folder_path=folder_path)
-        else:
-            self.logger.error(res.text)
+        self.download_subtitle(
+            subtitles=subtitles, languages=languages, folder_path=folder_path)
 
     def series_subtitle(self, data):
         title = data['coverInfo']['title']
@@ -149,9 +134,9 @@ class WeTV(Service):
 
         self.logger.info("\n%s", title)
 
-        series_id = data['coverInfo']['cover_id']
-        current_eps = data['coverInfo']['episode_updated_country']
-        episode_num = data['coverInfo']['episode_all']
+        series_id = data['coverInfo']['cid']
+        current_eps = data['coverInfo']['episodeUpdated']
+        episode_num = data['coverInfo']['episodeAll']
 
         episode_list = data['videoList']
 
@@ -173,16 +158,17 @@ class WeTV(Service):
                     current_eps)
 
         title = self.ripprocess.rename_file_name(
-            f'{title}.S{season_name}')
+            f'{title}.S{str(season_index).zfill(2)}')
         folder_path = os.path.join(self.download_path, title)
         if os.path.exists(folder_path):
             shutil.rmtree(folder_path)
 
         if len(episode_list) > 0:
-            driver = driver_init()
             languages = set()
             subtitles = []
             for episode in episode_list:
+                if episode['isTrailer'] == 1:
+                    continue
                 episode_index = int(episode['episode'])
                 if not self.download_season or season_index in self.download_season:
                     if not self.download_episode or episode_index in self.download_episode:
@@ -195,45 +181,96 @@ class WeTV(Service):
                         self.logger.info(
                             self._("Finding %s ..."), file_name)
 
-                        driver.get(episode_url)
+                        episode_data = self.get_dash_url(
+                            cid=series_id, vid=episode_id, url=url)
 
-                        getvinfo_url = get_network_url(
-                            driver=driver, search_url=r"https:\/\/play.wetv.vip\/getvinfo\?", lang=self.locale)
-                        self.logger.debug("getvinfo url: %s", getvinfo_url)
-                        res = self.session.get(url=getvinfo_url)
-                        if res.ok:
-                            callback = re.sub(
-                                r'.+?\(({.+})\)', '\\1', res.text)
-                            if callback:
-                                episode_data = orjson.loads(callback)
+                        if episode_data:
+                            subs, lang_paths = self.get_subtitle(
+                                episode_data, folder_path, file_name)
+                            subtitles += subs
+                            languages = set.union(
+                                languages, lang_paths)
 
-                                if 'sfl' in episode_data:
-                                    episode_data = episode_data['sfl']
-                                    self.logger.debug(episode_data)
-                                    self.get_all_languages(episode_data)
-
-                                    subs, lang_paths = self.get_subtitle(
-                                        episode_data, folder_path, file_name)
-                                    subtitles += subs
-                                    languages = set.union(
-                                        languages, lang_paths)
-                        else:
-                            self.logger.error(res.text)
-
-            driver.quit()
             self.download_subtitle(
                 subtitles=subtitles, languages=languages, folder_path=folder_path)
 
-    def get_ckey(self, vid):
-        cookies = self.cookies.get_cookies()
+    def get_dash_url(self, cid, vid, url):
 
+        cookies = self.cookies.get_cookies()
         guid = cookies['guid']
-        with open(os.path.join(os.path.dirname(__file__).replace('\\', '/'), 'tx.js'), 'r', encoding='utf-8') as f:
-            js = f.read()
-        module = NodeVM.code(js)
-        ckey = module.call_member('getckey', vid, guid)
-        self.logger.debug("cKey: %s", ckey)
-        return ckey
+        tm = str(int(time()))
+        ckey = CKey().make(vid=vid, tm=tm, app_ver='2.5.13',
+                           guid=guid, platform='4830201', url=url)
+
+        headers = {
+            'Referer': url,
+            'User-Agent': self.user_agent
+        }
+
+        params = {
+            'charge': '0',
+            'otype': 'json',
+            'defnpayver': '0',
+            'spau': '1',
+            'spaudio': '1',
+            'spwm': '1',
+            'sphls': '1',
+            'host': 'wetv.vip',
+            'refer': 'wetv.vip',
+            'ehost': url,
+            'sphttps': '1',
+            'encryptVer': '8.1',
+            'cKey': ckey,
+            'clip': '4',
+            'guid': guid,
+            'flowid': '4bc874cf11eac741b34fa6e4c62ca18e',
+            'platform': '4830201',
+            'sdtfrom': '1002',
+            'appVer': '2.5.13',
+            'unid': '',
+            'auth_from': '',
+            'auth_ext': '',
+            'vid': vid,
+            'defn': 'shd',
+            'fhdswitch': '0',
+            'dtype': '3',
+            'spsrt': '2',
+            'tm': tm,
+            'lang_code': '8229847',
+            'logintoken': '',
+            'spcaptiontype': '1',
+            'spmasterm3u8': '2',
+            'country_code': '153514',
+            'cid': cid,
+            'drm': '40',
+            'callback': f'getinfo_callback_{randint(10000, 999999)}',
+        }
+
+        cookies = cookiejar_from_dict(
+            self.cookies.get_cookies(), cookiejar=None, overwrite=True)
+
+        res = self.session.get(
+            'https://play.wetv.vip/getvinfo', params=params, cookies=cookies, headers=headers)
+
+        if res.ok:
+            callback = re.sub(
+                r'.+?\(({.+})\)', '\\1', res.text)
+            if callback:
+                data = orjson.loads(callback)
+                if 'sfl' in data:
+                    data = data['sfl']
+                    self.logger.debug(data)
+                    self.get_all_languages(data)
+                    return data
+                elif data['msg'] and data['msg'] == 'pay limit':
+                    self.logger.warning("pay limit")
+                else:
+                    self.logger.error(res.text)
+                    sys.exit(1)
+
+        else:
+            self.logger.error(res.text)
+            sys.exit(1)
 
     def get_subtitle(self, data, folder_path, file_name):
 
@@ -293,10 +330,8 @@ class WeTV(Service):
                 data = orjson.loads(match.group(1).strip())[
                     'props']['pageProps']['data']
                 data = orjson.loads(data)
-                print(self.get_ckey(data['videoInfo']['vid']))
-                exit()
 
-                if data['videoInfo']['is_area_limit'] == 1:
+                if data['coverInfo']['isAreaLimit'] == 1:
                     self.logger.info(
                         self._("\nSorry, this video is not allow in your region!"))
                     sys.exit(0)

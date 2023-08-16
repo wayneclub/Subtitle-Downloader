@@ -9,13 +9,14 @@ from hashlib import md5
 import math
 import re
 import os
+from shlex import quote
 import shutil
 import logging
+import subprocess
 import sys
 from time import time
 from urllib.parse import urlencode
 import orjson
-from node_vm2 import NodeVM
 from cn2an import cn2an
 from configs.config import Platform
 from utils.cookies import Cookies
@@ -226,7 +227,8 @@ class IQIYI(Service):
                     episode_num,
                     current_eps)
 
-        title = self.ripprocess.rename_file_name(f'{title}.S{season_name}')
+        title = self.ripprocess.rename_file_name(
+            f'{title}.S{str(season_index).zfill(2)}')
 
         folder_path = os.path.join(self.download_path, title)
 
@@ -326,10 +328,11 @@ class IQIYI(Service):
             "ut": "1",
         }
         url = "/dash?" + urlencode(params)
-        with open(os.path.join(os.path.dirname(__file__).replace('\\', '/'), 'cmd5x.js'), 'r', encoding='utf-8') as f:
-            js = f.read()
-        module = NodeVM.code(js)
-        vf = module.call_member('cmd5x', url)
+        cmdx5js = os.path.join(os.path.dirname(
+            __file__).replace('\\', '/'), 'cmd5x.js')
+        process = subprocess.run(f"node {cmdx5js} {quote(url)}",
+                                 shell=True, stdout=subprocess.PIPE, check=False)
+        vf = process.stdout.decode("utf-8")
         self.logger.debug("vf: %s", vf)
         return f"https://cache-video.iq.com{url}&vf={vf}"
 

@@ -36,6 +36,11 @@ class Platform:
     ITUNES = "iTunes"
 
 
+# Copy user-agent from login browser (https://www.whatsmyua.info/)
+USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36"
+
+SUBTITLE_LANGUAGE = 'zh-Hant'  # en/zh-Hant/zh-Hans
+
 CREDENTIAL = {}
 
 CREDENTIAL[Platform.FRIDAY] = {
@@ -102,8 +107,6 @@ VPN = {
     },
 }
 
-# Copy user-agent from login browser (https://www.whatsmyua.info/)
-USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36"
 
 ISO_6391 = {
     'cht': 'zh-Hant',

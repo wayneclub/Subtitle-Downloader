@@ -79,12 +79,12 @@ class LineTV(Service):
                     if 'number' in episode:
                         episode_index = int(episode['number'])
                         if not self.download_season or season_index in self.download_season:
-                            if not self.download_episode or episode['episode_index'] in self.download_episode:
+                            if not self.download_episode or episode_index in self.download_episode:
                                 subtitle_link = self.api['sub_1'].format(
                                     drama_id=drama_id, episode_name=episode_index)
                                 self.logger.debug(subtitle_link)
 
-                                file_name = f'{title}.S{season_name}E{str(episode_index).zfill(2)}.WEB-DL.{Platform.LINETV}.zh-Hant.vtt'
+                                file_name = f'{title}.S{str(season_index).zfill(2)}E{str(episode_index).zfill(2)}.WEB-DL.{Platform.LINETV}.zh-Hant.vtt'
 
                                 if not check_url_exist(subtitle_link):
                                     if check_url_exist(subtitle_link.replace('tv-aws-media-convert-input-tokyo', 'aws-elastic-transcoder-input-tokyo')):

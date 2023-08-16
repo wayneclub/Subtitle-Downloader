@@ -149,7 +149,8 @@ class Viu(Service):
             self.logger.info(self._("\n%s Season %s"),
                              title, season_index)
 
-            title = self.ripprocess.rename_file_name(f'{title}.S{season_name}')
+            title = self.ripprocess.rename_file_name(
+                f'{title}.S{str(season_index).zfill(2)}')
             folder_path = os.path.join(self.download_path, title)
 
             if os.path.exists(folder_path):
@@ -254,7 +255,8 @@ class Viu(Service):
             self.logger.info(self._("\n%s Season %s"),
                              title, season_index)
 
-            title = self.ripprocess.rename_file_name(f'{title}.S{season_name}')
+            title = self.ripprocess.rename_file_name(
+                f'{title}.S{str(season_index).zfill(2)}')
             folder_path = os.path.join(self.download_path, title)
 
             episode_list = [ep for ep in data['item']

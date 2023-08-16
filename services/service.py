@@ -69,12 +69,13 @@ class Service(object):
         self.default_language = self.get_default_language(self.locale)
 
     def get_default_language(self, lang=""):
-        current_locale = locale.getdefaultlocale()[0]
-
-        if 'zh' in current_locale or (lang and 'zh' in lang):
-            return 'zh-Hant'
+        if locale.getdefaultlocale():
+            current_locale = locale.getdefaultlocale()[0]
+            if 'zh' in current_locale or (lang and 'zh' in lang):
+                return 'zh-Hant'
         else:
             return 'en'
+
 
 class TLSAdapter(requests.adapters.HTTPAdapter):
 
@@ -83,6 +84,7 @@ class TLSAdapter(requests.adapters.HTTPAdapter):
         ctx.set_ciphers('DEFAULT@SECLEVEL=1')
         kwargs['ssl_context'] = ctx
         return super(TLSAdapter, self).init_poolmanager(*args, **kwargs)
+
 
 class EpisodesNumbersHandler(object):
     def __init__(self, episodes):

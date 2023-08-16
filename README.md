@@ -4,40 +4,41 @@
 
 Subtitle-Downloader supports downloading subtitles from Disney Plus, HBOGO Asia, KKTV, LineTV, friDay Video, CatchPlay, iq.com, Viu (support HK and SG without vpn), WeTV, and NowE.
 
-**_Recommend using colab and save time for environmental issues.(Colab environment is in the US, if you want to use in other region please exexute on local)_**
-
-- English
-  <a href="https://colab.research.google.com/drive/1Qu7MHUt4QXym9cNOORCKTezIBYBNNg3V?usp=sharing" target="_blank"><img src="https://colab.research.google.com/assets/colab-badge.svg" title="Open this file in Google Colab" alt="Colab"/></a>
-
-- 中文
-  <a href="https://colab.research.google.com/drive/13tv-eT5mx6EWBL_du9Bd2gMQFxT83NCp?usp=sharing" target="_blank"><img src="https://colab.research.google.com/assets/colab-badge.svg" title="Open this file in Google Colab" alt="Colab"/></a>
-
 ## DESCRIPTION
 
 Subtitle-Downloader is a command-line program to download subtitles from the most popular streaming platform. It requires the Python interpreter, version 3.6+, and is not platform specific. It should work on Linux, on Windows or on macOS. This project is only for personal research and language learning.
 
 ## INSTALLATION
 
+- Linux:
 ```
 pip install -r requriements
 ```
 
-- For iq.com users, make sure your PC have installed the Chrome browser, the code use selenium and it requires Chrome app.
+- Windows: Execute install_requirements.bat
 
 ## USAGE
 
+- Online
+
+**_(Colab environment is in the US, if you want to use in other region please execute on local)_**
+
+  - English
+    <a href="https://colab.research.google.com/drive/1Qu7MHUt4QXym9cNOORCKTezIBYBNNg3V?usp=sharing" target="_blank"><img src="https://colab.research.google.com/assets/colab-badge.svg" title="Open this file in Google Colab" alt="Colab"/></a>
+
+  - 中文
+    <a href="https://colab.research.google.com/drive/13tv-eT5mx6EWBL_du9Bd2gMQFxT83NCp?usp=sharing" target="_blank"><img src="https://colab.research.google.com/assets/colab-badge.svg" title="Open this file in Google Colab" alt="Colab"/></a>
+
+- Local
+
+1. Depend on download platform and modify Subtitle-Downloader/configs/config.py
+2. Follow each platform requirements and put cookies.txt into Subtitle-Downloader/configs/cookies
+3. Execute the program with command line
+
 ```
 python subtitle_downloader.py URL [OPTIONS]
-
-e.g. Download season 1 episode 1-10
-python subtitle_downloader.py URL -s 1 -e 1-10
-
-e.g. Download season 1 episode 1,3,5
-python subtitle_downloader.py URL -s 1 -e 1,3,5
-
-e.g. Download season 1 with proxy (clash)
-python subtitle_downloader.py URL -p http://127.0.0.1:7890
 ```
+or Subtitle-Downloader.bat (Type url)
 
 ## OPTIONS
 
@@ -64,6 +65,8 @@ python subtitle_downloader.py URL -p http://127.0.0.1:7890
 
   -p, --proxy                   proxy
 ```
+
+
 
 ## Subtitle Languages
 
@@ -190,20 +193,58 @@ python subtitle_downloader.py https://www.disneyplus.com/series/loki/6pARMvILBGz
 1. Install https://chrome.google.com/webstore/detail/get-cookiestxt-locally/cclelndahbckbenkjhflpdbgdldlbecc
 2. Use this plugin download iq.com_cookies.txt (Don't modify anything even the file name)
 3. Put cookie.txt into Subtitle-Downloader/configs/cookies
-4. Make sure the movies or series which you're going to download is playable in your region.
+4. Install NodeJS https://nodejs.org/en/download (Windows install .msi)
+5. Make sure the movies or series which you're going to download is playable in your region.
 
 ## WeTV
-- Make your video is playable in your region and use the album page to download subtitles.
-- Make sure Google Chrome Browser is installed on your PC and update it to the latest version.
+1. Install https://chrome.google.com/webstore/detail/get-cookiestxt-locally/cclelndahbckbenkjhflpdbgdldlbecc
+2. Use this plugin download wetv.vip_cookies.txt (Don't modify anything even the file name)
+3. Put cookie.txt into Subtitle-Downloader/configs/cookies
+4. Make sure the movies or series which you're going to download is playable in your region.
+
+
+## More Examples
+- Download all seasons and all episodes
+```
+python subtitle_downloader.py URL
+```
+
+- Download season 1 episode 1
+```
+python subtitle_downloader.py URL -s 1 -e 1
+```
+
+- Download season 1 episode 1's subtitle with all langugages
+```
+python subtitle_downloader.py URL -s 1 -e 1 -slang all
+```
+
+- Download latest episode
+```
+python subtitle_downloader.py URL -l
+```
+
+- Download season 1 episode 1-10
+```
+python subtitle_downloader.py URL -s 1 -e 1-10
+```
+
+- Download season 1 episode 1,3,5
+```
+python subtitle_downloader.py URL -s 1 -e 1,3,5
+```
+
+- Download season 1 with proxy (clash)
+```
+python subtitle_downloader.py URL -p http://127.0.0.1:7890
+```
+
 
 ## FAQ
 
-- Any issue during downloading subtitles, upload the screenshot and log file.
+- Any issue during downloading subtitles, upload the screenshot and log file (Please provide title, platform and region).
 - Make sure the video contains embedded subtitles and it is playable in your region.
 
-```
-python subtitle_downloader.py https://www.disneyplus.com/series/loki/6pARMvILBGzF -d
-```
 
 > 目前只支持從
 >
