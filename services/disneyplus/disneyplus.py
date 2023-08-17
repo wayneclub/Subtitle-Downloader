@@ -5,7 +5,6 @@
 This module is to download subtitle from Disney+
 """
 
-import re
 import os
 import logging
 import math
@@ -31,9 +30,6 @@ class DisneyPlus(Service):
         self.email = args.email if args.email else self.credential['email']
         self.password = args.password if args.password else self.credential['password']
 
-        self.subtitle_language = args.subtitle_language
-        self.language_list = []
-
         self.audio_language = args.audio_language
 
         self.profile = dict()
@@ -46,13 +42,21 @@ class DisneyPlus(Service):
             'playback': 'https://disney.playback.edge.bamgrid.com/media/{media_id}/scenarios/tvs-drm-cbcs'
         }
 
-    def get_language_list(self):
-        if not self.subtitle_language:
-            self.subtitle_language = 'zh-Hant'
+    def get_all_languages(self, available_languages):
+        if 'all' in self.subtitle_language:
+            self.subtitle_language = available_languages
 
-        if self.subtitle_language != 'all':
-            self.language_list = tuple([
-                language for language in self.subtitle_language.split(',')])
+        intersect = set(self.subtitle_language).intersection(
+            set(available_languages))
+
+        if not intersect:
+            self.logger.error(
+                self._("\nUnsupport %s subtitle, available languages: %s"), ", ".join(self.subtitle_language), ", ".join(available_languages))
+            sys.exit(0)
+
+        if len(intersect) != len(self.subtitle_language):
+            self.logger.error(
+                self._("\nUnsupport %s subtitle, available languages: %s"), ", ".join(set(self.subtitle_language).symmetric_difference(intersect)), ", ".join(available_languages))
 
     def movie_subtitle(self):
         movie_url = self.api['DmcVideo'].format(
@@ -81,9 +85,13 @@ class DisneyPlus(Service):
             file_name = f'{title}.{release_year}.WEB-DL.{Platform.DISNEYPLUS}.vtt'
             subtitle_list, audio_list = self.parse_m3u(m3u8_url)
 
+            if not subtitle_list:
+                self.logger.error(
+                    self._("\nNo subtitles found!"))
+                sys.exit(1)
+
             self.logger.info(
                 self._("\nDownload: %s\n---------------------------------------------------------------"), file_name)
-
             self.get_subtitle(subtitle_list, program_type,
                               folder_path, file_name)
             if self.audio_language:
@@ -161,12 +169,11 @@ class DisneyPlus(Service):
 
                                     if not subtitle_list:
                                         self.logger.error(
-                                            "No subtitles found!")
+                                            self._("\nNo subtitles found!"))
                                         sys.exit(1)
 
                                     self.logger.info(
                                         self._("\nDownload: %s\n---------------------------------------------------------------"), file_name)
-
                                     self.get_subtitle(subtitle_list, program_type,
                                                       folder_path, file_name)
                                     if self.audio_language:
@@ -243,18 +250,12 @@ class DisneyPlus(Service):
                 if media.forced == 'YES':
                     sub_lang += '-forced'
 
-                if not self.language_list or sub_lang in self.language_list:
-                    sub = {}
-                    sub['lang'] = sub_lang
+                sub = {}
+                sub['lang'] = sub_lang
+                sub['m3u8_url'] = urljoin(media.base_uri, media.uri)
+                languages.add(sub_lang)
+                sub_url_list.append(sub)
 
-                    sub_m3u8 = urljoin(media.base_uri, media.uri)
-                    sub['urls'] = []
-                    if not sub_lang in languages:
-                        segments = m3u8.load(sub_m3u8)
-                        for uri in segments.files:
-                            sub['urls'].append(urljoin(segments.base_uri, uri))
-                        languages.add(sub_lang)
-                        sub_url_list.append(sub)
             if self.audio_language and media.type == 'AUDIO' and not 'Audio Description' in media.name:
                 audio = {}
                 if media.group_id == 'eac-3':
@@ -267,7 +268,20 @@ class DisneyPlus(Service):
                 self.logger.debug(audio['url'])
                 audio_url_list.append(audio)
 
-        return sub_url_list, audio_url_list
+        self.get_all_languages(languages)
+
+        subtitle_list = []
+        for sub in sub_url_list:
+            if sub['lang'] in self.subtitle_language:
+                subtitle = {}
+                subtitle['lang'] = sub['lang']
+                subtitle['urls'] = []
+                segments = m3u8.load(sub['m3u8_url'])
+                for uri in segments.files:
+                    subtitle['urls'].append(urljoin(segments.base_uri, uri))
+                subtitle_list.append(subtitle)
+
+        return subtitle_list, audio_url_list
 
     def get_subtitle(self, subtitle_list, program_type, folder_path, sub_name):
 
@@ -277,7 +291,7 @@ class DisneyPlus(Service):
         for sub in subtitle_list:
             file_name = sub_name.replace('.vtt', f".{sub['lang']}.vtt")
 
-            if program_type == 'movie' or len(self.language_list) == 1:
+            if program_type == 'movie' or len(self.subtitle_language) == 1:
                 lang_folder_path = os.path.join(
                     folder_path, f"tmp_{file_name.replace('.vtt', '.srt')}")
             else:
@@ -322,15 +336,12 @@ class DisneyPlus(Service):
                     folder_path, file_name))
 
     def main(self):
-        self.get_language_list()
         user = Login(email=self.email,
                      password=self.password,
                      ip_info=self.ip_info,
                      locale=self.locale)
         self.profile, self.access_token = user.get_auth_token()
-        if self.default_language:
-            self.profile['language'] = self.default_language
-            # self.profile['language'] = 'en'
+        # self.profile['language'] = 'en'
         if self.region:
             self.profile['region'] = self.region
 

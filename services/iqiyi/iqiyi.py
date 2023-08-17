@@ -30,53 +30,14 @@ class IQIYI(Service):
         super().__init__(args)
         self.logger = logging.getLogger(__name__)
         self._ = get_locale(__name__, self.locale)
-        self.subtitle_language = args.subtitle_language
 
         self.credential = self.config.credential(Platform.IQIYI)
         self.cookies = Cookies(self.credential)
-
-        self.language_list = ()
 
         self.api = {
             'episode_list': 'https://pcw-api.iq.com/api/episodeListSource/{album_id}?platformId=3&modeCode={mode_code}&langCode={lang_code}&deviceId=21fcb553c8e206bb515b497bb6376aa4&endOrder={end_order}&startOrder={start_order}',
             'meta': 'https://meta.video.iqiyi.com'
         }
-
-    def get_language_code(self, lang):
-        language_code = {
-            '英語': 'en',
-            '繁體中文': 'zh-Hant',
-            '簡體中文': 'zh-Hans',
-            '韓語': 'ko',
-            '馬來語': 'ms',
-            '越南語': 'vi',
-            '泰語': 'th',
-            '印尼語': 'id',
-            '阿拉伯語': 'ar',
-            '西班牙語': 'es',
-            '葡萄牙語': 'pt',
-            'Traditional Chinese': 'zh-Hant',
-            'Simplified Chinese':  'zh-Hans',
-            'Bahasa Malaysia': 'ms',
-            'Thai': 'th',
-            'Vietnamese': 'vi',
-            'Bahasa Indonesia': 'id',
-            'English': 'en',
-            'Korean': 'ko',
-            'Arabic': 'ar',
-            'Spanish': 'es',
-            'Portuguese': 'pt',
-        }
-
-        if language_code.get(lang):
-            return language_code.get(lang)
-
-    def get_language_list(self):
-        if not self.subtitle_language:
-            self.subtitle_language = 'zh-Hant'
-
-        self.language_list = tuple([
-            language for language in self.subtitle_language.split(',')])
 
     def get_all_languages(self, data):
 
@@ -88,13 +49,20 @@ class IQIYI(Service):
         available_languages = tuple(
             [self.get_language_code(sub['_name']) for sub in data['stl']])
 
-        if 'all' in self.language_list:
-            self.language_list = available_languages
+        if 'all' in self.subtitle_language:
+            self.subtitle_language = available_languages
 
-        if not set(self.language_list).intersection(set(available_languages)):
+        intersect = set(self.subtitle_language).intersection(
+            set(available_languages))
+
+        if not intersect:
             self.logger.error(
-                self._("\nSubtitle available languages: %s"), available_languages)
+                self._("\nUnsupport %s subtitle, available languages: %s"), ", ".join(self.subtitle_language), ", ".join(available_languages))
             sys.exit(0)
+
+        if len(intersect) != len(self.subtitle_language):
+            self.logger.error(
+                self._("\nUnsupport %s subtitle, available languages: %s"), ", ".join(set(self.subtitle_language).symmetric_difference(intersect)), ", ".join(available_languages))
 
     def get_vid(self, play_url):
         vid = ''
@@ -165,6 +133,7 @@ class IQIYI(Service):
             self.logger.error(res.text)
 
     def series_subtitle(self, data, mode_code, lang_code):
+
         title = data['name'].strip()
         album_id = data['albumId']
         start_order = data['from']
@@ -332,7 +301,7 @@ class IQIYI(Service):
             __file__).replace('\\', '/'), 'cmd5x.js')
         process = subprocess.run(f"node {cmdx5js} {quote(url)}",
                                  shell=True, stdout=subprocess.PIPE, check=False)
-        vf = process.stdout.decode("utf-8")
+        vf = process.stdout.decode("utf-8").strip()
         self.logger.debug("vf: %s", vf)
         return f"https://cache-video.iq.com{url}&vf={vf}"
 
@@ -343,8 +312,8 @@ class IQIYI(Service):
         for sub in data['stl']:
             self.logger.debug(sub)
             sub_lang = self.get_language_code(sub['_name'])
-            if sub_lang in self.language_list:
-                if len(self.language_list) > 1:
+            if sub_lang in self.subtitle_language:
+                if len(self.subtitle_language) > 1:
                     lang_folder_path = os.path.join(folder_path, sub_lang)
                 else:
                     lang_folder_path = folder_path
@@ -384,7 +353,6 @@ class IQIYI(Service):
                 shutil.move(folder_path, self.output)
 
     def main(self):
-        self.get_language_list()
         self.cookies.load_cookies('__dfp')
 
         if 'play/' in self.url:

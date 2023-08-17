@@ -30,41 +30,13 @@ class WeTV(Service):
         super().__init__(args)
         self.logger = logging.getLogger(__name__)
         self._ = get_locale(__name__, self.locale)
-        self.subtitle_language = args.subtitle_language
 
         self.credential = self.config.credential(Platform.WETV)
         self.cookies = Cookies(self.credential)
 
-        self.language_list = ()
-
         self.api = {
             'play': 'https://wetv.vip/id/play/{series_id}/{episode_id}',
         }
-
-    def get_language_code(self, lang):
-        language_code = {
-            'EN': 'en',
-            'ZH-TW': 'zh-Hant',
-            'ZH-CN': 'zh-Hans',
-            'MS': 'ms',
-            'TH': 'th',
-            'ID': 'id',
-            'PT': 'pt',
-            'ES': 'es',
-            'KO': 'ko',
-            'VI': 'vi',
-            'AR': 'ar',
-        }
-
-        if language_code.get(lang):
-            return language_code.get(lang)
-
-    def get_language_list(self):
-        if not self.subtitle_language:
-            self.subtitle_language = 'zh-Hant'
-
-        self.language_list = tuple([
-            language for language in self.subtitle_language.split(',')])
 
     def get_all_languages(self, data):
 
@@ -76,13 +48,20 @@ class WeTV(Service):
         available_languages = tuple(
             [self.get_language_code(sub['lang']) for sub in data['fi']])
 
-        if 'all' in self.language_list:
-            self.language_list = available_languages
+        if 'all' in self.subtitle_language:
+            self.subtitle_language = available_languages
 
-        if not set(self.language_list).intersection(set(available_languages)):
+        intersect = set(self.subtitle_language).intersection(
+            set(available_languages))
+
+        if not intersect:
             self.logger.error(
-                self._("\nSubtitle available languages: %s"), available_languages)
+                self._("\nUnsupport %s subtitle, available languages: %s"), ", ".join(self.subtitle_language), ", ".join(available_languages))
             sys.exit(0)
+
+        if len(intersect) != len(self.subtitle_language):
+            self.logger.error(
+                self._("\nUnsupport %s subtitle, available languages: %s"), ", ".join(set(self.subtitle_language).symmetric_difference(intersect)), ", ".join(available_languages))
 
     def movie_subtitle(self, data):
         title = data['videoInfo']['title']
@@ -279,8 +258,8 @@ class WeTV(Service):
         for sub in data['fi']:
             self.logger.debug(sub)
             sub_lang = self.get_language_code(sub['lang'])
-            if sub_lang in self.language_list:
-                if len(self.language_list) > 1:
+            if sub_lang in self.subtitle_language:
+                if len(self.subtitle_language) > 1:
                     lang_folder_path = os.path.join(folder_path, sub_lang)
                 else:
                     lang_folder_path = folder_path
@@ -319,7 +298,7 @@ class WeTV(Service):
 
     def main(self):
         """Download subtitle from WeTV"""
-        self.get_language_list()
+
         self.cookies.load_cookies('guid')
 
         res = self.session.get(url=self.url)

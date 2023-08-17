@@ -35,9 +35,6 @@ class HBOGOAsia(Service):
         self.username = args.email if args.email else self.credential['username']
         self.password = args.password if args.password else self.credential['password']
 
-        self.subtitle_language = args.subtitle_language
-
-        self.language_list = ()
         self.device_id = str(uuid.uuid4())
         self.origin = ""
         self.territory = ""
@@ -54,27 +51,6 @@ class HBOGOAsia(Service):
             'movie': 'https://api2.hbogoasia.com/v1/movie?contentId={content_id}&territory={territory}',
             'playback': 'https://api2.hbogoasia.com/v1/asset/playbackurl?territory={territory}&contentId={content_id}&sessionToken={session_token}&channelPartnerID={channel_partner_id}&operatorId=SIN&lang=zh-Hant'
         }
-
-    def get_language_code(self, lang):
-        language_code = {
-            'ENG': 'en',
-            'CHN': 'zh-Hant',
-            'CHC': 'zh-Hant',
-            'CHZ': 'zh-Hans',
-            'MAL': 'ms',
-            'THA': 'th',
-            'IND': 'id',
-        }
-
-        if language_code.get(lang):
-            return language_code.get(lang)
-
-    def get_language_list(self):
-        if not self.subtitle_language:
-            self.subtitle_language = 'zh-Hant'
-
-        self.language_list = tuple([
-            language for language in self.subtitle_language.split(',')])
 
     def get_territory(self):
         geo_url = self.api['geo'].format(bundle_id=urlparse(self.url).netloc)
@@ -151,13 +127,20 @@ class HBOGOAsia(Service):
         available_languages = tuple([self.get_language_code(
             media['lang']) for media in data['materials'] if media['type'] == 'subtitle'])
 
-        if 'all' in self.language_list:
-            self.language_list = available_languages
+        if 'all' in self.subtitle_language:
+            self.subtitle_language = available_languages
 
-        if not set(self.language_list).intersection(set(available_languages)):
+        intersect = set(self.subtitle_language).intersection(
+            set(available_languages))
+
+        if not intersect:
             self.logger.error(
-                self._("\nSubtitle available languages: %s"), available_languages)
+                self._("\nUnsupport %s subtitle, available languages: %s"), ", ".join(self.subtitle_language), ", ".join(available_languages))
             sys.exit(0)
+
+        if len(intersect) != len(self.subtitle_language):
+            self.logger.error(
+                self._("\nUnsupport %s subtitle, available languages: %s"), ", ".join(set(self.subtitle_language).symmetric_difference(intersect)), ", ".join(available_languages))
 
     def movie_subtitle(self, movie_url, content_id):
         res = self.session.get(url=movie_url)
@@ -270,8 +253,8 @@ class HBOGOAsia(Service):
                 if media['type'] == 'subtitle':
                     self.logger.debug(media)
                     sub_lang = self.get_language_code(media['lang'])
-                    if sub_lang in self.language_list:
-                        if len(self.language_list) > 1:
+                    if sub_lang in self.subtitle_language:
+                        if len(self.subtitle_language) > 1:
                             if category == 'SERIES':
                                 lang_folder_path = os.path.join(
                                     folder_path, sub_lang)
@@ -317,8 +300,6 @@ class HBOGOAsia(Service):
 
     def main(self):
         self.origin = f"https://{urlparse(self.url).netloc}"
-
-        self.get_language_list()
         self.get_territory()
 
         # nowe

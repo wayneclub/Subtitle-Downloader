@@ -6,10 +6,12 @@ This module is default service
 """
 import locale
 import logging
-import os
-import ssl
-from natsort import natsorted
+import sys
 import requests
+import ssl
+import opencc
+from tmdbv3api import TMDb, Search
+from natsort import natsorted
 from configs.config import Config
 from utils.ripprocess import ripprocess
 
@@ -66,15 +68,65 @@ class Service(object):
 
         self.download_path = self.config.paths()['downloads']
 
-        self.default_language = self.get_default_language(self.locale)
+        # self.default_language = self.get_default_language(self.locale)
+        self.subtitle_language = self.get_language_list(args)
 
-    def get_default_language(self, lang=""):
-        if locale.getdefaultlocale():
-            current_locale = locale.getdefaultlocale()[0]
-            if 'zh' in current_locale or (lang and 'zh' in lang):
-                return 'zh-Hant'
+        self.tmdb = TMDb()
+        self.tmdb.api_key = self.config.credential("TMDB")['api_key']
+        self.search = Search()
+
+    def get_language_code(self, lang):
+        language_code = self.config.get_language_code(lang)
+        if language_code:
+            return language_code
         else:
-            return 'en'
+            self.logger.error("\nMissing codec mapping: %s", lang)
+            sys.exit(1)
+
+    def get_language_list(self, args):
+        subtitle_language = args.subtitle_language
+        if not subtitle_language:
+            subtitle_language = self.config.get_default_language()
+
+        return tuple([
+            language for language in subtitle_language.split(',')])
+
+    def get_movie_info(self, title, release_year="", title_aliases=[]):
+        title_aliases.append(opencc.OpenCC('t2s.json').convert(title))
+
+        query = {'query': title.strip()}
+        if release_year:
+            query['year'] = int(release_year)
+
+        results = self.search.movies(query)
+
+        if results:
+            return results[0]
+        else:
+            for alias in title_aliases:
+                query['query'] = alias.strip()
+                results = self.search.movies(query)
+                if results:
+                    return results[0]
+
+    def get_series_info(self, title, title_aliases=[]):
+        title_aliases.append(opencc.OpenCC('t2s.json').convert(title))
+
+        query = {'query': title.strip()}
+
+        results = self.search.tv_shows(query)
+
+        if results:
+            return results[0]
+        else:
+            for alias in title_aliases:
+                query['query'] = alias.strip()
+                results = self.search.tv_shows(query)
+                if results:
+                    return results[0]
+
+    def replace_title(self, title):
+        return title.replace(":", " ").replace("!", " ").replace("?", " ").replace("#", " ").replace("’", "'").replace("  ", " ").strip()
 
 
 class TLSAdapter(requests.adapters.HTTPAdapter):

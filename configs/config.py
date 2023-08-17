@@ -39,9 +39,14 @@ class Platform:
 # Copy user-agent from login browser (https://www.whatsmyua.info/)
 USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36"
 
-SUBTITLE_LANGUAGE = 'zh-Hant'  # en/zh-Hant/zh-Hans
+# Subtitle default language: all/en/zh-Hant/zh-Hans/zh-HK
+DEFAULT_LANGUAGE = 'zh-Hant'
 
 CREDENTIAL = {}
+
+CREDENTIAL["TMDB"] = {
+    "api_key": "305cd2702459761c82756596508900d7"
+}
 
 CREDENTIAL[Platform.FRIDAY] = {
     "cookies_file": f"{PATHS['cookies']}/cookies_friday.txt",
@@ -111,40 +116,66 @@ VPN = {
 ISO_6391 = {
     'cht': 'zh-Hant',
     'tw': 'zh-Hant',
+    'zh_tw': 'zh-Hant',
     'zh-tw': 'zh-Hant',
-    'hk': 'Cantonese',
-    'hkg': 'Cantonese',
+    'hk': 'zh-HK',
+    'hkg': 'zh-HK',
     'chs': 'zh-Hans',
     'cn': 'zh-Hans',
-    'chn': 'zh-Hans',
+    'chn': 'zh-Hant',
+    'chc': 'zh-Hant',
+    'chz': 'zh-Hans',
+    'zh_cn': 'zh-Hans',
     'zh-cn': 'zh-Hans',
-    'us': 'eng',
-    'gb': 'eng',
-    'gbr': 'eng',
-    'en': 'eng',
-    'en-us': 'eng',
-    'en-gb': 'eng',
-    'en-ca': 'eng',
-    'ko': 'kor',
-    'kr': 'kor',
-    'ko_kr': 'kor',
-    'ko-kr': 'kor',
-    'ko-ko': 'kor',
-    'ja': 'jpn',
-    'jp': 'jpn',
-    'jpg': 'jpn',
-    'ja-jp': 'jpn',
-    'ru': 'rus',
-    'ms': 'msa',
-    'th': 'tha',
-    'id': 'ind',
-    'vi': 'vie',
-    'ar': 'ara',
-    'es': 'spa',
-    'de': 'deu',
-    'fr': 'fra',
-    'no': 'nor',
-    'pt': 'por'
+    'zh': 'zh-Hans',
+    'us': 'en',
+    'gb': 'en',
+    'gbr': 'en',
+    'kor': 'ko',
+    'kr': 'ko',
+    'ko_kr': 'ko',
+    'ko-kr': 'ko',
+    'ko-ko': 'ko',
+    'jpn': 'ja',
+    'jp': 'ja',
+    'ja-jp': 'ja',
+    'rus': 'ru',
+    'msa': 'ms',
+    'mya': 'my',
+    'tha': 'th',
+    'ind': 'id',
+    'vie': 'vi',
+    'ara': 'ar',
+    'spa': 'es',
+    'deu': 'de',
+    'fra': 'fr',
+    'nor': 'no',
+    'por': 'pt',
+    '英語': 'en',
+    '繁體中文': 'zh-Hant',
+    '簡體中文': 'zh-Hans',
+    '韓語': 'ko',
+    '馬來語': 'ms',
+    '越南語': 'vi',
+    '泰語': 'th',
+    '印尼語': 'id',
+    '阿拉伯語': 'ar',
+    '西班牙語': 'es',
+    '葡萄牙語': 'pt',
+    '日語': 'ja',
+    'traditional chinese': 'zh-Hant',
+    'simplified chinese':  'zh-Hans',
+    'bahasa malaysia': 'ms',
+    'thai': 'th',
+    'vietnamese': 'vi',
+    'bahasa indonesia': 'id',
+    'indonesian': 'id',
+    'english': 'en',
+    'korean': 'ko',
+    'arabic': 'ar',
+    'spanish': 'es',
+    'portuguese': 'pt',
+    'japanese': 'ja'
 }
 
 LANGUAGE_LIST = [
@@ -264,8 +295,6 @@ class Config:
     def get_language_code(self, lang):
         if ISO_6391.get(lang.lower()):
             return ISO_6391.get(lang.lower())
-        else:
-            return lang
 
     def vpn(self):
         return VPN
@@ -277,3 +306,6 @@ class Config:
 
     def get_user_agent(self):
         return USER_AGENT
+
+    def get_default_language(self):
+        return DEFAULT_LANGUAGE

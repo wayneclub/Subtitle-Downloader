@@ -24,8 +24,8 @@ msgstr "\n抱歉，此劇只有硬字幕，可去其他串流平台查看"
 #, python-format
 msgid ""
 "\n"
-"Subtitle available languages: %s"
-msgstr "\n提供的字幕語言：%s"
+"Unsupport %s subtitle, available languages: %s"
+msgstr "\n未提供%s的字幕，支援語言：%s"
 
 #: services/wetv/wetv.py:89
 msgid ""

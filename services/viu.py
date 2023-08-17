@@ -24,9 +24,6 @@ class Viu(Service):
         self.logger = logging.getLogger(__name__)
         self._ = get_locale(__name__, self.locale)
 
-        self.subtitle_language = args.subtitle_language
-        self.language_list = []
-
         self.token = ""
 
         self.api = {
@@ -35,38 +32,22 @@ class Viu(Service):
             'token': 'https://um.viuapi.io/user/identity?ver=1.0&fmt=json&aver=5.0&appver=2.0&appid=viu_desktop&platform=desktop&iid=c1757177-ad9e-4cbb-8025-7f11569645d6'
         }
 
-    def get_language_code(self, lang):
-        language_code = {
-            'en': 'en',
-            'zh': 'zh-Hans',
-            'zh-CN': 'zh-Hans',
-            'zh-Hant': 'zh-Hant',
-            'ms': 'ms',
-            'th': 'th',
-            'id': 'id',
-            'my': 'my',
-            'mya': 'mya'
-        }
-
-        if language_code.get(lang):
-            return language_code.get(lang)
-
-    def get_language_list(self):
-        if not self.subtitle_language:
-            self.subtitle_language = 'zh-Hant'
-
-        self.language_list = tuple([
-            language for language in self.subtitle_language.split(',')])
-
     def get_all_languages(self, available_languages):
 
-        if 'all' in self.language_list:
-            self.language_list = available_languages
+        if 'all' in self.subtitle_language:
+            self.subtitle_language = available_languages
 
-        if not set(self.language_list).intersection(set(available_languages)):
+        intersect = set(self.subtitle_language).intersection(
+            set(available_languages))
+
+        if not intersect:
             self.logger.error(
-                self._("\nSubtitle available languages: %s"), available_languages)
+                self._("\nUnsupport %s subtitle, available languages: %s"), ", ".join(self.subtitle_language), ", ".join(available_languages))
             sys.exit(0)
+
+        if len(intersect) != len(self.subtitle_language):
+            self.logger.error(
+                self._("\nUnsupport %s subtitle, available languages: %s"), ", ".join(set(self.subtitle_language).symmetric_difference(intersect)), ", ".join(available_languages))
 
     def get_region(self):
         region = ''
@@ -302,9 +283,9 @@ class Viu(Service):
         for sub in data:
             self.logger.debug(sub['code'])
             sub_lang = self.get_language_code(sub['code'])
-            if sub_lang in self.language_list:
+            if sub_lang in self.subtitle_language:
                 subtitle = dict()
-                if len(self.language_list) > 1:
+                if len(self.subtitle_language) > 1:
                     lang_folder_path = os.path.join(folder_path, sub_lang)
                 else:
                     lang_folder_path = folder_path
@@ -350,9 +331,9 @@ class Viu(Service):
         for sub in data:
             self.logger.debug(sub['language'])
             sub_lang = self.get_language_code(sub['language'])
-            if sub_lang in self.language_list and sub['format'] == 'vtt':
+            if sub_lang in self.subtitle_language and sub['format'] == 'vtt':
                 subtitle = dict()
-                if len(self.language_list) > 1:
+                if len(self.subtitle_language) > 1:
                     lang_folder_path = os.path.join(folder_path, sub_lang)
                 else:
                     lang_folder_path = folder_path
@@ -396,7 +377,6 @@ class Viu(Service):
                 shutil.move(folder_path, self.output)
 
     def main(self):
-        self.get_language_list()
         product_id = re.search(r'vod\/(\d+)\/', self.url)
         playlist_id = re.search(r'.+playlist-(\d+)', self.url)
         if product_id:
