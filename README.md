@@ -158,17 +158,6 @@ WeTV
 | es | Spanish | 西班牙文 |
 | ko | Korean | 韓文 |
 
-```
-python subtitle_downloader.py https://www.disneyplus.com/series/loki/6pARMvILBGzF -slang en,zh-Hant
-```
-
-## Windows
-
-```
-1. Run install_requirements.bat
-2. Run Subtitle_Downloader.bat
-```
-
 ## Friday Video
 
 1. Install https://chrome.google.com/webstore/detail/get-cookiestxt-locally/cclelndahbckbenkjhflpdbgdldlbecc
@@ -220,6 +209,11 @@ python subtitle_downloader.py URL -s 1 -e 1
 - Download season 1 episode 1's subtitle with all langugages
 ```
 python subtitle_downloader.py URL -s 1 -e 1 -slang all
+```
+
+- Download all episodes subtitles with all langugages: en, zh-Hant
+```
+python subtitle_downloader.py https://www.disneyplus.com/series/loki/6pARMvILBGzF -slang en,zh-Hant
 ```
 
 - Download latest episode
