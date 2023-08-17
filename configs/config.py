@@ -116,16 +116,17 @@ VPN = {
 ISO_6391 = {
     'cht': 'zh-Hant',
     'tw': 'zh-Hant',
-    'zh_tw': 'zh-Hant',
+    'zh-hant': 'zh-Hant',
     'zh-tw': 'zh-Hant',
+    'zh-hk': 'zh-HK',
     'hk': 'zh-HK',
     'hkg': 'zh-HK',
+    'zh-hans': 'zh-Hans',
     'chs': 'zh-Hans',
     'cn': 'zh-Hans',
     'chn': 'zh-Hant',
     'chc': 'zh-Hant',
     'chz': 'zh-Hans',
-    'zh_cn': 'zh-Hans',
     'zh-cn': 'zh-Hans',
     'zh': 'zh-Hans',
     'us': 'en',
@@ -133,7 +134,6 @@ ISO_6391 = {
     'gbr': 'en',
     'kor': 'ko',
     'kr': 'ko',
-    'ko_kr': 'ko',
     'ko-kr': 'ko',
     'ko-ko': 'ko',
     'jpn': 'ja',
@@ -293,8 +293,11 @@ class Config:
         return LANGUAGE_LIST
 
     def get_language_code(self, lang):
-        if ISO_6391.get(lang.lower()):
-            return ISO_6391.get(lang.lower())
+        uniform = lang.lower().replace('_', '-')
+        if ISO_6391.get(uniform):
+            return ISO_6391.get(uniform)
+        else:
+            return lang
 
     def vpn(self):
         return VPN

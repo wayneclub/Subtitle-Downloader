@@ -11,6 +11,7 @@ import logging
 import shutil
 import sys
 import orjson
+from cn2an import cn2an
 from configs.config import Platform
 from utils.helper import get_locale, download_files
 from utils.subtitle import convert_subtitle, merge_subtitle_fragments
@@ -117,7 +118,12 @@ class Viu(Service):
             self.logger.debug(data)
 
             title = data['series']['name']
-            if data['series']['name'].split(' ')[-1].isdecimal():
+            season_search = re.search(
+                r'(.+?)第(.+?)季', title)
+            if season_search:
+                title = season_search.group(1).strip()
+                season_name = cn2an(season_search.group(2))
+            elif data['series']['name'].split(' ')[-1].isdecimal():
                 title = title.replace(
                     data['series']['name'].split(' ')[-1], '').strip()
                 season_name = data['series']['name'].split(
