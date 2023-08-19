@@ -1,5 +1,7 @@
 # Subtitle Downloader
 
+[![zh](https://img.shields.io/badge/lang-中文-blue)](https://github.com/wayneclub/Subtitle-Downloader/blob/main/README.zh-Hant.md)
+
 **NON-COMMERCIAL USE ONLY**
 
 Subtitle-Downloader supports downloading subtitles from multiple streaming services, such as Disney Plus, HBOGO Asia, KKTV, LineTV, friDay Video, CatchPlay, iq.com, Viu (support HK and SG without vpn), WeTV, NowE, Now Player, AppleTV Plus and etc.
@@ -25,13 +27,7 @@ pip install -r requriements
   3. Depend the download platform and modify the text field  (Cick the play button next to it when modified complete)
   4. Download the subtitles from the left side menu
 
-
-  - English
-    <a href="https://colab.research.google.com/drive/1Qu7MHUt4QXym9cNOORCKTezIBYBNNg3V?usp=sharing" target="_blank"><img src="https://colab.research.google.com/assets/colab-badge.svg" title="Open this file in Google Colab" alt="Colab"/></a>
-
-  - 中文
-    <a href="https://colab.research.google.com/drive/13tv-eT5mx6EWBL_du9Bd2gMQFxT83NCp?usp=sharing" target="_blank"><img src="https://colab.research.google.com/assets/colab-badge.svg" title="Open this file in Google Colab" alt="Colab"/></a>
-
+  <a href="https://colab.research.google.com/drive/1Qu7MHUt4QXym9cNOORCKTezIBYBNNg3V?usp=sharing" target="_blank"><img src="https://colab.research.google.com/assets/colab-badge.svg" title="Open this file in Google Colab" alt="Colab"/></a>
 
 - Local
 
@@ -244,26 +240,8 @@ python subtitle_downloader.py URL -s 1 -e 1,3,5
 python subtitle_downloader.py URL -p http://127.0.0.1:7890
 ```
 
-
 ## FAQ
 
 - Any issue during downloading subtitles, upload the screenshot and log file (Please provide title, platform and region).
 - Make sure the video contains embedded subtitles and it is playable in your region.
 
-
-> 目前只支持從
->
-> 1. KKTV 下載電影、影集、綜藝、動漫字幕
-> 2. LineTV 下載影集、綜藝字幕
-> 3. FriDay 影音 下載電影、影集、綜藝、動漫字幕
-> 4. 愛奇藝（iq.com） 下載電影、劇集
-> 5. Disney+ 下載電影、影集
-> 6. HBOGO Asia 下載電影、影集
-> 7. Viu 下載電影、影集
-> 8. CatchPlay 下載電影、影集字幕
-> 9. WeTV 下載電影、影集字幕
-> 10. NOW E 下載電影、影集字幕
-> 11. Now Player 下載電影、影集字幕
-> 請確認網站網址無誤
-
-![alt text](https://github.com/wayneclub/Subtitle-Downloader/blob/main/guide.png?raw=true)
