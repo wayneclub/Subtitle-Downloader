@@ -73,7 +73,7 @@ pip install -r requriements
 
 ## Subtitle Languages
 
-Disney Plus
+Disney+
 
 | Codec         | Language                           | 語言                         |
 | ------------- | ---------------------------------- | ---------------------------- |
@@ -189,8 +189,16 @@ WeTV
 5. Make sure the movies or series which you're going to download is playable in your region.
 
 ## WeTV
+
 1. Install https://chrome.google.com/webstore/detail/get-cookiestxt-locally/cclelndahbckbenkjhflpdbgdldlbecc
 2. Use this plugin download wetv.vip_cookies.txt (Don't modify anything even the file name)
+3. Put cookie.txt into Subtitle-Downloader/configs/cookies
+4. Make sure the movies or series which you're going to download is playable in your region.
+
+## AppleTV+
+
+1. Install https://chrome.google.com/webstore/detail/get-cookiestxt-locally/cclelndahbckbenkjhflpdbgdldlbecc
+2. Use this plugin download tv.apple.com_cookies.txt (Don't modify anything even the file name)
 3. Put cookie.txt into Subtitle-Downloader/configs/cookies
 4. Make sure the movies or series which you're going to download is playable in your region.
 
