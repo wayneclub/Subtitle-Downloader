@@ -199,9 +199,9 @@ class HBOGOAsia(Service):
                         parent_id=season['contentId'], territory=self.territory)
                     self.logger.debug("season url: %s", season_url)
 
-                    title = self.ripprocess.rename_file_name(
+                    name = self.ripprocess.rename_file_name(
                         f'{title}.S{str(season_index).zfill(2)}')
-                    folder_path = os.path.join(self.download_path, title)
+                    folder_path = os.path.join(self.download_path, name)
                     if os.path.exists(folder_path):
                         shutil.rmtree(folder_path)
 
@@ -220,7 +220,7 @@ class HBOGOAsia(Service):
                             if not self.download_episode or episode_index in self.download_episode:
                                 content_id = episode['contentId']
 
-                                file_name = f'{title}E{str(episode_index).zfill(2)}.WEB-DL.{Platform.HBOGO}.vtt'
+                                file_name = f'{name}E{str(episode_index).zfill(2)}.WEB-DL.{Platform.HBOGO}.vtt'
 
                                 self.logger.info(
                                     self._("Finding %s ..."), file_name)

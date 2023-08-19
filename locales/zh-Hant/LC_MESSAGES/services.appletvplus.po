@@ -14,34 +14,29 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: services/kktv.py:43
-msgid ""
-"\n"
-"Series not found!"
-msgstr "\n找不到該劇，請確認網址重試一次"
-
-#: services/kktv.py:68
+#: services/appletvplus:63 services/appletvplus:68
 #, python-format
 msgid ""
 "\n"
-"%s total: %s season(s) (Provide bilingual subtitles)"
-msgstr "\n%s 共有：%s 季（提供雙語字幕）"
+"Unsupport %s subtitle, available languages: %s"
+msgstr "\n未提供%s的字幕，支援語言：%s"
 
-#: services/kktv.py:72
+
+#: services/appletvplus.py:60
 #, python-format
 msgid ""
 "\n"
 "%s total: %s season(s)"
 msgstr "\n%s 共有：%s 季"
 
-#: services/kktv.py:85
+#: services/appletvplus.py:85
 msgid ""
 "\n"
 "Download:\n"
 "---------------------------------------------------------------"
 msgstr "\n下載：\n---------------------------------------------------------------"
 
-#: services/kktv.py:89
+#: services/appletvplus.py:89
 #, python-format
 msgid ""
 "\n"
@@ -49,7 +44,7 @@ msgid ""
 "---------------------------------------------------------------"
 msgstr "\n第 %s 季 共有：%s 集\t下載第 %s 季 最後一集\n---------------------------------------------------------------"
 
-#: services/kktv.py:99
+#: services/appletvplus.py:99
 #, python-format
 msgid ""
 "\n"
@@ -57,7 +52,7 @@ msgid ""
 "---------------------------------------------------------------"
 msgstr "\n共有：%s 集\t下載全集\n---------------------------------------------------------------"
 
-#: services/kktv.py:104
+#: services/appletvplus.py:104
 #, python-format
 msgid ""
 "\n"
@@ -65,8 +60,30 @@ msgid ""
 "---------------------------------------------------------------"
 msgstr "\n第 %s 季 共有：%s 集\t下載全集\n---------------------------------------------------------------"
 
-#: services/kktv.py:130
+#: services/appletvplus.py:155
+#, python-format
+msgid ""
+"\n"
+"Season %s total: %s episode(s)\tupdate to episode %s\tdownload all episodes\n"
+"---------------------------------------------------------------"
+msgstr "\n第 %s 季 共有：%s 集\t更新至 第 %s 集\t下載全集\n---------------------------------------------------------------"
+
+#: services/appletvplus.py:90
 msgid ""
 "\n"
 "Sorry, there's no embedded subtitles in this video!"
 msgstr "\n無提供可下載的字幕"
+
+#: services/appletvplus.py:96
+#, python-format
+msgid ""
+"\n"
+"Download: %s\n"
+"---------------------------------------------------------------"
+msgstr "\n下載：%s\n---------------------------------------------------------------"
+
+#: services/appletvplus.py:90
+msgid ""
+"\n"
+"Failed to get AppleTV+ WEB TV App Environment Configuration..."
+msgstr "\n無法取得 AppleTV+ WEB TV App 環境設定..."

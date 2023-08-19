@@ -13,3 +13,4 @@ Subtitle-Downloader:
 	msgfmt -o locales/zh-Hant/LC_MESSAGES/services.itunes.mo locales/zh-Hant/LC_MESSAGES/services.itunes
 	msgfmt -o locales/zh-Hant/LC_MESSAGES/services.catchplay.mo locales/zh-Hant/LC_MESSAGES/services.catchplay
 	msgfmt -o locales/zh-Hant/LC_MESSAGES/services.wetv.wetv.mo locales/zh-Hant/LC_MESSAGES/services.wetv.wetv
+	msgfmt -o locales/zh-Hant/LC_MESSAGES/services.appletvplus.mo locales/zh-Hant/LC_MESSAGES/services.appletvplus

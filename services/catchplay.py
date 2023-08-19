@@ -109,9 +109,9 @@ class CatchPlay(Service):
                 data['apolloState'][season_id]['title']['short'].replace('S', ''))
 
             if not self.download_season or season_index in self.download_season:
-                title = self.ripprocess.rename_file_name(
+                name = self.ripprocess.rename_file_name(
                     f'{title}.S{str(season_index).zfill(2)}')
-                folder_path = os.path.join(self.download_path, title)
+                folder_path = os.path.join(self.download_path, name)
                 if os.path.exists(folder_path):
                     shutil.rmtree(folder_path)
 
@@ -132,7 +132,7 @@ class CatchPlay(Service):
 
                 for episode_index, episode in enumerate(episode_list, start=1):
                     if not self.download_episode or episode_index in self.download_episode:
-                        file_name = f'{title}E{str(episode_index).zfill(2)}.WEB-DL.{Platform.CATCHPLAY}.vtt'
+                        file_name = f'{name}E{str(episode_index).zfill(2)}.WEB-DL.{Platform.CATCHPLAY}.vtt'
                         episode_id = episode['__ref'].replace('Program:', '')
                         play_video_id, play_token = self.get_vcms_access_token(
                             episode_id)

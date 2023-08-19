@@ -22,6 +22,7 @@ from services.nowe import NowE
 from services.disneyplus.disneyplus import DisneyPlus
 from services.hbogoasia import HBOGOAsia
 from services.itunes import iTunes
+from services.appletvplus import AppleTVPlus
 from utils.helper import get_locale
 from utils.proxy_environ import proxy_env
 
@@ -175,14 +176,17 @@ if __name__ == "__main__":
         nowplayer = NowPlayer(args)
         nowplayer.main()
     elif 'disneyplus' in args.url:
-        disney_plus = DisneyPlus(args)
-        disney_plus.main()
+        disneyplus = DisneyPlus(args)
+        disneyplus.main()
     elif 'hbogoasia' in args.url:
         hbogoasia = HBOGOAsia(args)
         hbogoasia.main()
     elif 'itunes.apple.com' in args.url:
         itunes = iTunes(args)
         itunes.main()
+    elif 'tv.apple.com' in args.url:
+        appletvplus = AppleTVPlus(args)
+        appletvplus.main()
     else:
         logging.info(
             _("Only support downloading subtitles from Disney Plus, HBOGO Asia, KKTV, LineTV, friDay Video, iq.com, Viu, CatchPlay, WeTV ,and iTunes."))

@@ -32,7 +32,7 @@ class Platform:
     NOWPLAYER = 'NowPlayer'
     DISNEYPLUS = "DisneyPlus"
     HBOGO = "HBOGO"
-    APPLETV = 'AppleTV'
+    APPLETVPLUS = 'AppleTVPlus'
     ITUNES = "iTunes"
 
 
@@ -92,6 +92,11 @@ CREDENTIAL[Platform.NOWPLAYER] = {
     "cookies_txt": f"{PATHS['cookies']}/now.com_cookies.txt",
 }
 
+CREDENTIAL[Platform.APPLETVPLUS] = {
+    "cookies_file": f"{PATHS['cookies']}/cookies_appletvplus.txt",
+    "cookies_txt": f"{PATHS['cookies']}/tv.apple.com_cookies.txt",
+}
+
 
 VPN = {
     "proxies": "http://127.0.0.1:7890",
@@ -118,10 +123,13 @@ ISO_6391 = {
     'tw': 'zh-Hant',
     'zh-hant': 'zh-Hant',
     'zh-tw': 'zh-Hant',
+    'cmn-hant': 'zh-Hant',
     'zh-hk': 'zh-HK',
     'hk': 'zh-HK',
     'hkg': 'zh-HK',
+    'cmn-hk': 'zh-HK',
     'zh-hans': 'zh-Hans',
+    'cmn-hans': 'zh-Hans',
     'chs': 'zh-Hans',
     'cn': 'zh-Hans',
     'chn': 'zh-Hant',

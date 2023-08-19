@@ -59,7 +59,7 @@ class KKTV(Service):
         if 'totalSeriesCount' in data:
             season_num = data['totalSeriesCount']
 
-        self.logger.info("\n%s total: %s season(s)", title, season_num)
+        self.logger.info(self._("\n%s total: %s season(s)"), title, season_num)
 
         if 'series' in data:
             for season in data['series']:
@@ -68,19 +68,19 @@ class KKTV(Service):
                         r'第(.+)季', season['title'])[0].strip())
                 if not self.download_season or season_index in self.download_season:
                     episode_num = len(season['episodes'])
-                    title = self.ripprocess.rename_file_name(
+                    name = self.ripprocess.rename_file_name(
                         f'{title}.S{str(season_index).zfill(2)}')
-                    folder_path = os.path.join(self.download_path, title)
+                    folder_path = os.path.join(self.download_path, name)
 
                     if self.last_episode:
-                        self.logger.info("\nSeason %s total: %s episode(s)\tdownload season %s last episode\n---------------------------------------------------------------",
+                        self.logger.info(self._("\nSeason %s total: %s episode(s)\tdownload season %s last episode\n---------------------------------------------------------------"),
                                          season_index,
                                          episode_num,
                                          season_index)
 
                         season['episodes'] = [list(season['episodes'])[-1]]
                     else:
-                        self.logger.info("\nSeason %s total: %s episode(s)\tdownload all episodes\n---------------------------------------------------------------",
+                        self.logger.info(self._("\nSeason %s total: %s episode(s)\tdownload all episodes\n---------------------------------------------------------------"),
                                          season_index,
                                          episode_num)
 
@@ -107,7 +107,7 @@ class KKTV(Service):
                                 episode['id'].replace(episode['seriesId'], ''))
 
                         if not self.download_episode or episode_index in self.download_episode:
-                            file_name = f"{title}E{str(episode_index).zfill(fill_num)}.WEB-DL.{Platform.KKTV}.zh-Hant.vtt"
+                            file_name = f"{name}E{str(episode_index).zfill(fill_num)}.WEB-DL.{Platform.KKTV}.zh-Hant.vtt"
 
                             if not episode['subtitles']:
                                 self.logger.error(

@@ -68,7 +68,10 @@ class DisneyPlus(Service):
             data = res.json()['data']['DmcVideoBundle']['video']
             title = data['text']['title']['full']['program']['default']['content'].strip(
             )
-            self.logger.info("\n%s", title)
+            release_year = next(
+                release['releaseYear'] for release in data['releases'] if release['releaseType'] == 'original')
+
+            self.logger.info("\n%s (%s)", title, release_year)
             title = fix_filename(title)
 
             folder_path = os.path.join(self.download_path, title)
@@ -76,8 +79,6 @@ class DisneyPlus(Service):
                 shutil.rmtree(folder_path)
 
             program_type = data['programType']
-            release_year = next(
-                release['releaseYear'] for release in data['releases'] if release['releaseType'] == 'original')
 
             media_id = data['mediaMetadata']['mediaId']
             m3u8_url = self.get_m3u8_url(media_id)
@@ -128,57 +129,53 @@ class DisneyPlus(Service):
                 season_index = int(season['seasonSequenceNumber'])
                 if not self.download_season or season_index in self.download_season:
                     episode_num = season['episodes_meta']['hits']
+                    season_id = season['seasonId']
+                    episodes = self.get_episodes(
+                        season_id=season_id, episode_num=episode_num)
 
-                    title = self.ripprocess.rename_file_name(
+                    name = self.ripprocess.rename_file_name(
                         f'{title}.S{str(season_index).zfill(2)}')
-                    folder_path = os.path.join(self.download_path, title)
+                    folder_path = os.path.join(self.download_path, name)
 
                     if os.path.exists(folder_path):
                         shutil.rmtree(folder_path)
 
-                    self.logger.info(
-                        self._("\nSeason %s total: %s episode(s)\tdownload all episodes\n---------------------------------------------------------------"), season_index, episode_num)
+                    if self.last_episode:
+                        self.logger.info(self._("\nSeason %s total: %s episode(s)\tdownload season %s last episode\n---------------------------------------------------------------"),
+                                         season_index,
+                                         episode_num,
+                                         season_index)
 
-                    season_id = season['seasonId']
-                    page_size = math.ceil(episode_num / 30)
+                        episodes = [list(episodes)[-1]]
+                    else:
+                        self.logger.info(self._("\nSeason %s total: %s episode(s)\tdownload all episodes\n---------------------------------------------------------------"),
+                                         season_index,
+                                         episode_num)
 
-                    for page in range(1, page_size+1):
-                        episode_page_url = self.api['DmcEpisodes'].format(
-                            region=self.profile['region'],
-                            language=self.profile['language'],
-                            season_id=season_id, page=page)
-                        self.logger.debug(episode_page_url)
-                        episode_res = self.session.get(url=episode_page_url)
+                    for episode in episodes:
+                        episode_index = episode['episodeSequenceNumber']
+                        if not self.download_episode or episode_index in self.download_episode:
+                            program_type = episode['programType']
+                            media_id = episode['mediaMetadata']['mediaId']
+                            m3u8_url = self.get_m3u8_url(media_id)
+                            self.logger.debug(m3u8_url)
 
-                        if episode_res.ok:
-                            episode_data = episode_res.json(
-                            )['data']['DmcEpisodes']['videos']
-                            for episode in episode_data:
-                                episode_index = int(
-                                    episode['episodeSequenceNumber'])
-                                if not self.download_episode or episode_index in self.download_episode:
-                                    episode_name = str(episode_index).zfill(2)
-                                    program_type = episode['programType']
-                                    media_id = episode['mediaMetadata']['mediaId']
-                                    m3u8_url = self.get_m3u8_url(media_id)
-                                    self.logger.debug(m3u8_url)
+                            file_name = f'{name}E{str(episode_index).zfill(2)}.WEB-DL.{Platform.DISNEYPLUS}.vtt'
+                            subtitle_list, audio_list = self.parse_m3u(
+                                m3u8_url)
 
-                                    file_name = f'{title}E{episode_name}.WEB-DL.{Platform.DISNEYPLUS}.vtt'
-                                    subtitle_list, audio_list = self.parse_m3u(
-                                        m3u8_url)
+                            if not subtitle_list:
+                                self.logger.error(
+                                    self._("\nNo subtitles found!"))
+                                sys.exit(1)
 
-                                    if not subtitle_list:
-                                        self.logger.error(
-                                            self._("\nNo subtitles found!"))
-                                        sys.exit(1)
-
-                                    self.logger.info(
-                                        self._("\nDownload: %s\n---------------------------------------------------------------"), file_name)
-                                    self.get_subtitle(subtitle_list, program_type,
-                                                      folder_path, file_name)
-                                    if self.audio_language:
-                                        self.get_audio(
-                                            audio_list, folder_path, file_name)
+                            self.logger.info(
+                                self._("\nDownload: %s\n---------------------------------------------------------------"), file_name)
+                            self.get_subtitle(subtitle_list, program_type,
+                                              folder_path, file_name)
+                            if self.audio_language:
+                                self.get_audio(
+                                    audio_list, folder_path, file_name)
 
                     convert_subtitle(folder_path=folder_path,
                                      platform=Platform.DISNEYPLUS, lang=self.locale)
@@ -186,6 +183,25 @@ class DisneyPlus(Service):
                         shutil.move(folder_path, self.output)
         else:
             self.logger.error(res.text)
+
+    def get_episodes(self, season_id, episode_num):
+        episodes = []
+        page_size = math.ceil(episode_num / 30)
+        for page in range(1, page_size+1):
+            episode_page_url = self.api['DmcEpisodes'].format(
+                region=self.profile['region'],
+                language=self.profile['language'],
+                season_id=season_id, page=page)
+            self.logger.debug(episode_page_url)
+            res = self.session.get(url=episode_page_url)
+
+            if res.ok:
+                data = res.json()
+                episodes += data['data']['DmcEpisodes']['videos']
+            else:
+                self.logger.error(res.text)
+                sys.exit(1)
+        return episodes
 
     def get_m3u8_url(self, media_id):
         headers = {

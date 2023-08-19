@@ -68,7 +68,8 @@ def convert_subtitle(folder_path="", platform="", lang=""):
                     convert_utf8(subtitle)
                     subs = pysubs2.load(subtitle)
                     if '.zh-Hant' in subtitle_name:
-                        subs = format_subtitle(subs)
+                        subs = format_zh_subtitle(subs)
+                    subs = format_subtitle(subs)
                     subs.save(subtitle_name)
                     os.remove(subtitle)
                     logger.info(os.path.basename(subtitle_name))
@@ -81,7 +82,8 @@ def convert_subtitle(folder_path="", platform="", lang=""):
             convert_utf8(folder_path)
             subs = pysubs2.load(folder_path)
             if '.zh-Hant' in subtitle_name:
-                subs = format_subtitle(subs)
+                subs = format_zh_subtitle(subs)
+            subs = format_subtitle(subs)
             subs.save(subtitle_name)
             os.remove(folder_path)
             logger.info(os.path.basename(subtitle_name))
@@ -173,14 +175,15 @@ def merge_subtitle_fragments(folder_path="", file_name="", lang="", display=Fals
             Path(folder_path).parent.absolute(), file_name)
         subs.sort()
         if '.zh-Hant' in file_path or '.cmn-Hant' in file_path:
-            subs = format_subtitle(subs)
+            subs = format_zh_subtitle(subs)
+        subs = format_subtitle(subs)
         subs.save(file_path)
         logger.info(file_name)
         if os.path.exists(folder_path):
             shutil.rmtree(folder_path)
 
 
-def format_subtitle(subs):
+def format_zh_subtitle(subs):
     """
     Format subtitle
     """
@@ -217,6 +220,27 @@ def clean_subs(subs):
         text = re.sub(r"&lrm;", "", text)
         text = re.sub(r"&amp;", "&", text)
         sub.text = text.strip()
+    return subs
+
+
+def format_subtitle(subs):
+    """
+    Format subtitle
+    """
+
+    delete_list = []
+    for i, sub in enumerate(subs):
+        sub.text = re.sub(r'\u200b', '', sub.text)
+        sub.text = re.sub(r'\u200e', '', sub.text)
+        sub.text = re.sub(r'\u202a', '', sub.text)
+        sub.text = re.sub(r'\ufeff', '', sub.text)
+        sub.text = re.sub(r'\xa0', ' ', sub.text)
+
+        if sub.text == "":
+            delete_list.append(i)
+
+    for i in reversed(delete_list):
+        del subs[i]
 
     return subs
 

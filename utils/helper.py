@@ -62,7 +62,7 @@ def check_url_exist(url, print_error=False):
 
     # Get Url
     res = requests.get(
-        url, headers={'User-Agent': Config().get_user_agent()}, stream=True)
+        url, headers={'User-Agent': Config().get_user_agent()}, stream=True, timeout=5)
     # if the request succeeds
     if res.status_code == 200:
         return True
@@ -141,7 +141,7 @@ def download_file(url, output_path, lang=""):
     if check_url_exist(url):
 
         resp = requests.get(
-            url, headers={'User-Agent': Config().get_user_agent()}, stream=True)
+            url, headers={'User-Agent': Config().get_user_agent()}, stream=True, timeout=5)
         total = int(resp.headers.get('content-length', 0))
         with open(output_path, 'wb') as file, tqdm(
             desc=os.path.basename(output_path),
