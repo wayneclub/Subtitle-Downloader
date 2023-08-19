@@ -2,7 +2,7 @@
 
 **NON-COMMERCIAL USE ONLY**
 
-Subtitle-Downloader supports downloading subtitles from multiple streaming services, such as Disney Plus, HBOGO Asia, KKTV, LineTV, friDay Video, CatchPlay, iq.com, Viu (support HK and SG without vpn), WeTV, NowE, Now Player and etc.
+Subtitle-Downloader supports downloading subtitles from multiple streaming services, such as Disney Plus, HBOGO Asia, KKTV, LineTV, friDay Video, CatchPlay, iq.com, Viu (support HK and SG without vpn), WeTV, NowE, Now Player, AppleTV Plus and etc.
 
 ## DESCRIPTION
 
