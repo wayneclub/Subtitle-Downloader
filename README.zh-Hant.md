@@ -4,7 +4,7 @@
 
 **禁止營利使用，只限個人研究和語言學習，字幕版權皆屬原串流平台所有**
 
-Subtitle-Downloader 支持從各大串流平台下載字幕，例如：Disney Plus、HBOGO Asia、KKTV、LineTV、friDay影音、CatchPlay、iq.com（愛奇藝）、Viu（不需要VPN即可下載香港、新加坡地區的字幕）、WeTV、NowE、Now Player、AppleTV Plus等等。
+Subtitle-Downloader 支持從各大串流平台下載字幕，例如：Disney Plus、HBOGO Asia、KKTV、LineTV、friDay影音、CatchPlay、iq.com（愛奇藝）、Viu（不需要VPN即可下載香港、新加坡地區的字幕）、WeTV、NowE、Now Player、AppleTV Plus、iTunes等等。
 
 ## 說明
 
@@ -174,7 +174,7 @@ WeTV
 3. Put cookie.txt into Subtitle-Downloader/configs/cookies
 4. Make sure the movies or series which you're going to download is playable in your region.
 
-## iq.com
+## 愛奇藝（iq.com）
 
 1. Install https://chrome.google.com/webstore/detail/get-cookiestxt-locally/cclelndahbckbenkjhflpdbgdldlbecc
 2. Use this plugin download iq.com_cookies.txt (Don't modify anything even the file name)
@@ -189,7 +189,7 @@ WeTV
 3. Put cookie.txt into Subtitle-Downloader/configs/cookies
 4. Make sure the movies or series which you're going to download is playable in your region.
 
-## AppleTV+
+## AppleTV+（iTunes）
 
 1. Install https://chrome.google.com/webstore/detail/get-cookiestxt-locally/cclelndahbckbenkjhflpdbgdldlbecc
 2. Use this plugin download tv.apple.com_cookies.txt (Don't modify anything even the file name)

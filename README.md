@@ -4,7 +4,7 @@
 
 **NON-COMMERCIAL USE ONLY**
 
-Subtitle-Downloader supports downloading subtitles from multiple streaming services, such as Disney Plus, HBOGO Asia, KKTV, LineTV, friDay Video, CatchPlay, iq.com, Viu (support HK and SG without vpn), WeTV, NowE, Now Player, AppleTV Plus and etc.
+Subtitle-Downloader supports downloading subtitles from multiple streaming services, such as Disney Plus, HBOGO Asia, KKTV, LineTV, friDay Video, CatchPlay, iq.com, Viu (support HK and SG without vpn), WeTV, NowE, Now Player, AppleTV Plus, iTunes and etc.
 
 ## DESCRIPTION
 
@@ -191,7 +191,7 @@ WeTV
 3. Put cookie.txt into Subtitle-Downloader/configs/cookies
 4. Make sure the movies or series which you're going to download is playable in your region.
 
-## AppleTV+
+## AppleTV+ (iTunes)
 
 1. Install https://chrome.google.com/webstore/detail/get-cookiestxt-locally/cclelndahbckbenkjhflpdbgdldlbecc
 2. Use this plugin download tv.apple.com_cookies.txt (Don't modify anything even the file name)
