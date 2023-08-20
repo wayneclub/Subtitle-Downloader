@@ -82,6 +82,12 @@ msgid ""
 "---------------------------------------------------------------"
 msgstr "\n下載：%s\n---------------------------------------------------------------"
 
+#: services/appletvplus.py:95
+msgid ""
+"\n"
+"Sorry, you haven't purchased this movie!"
+msgstr "\n抱歉，您尚未購買此部電影"
+
 #: services/appletvplus.py:90
 msgid ""
 "\n"

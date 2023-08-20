@@ -81,8 +81,22 @@ class AppleTVPlus(Service):
             shutil.rmtree(folder_path)
 
         file_name = f'{title}.WEB-DL.{Platform.APPLETVPLUS}.vtt'
-        playable_id = data['smartPlayables'][0]['playableId']
-        m3u8_url = data['playables'][playable_id]['assets']['hlsUrl']
+        playable_id = data['smartPlayables'][-1]['playableId']
+
+        m3u8_url = ''
+        if data['playables'][playable_id].get('assets'):
+            m3u8_url = data['playables'][playable_id]['assets']['hlsUrl']
+        elif data['playables'][playable_id].get('itunesMediaApiData'):
+            hd_item = next(item for item in data['playables'][playable_id]['itunesMediaApiData']
+                           ['offers'] if item['kind'] == 'rent' and item['variant'] == 'HD')
+            if hd_item:
+                m3u8_url = hd_item['hlsUrl']
+
+        if not m3u8_url:
+            self.logger.error(
+                self._("\nSorry, you haven't purchased this movie!"))
+            sys.exit(1)
+
         subtitle_list = self.parse_m3u(m3u8_url=m3u8_url)
 
         if not subtitle_list:
@@ -168,7 +182,7 @@ class AppleTVPlus(Service):
                             id=episode['id']), params=self.device, timeout=5)
                         if res.ok:
                             episode_data = res.json()['data']
-                            playable_id = episode_data['smartPlayables'][0]['playableId']
+                            playable_id = episode_data['smartPlayables'][-1]['playableId']
                             m3u8_url = episode_data['playables'][playable_id]['assets']['hlsUrl']
                             self.logger.debug("m3u8_url: %s", m3u8_url)
                         else:
