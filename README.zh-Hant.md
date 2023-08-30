@@ -32,8 +32,8 @@ pip install -r requriements
 
 - 本機執行
 
-  1. 可根據要下載的平台修改config.py設定檔（填入串流平台帳號、密碼等方便下次直接執行） Subtitle-Downloader/configs/config.py
-  2. 根據欲下載不同串流平台的字幕放入對應cookies.txt到Subtitle-Downloader/configs/cookies
+  1. 可根據要下載的平台修改config.py設定檔（填入串流平台帳號、密碼等方便下次直接執行） Subtitle-Downloader/user_config.toml
+  2. 根據欲下載不同串流平台的字幕放入對應cookies.txt到Subtitle-Downloader/cookies
   3. 在終端機執行python指令或是使用Subtitle-Downloader.bat下載字幕
   ```
   python subtitle_downloader.py URL [OPTIONS]
@@ -156,29 +156,29 @@ WeTV
 
 1. Install https://chrome.google.com/webstore/detail/get-cookiestxt-locally/cclelndahbckbenkjhflpdbgdldlbecc
 2. Login Friday Video, and use this plugin download video.friday.tw_cookies.txt (Don't modify anything even the file name)
-3. Put cookie.txt into Subtitle-Downloader/configs/cookies
+3. Put cookie.txt into Subtitle-Downloader/cookies
 4. Make sure the movies or series which you're going to download is playable in your region.
 
 ## CatchPlay
 
 1. Install https://chrome.google.com/webstore/detail/get-cookiestxt-locally/cclelndahbckbenkjhflpdbgdldlbecc
 2. Login CatchPlay, and use this plugin download catchplay.com_cookies.txt (Don't modify anything even the file name)
-3. Put cookie.txt into Subtitle-Downloader/configs/cookies
+3. Put cookie.txt into Subtitle-Downloader/cookies
 4. Make sure the movies or series which you're going to download is playable in your region.
 
 ## Now E, Now Player
 
 1. Install https://chrome.google.com/webstore/detail/get-cookiestxt-locally/cclelndahbckbenkjhflpdbgdldlbecc
 2. Login NowE, and use this plugin download nowe.com_cookies.txt (Don't modify anything even the file name)
-3. Copy user-agent from login browser (https://www.whatsmyua.info/) and paste it in Subtitle-Downloader/configs/config.py (USER_AGENT). The user-agent must be same as login browser user-agent.
-3. Put cookie.txt into Subtitle-Downloader/configs/cookies
+3. Copy user-agent from login browser (https://www.whatsmyua.info/) and paste it in Subtitle-Downloader/user_config.toml (User-Agent). The user-agent must be same as login browser user-agent.
+3. Put cookie.txt into Subtitle-Downloader/cookies
 4. Make sure the movies or series which you're going to download is playable in your region.
 
 ## 愛奇藝（iq.com）
 
 1. Install https://chrome.google.com/webstore/detail/get-cookiestxt-locally/cclelndahbckbenkjhflpdbgdldlbecc
 2. Use this plugin download iq.com_cookies.txt (Don't modify anything even the file name)
-3. Put cookie.txt into Subtitle-Downloader/configs/cookies
+3. Put cookie.txt into Subtitle-Downloader/cookies
 4. Install NodeJS https://nodejs.org/en/download (Windows install .msi)
 5. Make sure the movies or series which you're going to download is playable in your region.
 
@@ -186,14 +186,14 @@ WeTV
 
 1. Install https://chrome.google.com/webstore/detail/get-cookiestxt-locally/cclelndahbckbenkjhflpdbgdldlbecc
 2. Use this plugin download wetv.vip_cookies.txt (Don't modify anything even the file name)
-3. Put cookie.txt into Subtitle-Downloader/configs/cookies
+3. Put cookie.txt into Subtitle-Downloader/cookies
 4. Make sure the movies or series which you're going to download is playable in your region.
 
 ## AppleTV+（iTunes）
 
 1. Install https://chrome.google.com/webstore/detail/get-cookiestxt-locally/cclelndahbckbenkjhflpdbgdldlbecc
 2. Use this plugin download tv.apple.com_cookies.txt (Don't modify anything even the file name)
-3. Put cookie.txt into Subtitle-Downloader/configs/cookies
+3. Put cookie.txt into Subtitle-Downloader/cookies
 4. Make sure the movies or series which you're going to download is playable in your region.
 
 
