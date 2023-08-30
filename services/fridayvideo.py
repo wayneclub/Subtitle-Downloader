@@ -207,20 +207,10 @@ class FridayVideo(Service):
             self.logger.error(res.text)
             sys.exit(1)
 
-    def get_media_info(self, media_info):
+    def get_media_info(self, media_info, file_name):
 
         client_id = self.cookies['uid']
-        client_device_id = self.cookies['udid']
-        x_friday = self.cookies['x_friday']
-        fet_token = self.cookies['fetToken']
         login_access_token = self.cookies['login_accessToken']
-        id_token = self.cookies['idToken']
-
-        # headers = {
-        #     'user-agent': user_agent,
-        #     'Cookie': f'udid={client_device_id};x_friday={x_friday};logined=true;uid={client_id};login_accessToken={login_access_token};idToken={id_token};fetToken={fet_token};'
-        # }
-
         media_info_url = self.config['api']['media_info'].format(streaming_id=media_info['streaming_id'],
                                                                  streaming_type=media_info['streaming_type'],
                                                                  content_type=media_info['content_type'],
@@ -245,13 +235,14 @@ class FridayVideo(Service):
                     self.logger.debug("media_info: %s", data)
                     return data
                 else:
-                    self.logger.error("Error: %s", data['message'])
+                    self.logger.error("%s\nError: %s\n", os.path.basename(
+                        file_name), data['message'])
         else:
             self.logger.error(res.text)
             sys.exit(1)
 
     def get_subtitle(self, media_info, folder_path, file_name):
-        data = self.get_media_info(media_info)
+        data = self.get_media_info(media_info, file_name)
 
         lang_paths = set()
         subtitles = []
@@ -278,11 +269,6 @@ class FridayVideo(Service):
                     'path': folder_path,
                     'url': sub['url'].replace('http:', 'https:')
                 })
-
-        else:
-            self.logger.error(
-                self._("\nSorry, there's no embedded subtitles in this video!"))
-            sys.exit(0)
 
         return subtitles, lang_paths
 

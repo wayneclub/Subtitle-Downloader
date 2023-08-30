@@ -10,6 +10,7 @@ import logging
 import os
 import shutil
 from pathlib import Path
+import time
 import pysubs2
 from chardet import detect
 from utils.helper import get_locale
@@ -55,13 +56,15 @@ def convert_subtitle(folder_path="", platform="", lang=""):
     if os.path.exists(folder_path):
         if os.path.isdir(folder_path):
             display = True
-            for file in sorted(os.listdir(folder_path)):
+            folder = os.listdir(folder_path)
+            for file in sorted(folder):
                 extenison = Path(file).suffix
                 if os.path.isfile(os.path.join(folder_path, file)) and extenison == '.vtt':
                     if display:
                         logger.info(
                             _("\nConvert %s to .srt:\n---------------------------------------------------------------"), extenison)
                         display = False
+
                     subtitle = os.path.join(folder_path, file)
                     subtitle_name = subtitle.replace(
                         Path(subtitle).suffix, '.srt')
@@ -71,8 +74,9 @@ def convert_subtitle(folder_path="", platform="", lang=""):
                         subs = format_zh_subtitle(subs)
                     subs = format_subtitle(subs)
                     subs.save(subtitle_name)
-                    os.remove(subtitle)
                     logger.info(os.path.basename(subtitle_name))
+                    os.remove(subtitle)
+                    folder = os.listdir(folder_path)
             if platform:
                 archive_subtitle(path=os.path.normpath(
                     folder_path), platform=platform, lang=lang)
