@@ -1,0 +1,168 @@
+{
+  "cookies": {
+    "G_AUTHUSER_H": [
+      "1",
+      0
+    ],
+    "guid": [
+      "9a6d673a7577129e",
+      0
+    ],
+    "video_guid": [
+      "9a6d673a7577129e",
+      0
+    ],
+    "uin": [
+      "9a6d673a7577129e",
+      0
+    ],
+    "wetv_pt": [
+      "v",
+      0
+    ],
+    "video_appid": [
+      "1200004",
+      0
+    ],
+    "vplatform": [
+      "2",
+      0
+    ],
+    "_gcl_au": [
+      "1.1.1745850491.1691834152",
+      0
+    ],
+    "__lt__cid": [
+      "337edf9b-3d0c-475b-965a-712169787279",
+      0
+    ],
+    "_fbp": [
+      "fb.1.1691834155239.1064593805",
+      0
+    ],
+    "_cc_id": [
+      "2718d59ad416587a84edaf925a65067",
+      0
+    ],
+    "panoramaId_expiry": [
+      "1692448299327",
+      0
+    ],
+    "panoramaId": [
+      "716dd12307fd010492fee4510fec16d53938f014dcae5ed2ed767a41d5f1260a",
+      0
+    ],
+    "panoramaIdType": [
+      "panoIndiv",
+      0
+    ],
+    "optionalCookiePolicy": [
+      "accept",
+      0
+    ],
+    "country_code": [
+      "153514",
+      0
+    ],
+    "_gid": [
+      "GA1.2.1337724586.1692194878",
+      0
+    ],
+    "lang_code": [
+      "8229847",
+      0
+    ],
+    "wetv_lang": [
+      "zh-tw",
+      0
+    ],
+    "__gads": [
+      "ID=49dea6b34a038172:T=1691843440:RT=1692208035:S=ALNI_MbvNh2_g-BKBMuwmzlA6HXdVXCctg",
+      0
+    ],
+    "__gpi": [
+      "UID=00000c2b41230905:T=1691843440:RT=1692208035:S=ALNI_MaQ_yKxkVrCzNE1wQYp8hien-pxFg",
+      0
+    ],
+    "G_ENABLED_IDPS": [
+      "google",
+      0
+    ],
+    "vusession": [
+      "ukzzgVudAk0=",
+      0
+    ],
+    "next_refresh_token": [
+      "6600",
+      0
+    ],
+    "vutoken": [
+      "3rlwH2k0wMiInKbgDu7KiA==",
+      0
+    ],
+    "vuserid": [
+      "4076292831",
+      0
+    ],
+    "main_login": [
+      "google",
+      0
+    ],
+    "avatar": [
+      "https://lh3.googleusercontent.com/a/AAcHTteNpeL4ctk1c6xQocIOOj0WuC6GPIAntweJA65oN6lr=s96-c",
+      0
+    ],
+    "user_avatar": [
+      "https://lh3.googleusercontent.com/a/AAcHTteNpeL4ctk1c6xQocIOOj0WuC6GPIAntweJA65oN6lr=s96-c",
+      0
+    ],
+    "nick": [
+      "Wayne%20Wei%20(Origami%20Thinker)",
+      0
+    ],
+    "user_nick": [
+      "Wayne%20Wei%20(Origami%20Thinker)",
+      0
+    ],
+    "_ga_ZZRPPC4YSC": [
+      "GS1.1.1692201715.4.1.1692208135.54.0.0",
+      0
+    ],
+    "_dc_gtm_UA-195892328-1": [
+      "1",
+      0
+    ],
+    "_dc_gtm_UA-140552844-1": [
+      "1",
+      0
+    ],
+    "__lt__sid": [
+      "291c5993-e45ae03f",
+      0
+    ],
+    "_ga_YRZXWWKXN0": [
+      "GS1.1.1692201715.4.1.1692208136.0.0.0",
+      0
+    ],
+    "_ga": [
+      "GA1.1.828986647.1691834153",
+      0
+    ],
+    "_ga_5NSWYK5E9J": [
+      "GS1.1.1692201715.4.1.1692208136.53.0.0",
+      0
+    ],
+    "_ga_LMMR6KN931": [
+      "GS1.2.1692208137.4.0.1692208137.60.0.0",
+      0
+    ],
+    "_ga_2VG0PSP9MN": [
+      "GS1.2.1692208137.2.0.1692208137.60.0.0",
+      0
+    ],
+    "cto_bundle": [
+      "JvRQKV9HS3dCdjduNzlKMGJGMzdZRkt5ZEtxNzVhUVF3TlNHV1dHenVwUG4xYUVYWVRwRXlpbkZDcWJwS3FwTDk3ek1zaXV1VGpuWERwZEZXTHBlQkVyalI1MTFpZGNDRmtlSFRsM21OSXMyaE1kM1VrMkNwTXZCQlBPdW5tRVRSMXhkcHl2SnBYWnBRMm43dUREYUtRWHlPREJEYkYxY2xaM0pMRWo2WWlkSjltZXE4VUdXbk13aG82S2ZrQjFORk5iRFE",
+      0
+    ]
+  }
+}

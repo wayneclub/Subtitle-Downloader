@@ -1,0 +1,116 @@
+{
+  "cookies": {
+    "QC005": [
+      "9fed4bb75c08e865ec53bb5709a1b100",
+      0
+    ],
+    "QC173": [
+      "0",
+      0
+    ],
+    "lang": [
+      "zh_tw",
+      0
+    ],
+    "mod": [
+      "ntw",
+      0
+    ],
+    "_fbp": [
+      "fb.1.1691830717799.595534365",
+      0
+    ],
+    "_gid": [
+      "GA1.2.612313350.1691830718",
+      0
+    ],
+    "QC007": [
+      "DIRECT",
+      0
+    ],
+    "QC006": [
+      "542i7gwjo53n8mbenkwqa4am",
+      0
+    ],
+    "QC008": [
+      "1691830718.1691830718.1691830718.1",
+      0
+    ],
+    "_gcl_au": [
+      "1.1.430584203.1691830720",
+      0
+    ],
+    "__uuid": [
+      "5717e17c-bfce-f4a3-dba9-bf8f65532f2c",
+      0
+    ],
+    "nu": [
+      "0",
+      0
+    ],
+    "_cc_id": [
+      "2718d59ad416587a84edaf925a65067",
+      0
+    ],
+    "panoramaId_expiry": [
+      "1692435525197",
+      0
+    ],
+    "panoramaId": [
+      "716dd12307fd010492fee4510fec16d53938f014dcae5ed2ed767a41d5f1260a",
+      0
+    ],
+    "panoramaIdType": [
+      "panoIndiv",
+      0
+    ],
+    "cto_bundle": [
+      "V6RZYl9FZmZGSjNuYVZ1JTJGSVhmdVhnJTJCc2pZc3RYajE5dmdBWUZFcVNjVkxPY05SbmFkRWsyT0VMVmlRYTBKZDFYMzdxNUdseDJlOHZmS1IzclNTJTJGTTNSY1hrUXolMkJxeWVad3JkZmh6TXBFN0dKOWdkdk43dmw0JTJCNTBKS1FONVdsV0RJR012cm1UNTlJQUUwbiUyRlc0OG1td1lkVmhQNGVzaWxJSlBidExaaXVvMm00Mk5QM1VXNVpBUU4lMkZZZW1GOTFFTVhlOA",
+      0
+    ],
+    "ak_bmsc": [
+      "0F9BB9E430C46150405D8879E27A9979~000000000000000000000000000000~YAAQFUrIF4UKxLuJAQAAhgND6xSGdgiDjJKcUZzZZTcRm0FR768UrT29gPMDAL/PF2+vdmnl8ku6sMa1LaHpFEyQqppBo1GfDznx4+X/D6W9E4rBZFdPYbyhVhc7fOf3iMZHKrT5it3QCjAQATaUgAL1xuzQtsTiBpXIlO4+KFq/sHyW+2g+JULzuvl2mtYUiQBHGchgYlqh2hsHf4r+fh8jF2HBS7v1NkEpGq9ld1wHaVFq4rdsJJwR8uzrqfpXunM0ToHwE/t0BjAC1FgmXWwTe0z1De0rzQ+92Iws4Jd6fMw9XcTMagiEh0+5rTl0cMDXqnYuH4dNu3KdZ+89pCF+ydXhEE+lobx59UeQhIViSmq+k9EAAS/Tzg0wmmDXH0cYBbVt",
+      0
+    ],
+    "b_ext_ip": [
+      "114.44.114.190",
+      0
+    ],
+    "QC010": [
+      "45463968",
+      0
+    ],
+    "QiyiPlayerSupported": [
+      "%7B%22v%22%3A1%2C%22dm%22%3A%7B%22wv%22%3A1%7D%2C%22m%22%3A%7B%22wm-vp9%22%3A1%2C%22wm-av1%22%3A1%2C%22m4-hevc%22%3A1%7D%7D",
+      0
+    ],
+    "_ga": [
+      "GA1.1.489092951.1656703199",
+      0
+    ],
+    "intl_playbackRate": [
+      "1",
+      0
+    ],
+    "__dfp": [
+      "a1b44e4d4a02265cf197bb0ca88ffa6e1f0af3a7aea33386e7887c661b21fb8acf@1693126722821@1691830724821",
+      0
+    ],
+    "bm_sv": [
+      "9202CBBBA55BE8A047F5AB726A3B9E2D~YAAQvopFy0EGQeOJAQAArnxN6xSutZuenF64EKi//kN7vI6hj/wDyDGj9Eq2Zfsm7afmKIqQimjWVIT9dJGjBGB73lyNlCYrnk+medz1ptbsBhKdgl56GwyagM4V5ehp4EB/1uns5N8P+0uHcqJBi6MLbavXPzA7yvBlFdX3PnkZE+CrKuHZDgapw0D4f/CS1AXh+QKpPBND+P2hElP0frLw+TN6254briMQcdW1/Fyugsd4u+26liu2eU4j~1",
+      0
+    ],
+    "_ga_PCTZRE9688": [
+      "GS1.1.1691869189.5.1.1691869873.60.0.0",
+      0
+    ],
+    "__gads": [
+      "ID=99ec0e7e98665054-222fee53cee2003a:T=1691830722:RT=1691869874:S=ALNI_MYXtPHgDmYznVPSuohqRg-7BTUwrA",
+      0
+    ],
+    "__gpi": [
+      "UID=00000c2b3269b617:T=1691830722:RT=1691869874:S=ALNI_MYpOFZhQFRIRF0b4P1psS96Y6oh5Q",
+      0
+    ]
+  }
+}

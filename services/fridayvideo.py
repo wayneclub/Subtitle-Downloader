@@ -312,7 +312,7 @@ class FridayVideo(Service):
             sys.exit(-1)
 
         res = self.session.post(self.config['api']['title'].format(
-            content_id=content_id, content_type=content_type))
+            content_id=content_id, content_type=content_type), timeout=5)
 
         if res.ok:
             data = res.json()

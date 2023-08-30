@@ -7,7 +7,7 @@ logs/
 *.srt
 *.vtt
 *.log
-cookies_*.txt
+cookies/*_cookies.txt
 *.zip
 *.mp4
 *.mpd

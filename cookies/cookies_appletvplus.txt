@@ -1,0 +1,84 @@
+{
+  "cookies": {
+    "dssid2": [
+      "a8be690d-371b-4586-999a-b7e7a3978c03",
+      0
+    ],
+    "dssf": [
+      "1",
+      0
+    ],
+    "POD": [
+      "tw~zh",
+      0
+    ],
+    "as_affl": [
+      "p238%7C%7Cmtid%3A%3A18707vxu38484%26mnid%3A%3AsmZLf66c4-dc_mtid_18707vxu38484_pcrid_639761712441_pgrid_46869806803_pntwk_g_pchan__pexid__%26cid%3A%3Aaos-tw-kwgo-btb--slid---product-%26%7C%7C20230816_201400",
+      0
+    ],
+    "geo": [
+      "TW",
+      0
+    ],
+    "s_campaign": [
+      "aos-tw-kwgo-btb--slid---product-",
+      0
+    ],
+    "s_afc": [
+      "p238%7CsmZLf66c4-dc_mtid_18707vxu38484_pcrid_639761712441_pgrid_46869806803_pntwk_g_pchan__pexid__",
+      0
+    ],
+    "s_cc": [
+      "true",
+      0
+    ],
+    "as_pcts": [
+      "jAAxe9NVbCjq-VV1xuzEF7ks7QDEhLQ2e1gjP7oyMxx6INyvWBQkp7_grKH63i1:mm_9WHFuHuk-HVW27_ge--VYVsGCzK-B",
+      0
+    ],
+    "mk_epub": [
+      "%7B%22btuid%22%3A%221po278v%22%2C%22eVar1%22%3A%22apple%20tv%20plus%20-%20overview%20(tw)%20%7C%20local%20nav%20locked%20%7C%20stream%20now-apple%20tv%20plus%22%2C%22prop57%22%3A%22www.tw.appletvplus%22%7D",
+      0
+    ],
+    "pt-dm": [
+      "v1~x~ias5qe3x~m~1~n~apple%20tv%20plus%20-%20overview%20(tw)",
+      0
+    ],
+    "dslang": [
+      "TW-ZH",
+      0
+    ],
+    "site": [
+      "TWN",
+      0
+    ],
+    "myacinfo": [
+      "DAWTKNV323952cf8084a204fb20ab2508441a07d02d3ef16ac85f7981eadf3705abe0fe578d955995d0adc0f17a87e517fbe18695d2a3400ec1d55ccc8565b1865f91d09e207792cea1b48cc38c95f930f0f5857463f4f2952e73fa39682e1077ad2b5dd74fdd7dacd884e05ff38c813ec6d6b0ee63e39eb1eb8715b583fecdf2721d309fbfe68266bbf83d75082ba0efcb1420d984f267ecd87a1e75a296ff3ead8cf3c5e2067e9c3d47834467a7274935524c8d0b89f2c516441aa61a82baa35905c13031ab10cf23512f97037fde1f6882078648e3409beb157280c4d9a8a8ef28ea4b25fbcb5d8c60c8753465a49bb5c6d9b9a713b2a4e0a30e358c967aad48abd939613031715634305df6a2f643f014cfce745fae002310466bb5872309c547589ae630fc4ca95a30c5a18a75e027b25bd049101f291956e3990a41e43acd5c3a6ede300e65b4890fa2f544a3a0bce1d904c4903881ef97d45ba46deb8e43eaf2be762034d77f095c20dda5a6a86306bdf51a48a379a991ca4739f486774e8417333de9a4dc279a67e39b9365d377a2d0bd223443ba0fef3c73212cebc4cfa0eee02420b093bb2f5b28da241abd88ea64445ebe44564c435af7a9d2685aa85f835f8866b19806ca5c71b9ebdc0d6b18d1589b05117b6739324586c541e1da3ad567df9b770230fed3290500434e8f9737569b0e0a09ae4f019b484d2732c52e4dcb916e335f6ad1d7e72a8e164d1c6dfee868807f3265fdee72200cdc96230b571f51900574c74a1426ae7e718262e2d3a342a37e3b63e788c5ca04862fdc853410afcacc34dbf32d90adbe0d1bf9a00dd2b0b958a8094bd044c0e7d45918332edd3dcdc670162757365453c70756e781e388c585a47V3",
+      0
+    ],
+    "itspod": [
+      "37",
+      0
+    ],
+    "media-user-token": [
+      "Ak0fxXWBbZcGbSq07d5FdmzfHa4xx/wUvWBp+lGMTFgqywEi+/gXDUPJv/JBLxxSpFbkZlOgGV5F9VnIvvAy6xVob8GqGUCSUE+J55yIe34dSzKk60JCYtc6WoEXXZIOYpvFn6vb8W5r6N0Ieev6kEkbpziiZfvdv+MjFBTZjDSVWU8y+jOe1QgB/nQceRl+pYcyHHdaE1xnGTZprl8GbNfhwBDVn5sfQzpcS3gZ9uPln8mLkA==",
+      0
+    ],
+    "pldfltcid": [
+      "9ff36b70c5fe41ccb404ab126d60f42d037",
+      0
+    ],
+    "pltvcid": [
+      "cd99f23f5e884e49b3f3481c92d84b0a037",
+      0
+    ],
+    "itua": [
+      "tw",
+      0
+    ],
+    "vrep": [
+      "CKm_pvwEEgQICBAAEgkICxC_9_rflzESBAgMEAASBAgNEAASBAgQEAASBAgEEBgSBAgJEAASBAgCEAASBAgBEAASBAgOEAASBAgSEAASBAgDEAASBAgFEAASBAgHEAASBAgPEAASBAgTEAASBAgREAASBQgGEKI7EgQIChAA",
+      0
+    ]
+  }
+}

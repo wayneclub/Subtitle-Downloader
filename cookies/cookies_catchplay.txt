@@ -1,0 +1,84 @@
+{
+  "cookies": {
+    "_gcl_au": [
+      "1.1.556671783.1691829733",
+      0
+    ],
+    "geo": [
+      "j%3A%7B%22isoCode%22%3A%22TW%22%7D",
+      0
+    ],
+    "_gid": [
+      "GA1.2.1375720473.1691829734",
+      0
+    ],
+    "WZRK_G": [
+      "e0cb5c5d9bd6475da5cea82b9c15a133",
+      0
+    ],
+    "_hjFirstSeen": [
+      "1",
+      0
+    ],
+    "_hjIncludedInSessionSample_697742": [
+      "0",
+      0
+    ],
+    "_hjSession_697742": [
+      "eyJpZCI6IjcyYmMxMWNiLWEyYjEtNDMxYy04Mzk0LTIwNmQ4NGFkOGIwNiIsImNyZWF0ZWQiOjE2OTE4Mjk3MzM5NzQsImluU2FtcGxlIjpmYWxzZX0=",
+      0
+    ],
+    "_hjAbsoluteSessionInProgress": [
+      "0",
+      0
+    ],
+    "__lt__cid": [
+      "3ad09ede-6228-4550-ae0b-b48e01125351",
+      0
+    ],
+    "__lt__sid": [
+      "7ab75847-43ec800a",
+      0
+    ],
+    "dcard-adkt-device": [
+      "c0aef13c-409b-4247-9ff4-72d4b7b50934",
+      0
+    ],
+    "_fbp": [
+      "fb.1.1691829735069.391494150",
+      0
+    ],
+    "_tt_enable_cookie": [
+      "1",
+      0
+    ],
+    "_ttp": [
+      "orH7bQ_ulPDz8_yyGzad5flQuCE",
+      0
+    ],
+    "connect.sid": [
+      "s%3A3cqnFCz5nJZ7ZQmyzJPvJXsh64vuHTFR.sH%2FJFjf8sJ%2BKLvgJY1d1meT0laUib6myjdrPq6Zz7Cc",
+      0
+    ],
+    "_ga": [
+      "GA1.1.1473122093.1691829733",
+      0
+    ],
+    "_ga_TD2KLM2MCS": [
+      "GS1.1.1691829733.1.1.1691829757.36.0.0",
+      0
+    ],
+    "cto_bundle": [
+      "_iThBF8zOW1JWUN2bkhpQksxMnR5TU9ETlNab1lqMjJUTDRDdGtlMmVmJTJGOWZ3NGlMN2tYcnN4dHM3TUViTVdEakRXY2QlMkJhUk8yNzUxcWl1ZVNQQncxeHZMZmRYY2xnV2UyZ2pDWWJmMjIyJTJGM081S3BUZXdsR0lhSERhbiUyRlMwOXpRUDBMaE43b3JKcFBwd0lSQm43MU81MUJ5R2tHbnRHdHl4ZUxDVjB4U1hVekthZ096anVNQ2VQd0tpbTRiczlDeGlicHN0TFhiZHRSdnVCaGdTb1RWZXhwUWclM0QlM0Q",
+      0
+    ],
+    "_hjSessionUser_697742": [
+      "eyJpZCI6IjI2NjZlNTIzLTg4OWEtNWJjNS04Yzg5LTBkNzI4ZThjNWUxYyIsImNyZWF0ZWQiOjE2OTE4Mjk3MzM5NjEsImV4aXN0aW5nIjp0cnVlfQ==",
+      0
+    ],
+    "WZRK_S_884-K6W-R76Z": [
+      "%7B%22p%22%3A2%2C%22s%22%3A1691829738%2C%22t%22%3A1691829759%7D",
+      0
+    ]
+  }
+}
