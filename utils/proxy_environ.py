@@ -2,7 +2,7 @@ import os
 import requests
 import sys
 import re
-from configs.config import Config
+from configs.config import config
 from utils.vpn import connect
 import logging
 
@@ -30,7 +30,7 @@ class proxy_env(object):
     def __init__(self, args):
         self.logger = logging.getLogger(__name__)
         self.args = args
-        self.vpn = Config().vpn()
+        self.vpn = config.vpn()
         self.session = requests.session()
 
     def Load(self):

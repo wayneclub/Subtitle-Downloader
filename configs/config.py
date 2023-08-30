@@ -4,26 +4,33 @@
 """
 This module is for config.
 """
+from __future__ import annotations
 from os.path import dirname
+from pathlib import Path
+from typing import Any
+import rtoml
 
-script_name = "Subtitle Downloader"
+app_name = "Subtitle-Downloader"
 __version__ = "1.0.0"
 
 
 dir_path = dirname(dirname(__file__)).replace("\\", "/")
 
-PATHS = {
-    "cookies":  f"{dir_path}/configs/cookies",
+default_path = {
+    "cookies":  f"{dir_path}/cookies",
     "downloads": f"{dir_path}/downloads",
     "logs": f"{dir_path}/logs",
 }
 
 
 class Platform:
+    """
+    Define all streaming service name
+    """
 
     KKTV = "KKTV"
     LINETV = "LineTV"
-    FRIDAY = "friDay"
+    FRIDAYVIDEO = "FridayVideo"
     CATCHPLAY = 'CatchPlay'
     IQIYI = "iQIYI"
     WETV = 'WeTV'
@@ -31,71 +38,9 @@ class Platform:
     NOWE = 'NowE'
     NOWPLAYER = 'NowPlayer'
     DISNEYPLUS = "DisneyPlus"
-    HBOGO = "HBOGO"
+    HBOGOASIA = "HBOGOAsia"
     APPLETVPLUS = 'AppleTVPlus'
     ITUNES = "iTunes"
-
-
-# Copy user-agent from login browser (https://www.whatsmyua.info/)
-USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36"
-
-# Subtitle default language: all/en/zh-Hant/zh-Hans/zh-HK
-DEFAULT_LANGUAGE = 'zh-Hant'
-
-CREDENTIAL = {}
-
-CREDENTIAL["TMDB"] = {
-    "api_key": "305cd2702459761c82756596508900d7"
-}
-
-CREDENTIAL[Platform.FRIDAY] = {
-    "cookies_file": f"{PATHS['cookies']}/cookies_friday.txt",
-    "cookies_txt": f"{PATHS['cookies']}/video.friday.tw_cookies.txt"
-}
-
-CREDENTIAL[Platform.CATCHPLAY] = {
-    "cookies_file": f"{PATHS['cookies']}/cookies_catchplay.txt",
-    "cookies_txt": f"{PATHS['cookies']}/catchplay.com_cookies.txt"
-}
-
-CREDENTIAL[Platform.DISNEYPLUS] = {
-    # Enter the email address of your Disney Plus account here
-    "email": "",
-    # Enter the password of your Disney Plus account here
-    "password": "",
-}
-
-CREDENTIAL[Platform.HBOGO] = {
-    # Enter the username of your HBOGO account here
-    "username": "",
-    # Enter the password of your HBOGO account here
-    "password": "",
-}
-
-CREDENTIAL[Platform.IQIYI] = {
-    "cookies_file": f"{PATHS['cookies']}/cookies_iq.com.txt",
-    "cookies_txt": f"{PATHS['cookies']}/iq.com_cookies.txt",
-}
-
-CREDENTIAL[Platform.WETV] = {
-    "cookies_file": f"{PATHS['cookies']}/cookies_wetv.txt",
-    "cookies_txt": f"{PATHS['cookies']}/wetv.vip_cookies.txt",
-}
-
-CREDENTIAL[Platform.NOWE] = {
-    "cookies_file": f"{PATHS['cookies']}/cookies_nowe.txt",
-    "cookies_txt": f"{PATHS['cookies']}/nowe.com_cookies.txt",
-}
-
-CREDENTIAL[Platform.NOWPLAYER] = {
-    "cookies_file": f"{PATHS['cookies']}/cookies_nowplayer.txt",
-    "cookies_txt": f"{PATHS['cookies']}/now.com_cookies.txt",
-}
-
-CREDENTIAL[Platform.APPLETVPLUS] = {
-    "cookies_file": f"{PATHS['cookies']}/cookies_appletvplus.txt",
-    "cookies_txt": f"{PATHS['cookies']}/tv.apple.com_cookies.txt",
-}
 
 
 VPN = {
@@ -118,205 +63,55 @@ VPN = {
 }
 
 
-ISO_6391 = {
-    'cht': 'zh-Hant',
-    'tw': 'zh-Hant',
-    'zh-hant': 'zh-Hant',
-    'zh-tw': 'zh-Hant',
-    'cmn-hant': 'zh-Hant',
-    'zh-hk': 'zh-HK',
-    'hk': 'zh-HK',
-    'hkg': 'zh-HK',
-    'cmn-hk': 'zh-HK',
-    'zh-hans': 'zh-Hans',
-    'cmn-hans': 'zh-Hans',
-    'chs': 'zh-Hans',
-    'cn': 'zh-Hans',
-    'chn': 'zh-Hant',
-    'chc': 'zh-Hant',
-    'chz': 'zh-Hans',
-    'zh-cn': 'zh-Hans',
-    'zh': 'zh-Hans',
-    'us': 'en',
-    'gb': 'en',
-    'gbr': 'en',
-    'kor': 'ko',
-    'kr': 'ko',
-    'ko-kr': 'ko',
-    'ko-ko': 'ko',
-    'jpn': 'ja',
-    'jp': 'ja',
-    'ja-jp': 'ja',
-    'rus': 'ru',
-    'msa': 'ms',
-    'mya': 'my',
-    'tha': 'th',
-    'ind': 'id',
-    'vie': 'vi',
-    'ara': 'ar',
-    'spa': 'es',
-    'deu': 'de',
-    'fra': 'fr',
-    'nor': 'no',
-    'por': 'pt',
-    '英語': 'en',
-    '繁體中文': 'zh-Hant',
-    '簡體中文': 'zh-Hans',
-    '韓語': 'ko',
-    '馬來語': 'ms',
-    '越南語': 'vi',
-    '泰語': 'th',
-    '印尼語': 'id',
-    '阿拉伯語': 'ar',
-    '西班牙語': 'es',
-    '葡萄牙語': 'pt',
-    '日語': 'ja',
-    'traditional chinese': 'zh-Hant',
-    'simplified chinese':  'zh-Hans',
-    'bahasa malaysia': 'ms',
-    'thai': 'th',
-    'vietnamese': 'vi',
-    'bahasa indonesia': 'id',
-    'indonesian': 'id',
-    'english': 'en',
-    'korean': 'ko',
-    'arabic': 'ar',
-    'spanish': 'es',
-    'portuguese': 'pt',
-    'japanese': 'ja'
-}
-
-LANGUAGE_LIST = [
-    ["Hindi", "hin", "hin", "Hindi"],
-    ["Tamil", "tam", "tam", "Tamil"],
-    ["Telugu", "tel", "tel", "Telugu"],
-    ["English", "eng", "eng", "English"],
-    ["Afrikaans", "af", "afr", "Afrikaans"],
-    ["Arabic", "ara", "ara", "Arabic"],
-    ["Arabic (Syria)", "araSy", "ara", "Arabic Syria"],
-    ["Arabic (Egypt)", "araEG", "ara", "Arabic Egypt"],
-    ["Arabic (Kuwait)", "araKW", "ara", "Arabic Kuwait"],
-    ["Arabic (Lebanon)", "araLB", "ara", "Arabic Lebanon"],
-    ["Arabic (Algeria)", "araDZ", "ara", "Arabic Algeria"],
-    ["Arabic (Bahrain)", "araBH", "ara", "Arabic Bahrain"],
-    ["Arabic (Iraq)", "araIQ", "ara", "Arabic Iraq"],
-    ["Arabic (Jordan)", "araJO", "ara", "Arabic Jordan"],
-    ["Arabic (Libya)", "araLY", "ara", "Arabic Libya"],
-    ["Arabic (Morocco)", "araMA", "ara", "Arabic Morocco"],
-    ["Arabic (Oman)", "araOM", "ara", "Arabic Oman"],
-    ["Arabic (Saudi Arabia)", "araSA",
-     "ara", "Arabic Saudi Arabia"],
-    ["Arabic (Tunisia)", "araTN", "ara", "Arabic Tunisia"],
-    [
-        "Arabic (United Arab Emirates)",
-        "araAE",
-        "ara",
-        "Arabic United Arab Emirates",
-    ],
-    ["Arabic (Yemen)", "araYE", "ara", "Arabic Yemen"],
-    ["Armenian", "hye", "arm", "Armenian"],
-    ["Assamese", "asm", "asm", "Assamese"],
-    ["Bengali", "ben", "ben", "Bengali"],
-    ["Basque", "eus", "baq", "Basque"],
-    ["British English", "enGB", "eng", "British English"],
-    ["Bulgarian", "bul", "bul", "Bulgarian"],
-    ["Cantonese", "None", "chi", "Cantonese"],
-    ["Catalan", "cat", "cat", "Catalan"],
-    ["Simplified Chinese", "zhoS", "chi", "Simplified Chinese"],
-    ["Traditional Chinese", "zhoT", "chi", "Traditional Chinese"],
-    ["Croatian", "hrv", "hrv", "Croatian"],
-    ["Czech", "ces", "cze", "Czech"],
-    ["Danish", "dan", "dan", "Danish"],
-    ["Dutch", "nld", "dut", "Dutch"],
-    ["Estonian", "est", "est", "Estonian"],
-    ["Filipino", "fil", "fil", "Filipino"],
-    ["Finnish", "fin", "fin", "Finnish"],
-    ["Flemish", "nlBE", "dut", "Flemish"],
-    ["French", "fra", "fre", "French"],
-    ["French Canadian", "caFra", "fre", "French Canadian"],
-    ["Canadian French", "caFra", "fre", "Canadian French"],
-    ["German", "deu", "ger", "German"],
-    ["Greek", "ell", "gre", "Greek"],
-    ["Gujarati", "guj", "guj", "Gujarati"],
-    ["Hebrew", "heb", "heb", "Hebrew"],
-    ["Hungarian", "hun", "hun", "Hungarian"],
-    ["Icelandic", "isl", "ice", "Icelandic"],
-    ["Indonesian", "ind", "ind", "Indonesian"],
-    ["Italian", "ita", "ita", "Italian"],
-    ["Japanese", "jpn", "jpn", "Japanese"],
-    ["Kannada (India)", "kan", "kan", "Kannada (India)"],
-    ["Khmer", "khm", "khm", "Khmer"],
-    ["Klingon", "tlh", "tlh", "Klingon"],
-    ["Korean", "kor", "kor", "Korean"],
-    ["Lithuanian", "lit", "lit", "Lithuanian"],
-    ["Latvian", "lav", "lav", "Latvian"],
-    ["Malay", "msa", "may", "Malay"],
-    ["Malayalam", "mal", "mal", "Malayalam"],
-    ["Mandarin", "None", "chi", "Mandarin"],
-    ["Mandarin (Putonghua)", "zho", "chi", "Mandarin (Putonghua)"],
-    ["Mandarin Chinese (Simplified)", "zh-Hans", "chi", "Simplified Chinese"],
-    ["Mandarin Chinese (Traditional)", "zh-Hant",
-     "chi", "Traditional Chinese"],
-    ["Traditional Chinese", "mul", "chi", "Multiple Language"],
-    ["Mandarin Chinese", "zh", "chi", "Mandarin Chinese"],
-    ["Yue Chinese", "yue", "chi", "(Yue Chinese)"],
-    ["Manipuri", "mni", "mni", "Manipuri"],
-    ["Marathi", "mar", "mar", "Marathi"],
-    ["No Dialogue", "zxx", "zxx", "No Dialogue"],
-    ["Norwegian", "nor", "nor", "Norwegian"],
-    ["Norwegian Bokmal", "nob", "nob", "Norwegian Bokmal"],
-    ["Persian", "fas", "per", "Persian"],
-    ["Polish", "pol", "pol", "Polish"],
-    ["Portuguese", "por", "por", "Portuguese"],
-    ["Brazilian Portuguese", "brPor", "por", "Brazilian Portuguese"],
-    ["Punjabi", "pan", "pan", "Punjabi"],
-    ["Panjabi", "pan", "pan", "Panjabi"],
-    ["Romanian", "ron", "rum", "Romanian"],
-    ["Russian", "rus", "rus", "Russian"],
-    ["Serbian", "srp", "srp", "Serbian"],
-    ["Sinhala", "sin", "sin", "Sinhala"],
-    ["Slovak", "slk", "slo", "Slovak"],
-    ["Slovenian", "slv", "slv", "Slovenian"],
-    ["Spanish", "spa", "spa", "Spanish"],
-    ["European Spanish", "euSpa", "spa", "European Spanish"],
-    ["Swedish", "swe", "swe", "Swedish"],
-    ["Thai", "tha", "tha", "Thai"],
-    ["Tagalog", "tgl", "tgl", "Tagalog"],
-    ["Turkish", "tur", "tur", "Turkish"],
-    ["Ukrainian", "ukr", "ukr", "Ukrainian"],
-    ["Urdu", "urd", "urd", "Urdu"],
-    ["Vietnamese", "vie", "vie", "Vietnamese"],
-]
-
-
 class Config:
+    def __init__(self, **kwargs: Any):
+        self.default_language: str = kwargs.get("default-language") or ""
+        self.credentials: dict = kwargs.get("credentials") or {}
+        self.directories: dict = kwargs.get("directories") or {}
+        self.headers: dict = kwargs.get("headers") or {}
+        self.nordvpn: dict = kwargs.get("nordvpn") or {}
 
-    def credential(self, name):
-        return CREDENTIAL[name]
-
-    def paths(self):
-        return PATHS
-
-    def language_list(self):
-        return LANGUAGE_LIST
-
-    def get_language_code(self, lang):
-        uniform = lang.lower().replace('_', '-')
-        if ISO_6391.get(uniform):
-            return ISO_6391.get(uniform)
-        else:
-            return lang
+    @classmethod
+    def from_toml(cls, path: Path) -> Config:
+        if not path.exists():
+            raise FileNotFoundError(f"Config file path ({path}) was not found")
+        if not path.is_file():
+            raise FileNotFoundError(
+                f"Config file path ({path}) is not to a file.")
+        return cls(**rtoml.load(path))
 
     def vpn(self):
         return VPN
 
-    def get_platforms(self):
-        streaming_service = Platform()
-        return [attr.lower() for attr in dir(streaming_service) if not callable(
-            getattr(streaming_service, attr)) and not attr.startswith("__")]
 
-    def get_user_agent(self):
-        return USER_AGENT
+class Directories:
+    def __init__(self) -> None:
+        self.package_root = Path(__file__).resolve().parent.parent
+        self.configuration = self.package_root / 'configs'
+        self.downloads = self.package_root / 'downloads'
+        self.cookies = self.package_root / 'cookies'
+        self.logs = self.package_root / 'logs'
 
-    def get_default_language(self):
-        return DEFAULT_LANGUAGE
+
+class Filenames:
+    def __init__(self) -> None:
+        self.log = directories.logs / "{app_name}_{log_time}.log"
+        self.config = directories.configuration / "{service}.toml"
+        self.root_config: Path = directories.package_root / "user_config.toml"
+
+
+def mergeDictsOverwriteEmpty(d1, d2):
+    res = d2.copy()
+    for k, v in d1.items():
+        if k not in d2 or d2[k] == '':
+            res[k] = v
+    return res
+
+
+directories = Directories()
+filenames = Filenames()
+
+config = Config.from_toml(filenames.root_config)
+config.directories = mergeDictsOverwriteEmpty(default_path, config.directories)
+credentials = config.credentials
+user_agent = config.headers['User-Agent']

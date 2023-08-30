@@ -5,7 +5,6 @@
 This module is to download subtitle from WeTV
 """
 
-import logging
 import os
 from random import randint
 import re
@@ -15,30 +14,27 @@ from urllib.parse import urljoin
 import m3u8
 import orjson
 from time import time
-from requests.utils import cookiejar_from_dict
 from cn2an import cn2an
-from configs.config import Platform
-from utils.cookies import Cookies
-from utils.helper import get_locale, download_files
+from configs.config import user_agent
+from utils.helper import get_locale, get_language_code, download_files
 from utils.subtitle import convert_subtitle
 from services.service import Service
 from services.wetv.ckey import CKey
 
 
 class WeTV(Service):
+    """
+    Service code for WeTV streaming service (https://wetv.vip/).
+
+    Authorization: Cookies
+    """
+
     def __init__(self, args):
         super().__init__(args)
-        self.logger = logging.getLogger(__name__)
         self._ = get_locale(__name__, self.locale)
 
-        self.credential = self.config.credential(Platform.WETV)
-        self.cookies = Cookies(self.credential)
-
-        self.api = {
-            'play': 'https://wetv.vip/id/play/{series_id}/{episode_id}',
-        }
-
     def get_all_languages(self, data):
+        """Get all subtitles language"""
 
         if not 'fi' in data:
             self.logger.error(
@@ -46,7 +42,7 @@ class WeTV(Service):
             sys.exit(0)
 
         available_languages = tuple(
-            [self.get_language_code(sub['lang']) for sub in data['fi']])
+            [get_language_code(sub['lang']) for sub in data['fi']])
 
         if 'all' in self.subtitle_language:
             self.subtitle_language = available_languages
@@ -74,7 +70,7 @@ class WeTV(Service):
         if os.path.exists(folder_path):
             shutil.rmtree(folder_path)
 
-        file_name = f'{title}.WEB-DL.{Platform.WETV}.vtt'
+        file_name = f'{title}.WEB-DL.{self.platform}.vtt'
         self.logger.info(
             self._("\nDownload: %s\n---------------------------------------------------------------"), file_name)
 
@@ -152,11 +148,11 @@ class WeTV(Service):
                 if not self.download_season or season_index in self.download_season:
                     if not self.download_episode or episode_index in self.download_episode:
                         episode_id = episode['vid']
-                        episode_url = self.api['play'].format(
+                        episode_url = self.config['api']['play'].format(
                             series_id=series_id, episode_id=episode_id)
                         self.logger.debug(episode_url)
 
-                        file_name = f'{title}E{str(episode_index).zfill(2)}.WEB-DL.{Platform.WETV}.vtt'
+                        file_name = f'{title}E{str(episode_index).zfill(2)}.WEB-DL.{self.platform}.vtt'
                         self.logger.info(
                             self._("Finding %s ..."), file_name)
 
@@ -174,16 +170,14 @@ class WeTV(Service):
                 subtitles=subtitles, languages=languages, folder_path=folder_path)
 
     def get_dash_url(self, cid, vid, url):
-
-        cookies = self.cookies.get_cookies()
-        guid = cookies['guid']
+        guid = self.cookies['guid']
         tm = str(int(time()))
         ckey = CKey().make(vid=vid, tm=tm, app_ver='2.5.13',
                            guid=guid, platform='4830201', url=url)
 
         headers = {
             'Referer': url,
-            'User-Agent': self.user_agent
+            'User-Agent': user_agent
         }
 
         params = {
@@ -225,11 +219,8 @@ class WeTV(Service):
             'callback': f'getinfo_callback_{randint(10000, 999999)}',
         }
 
-        cookies = cookiejar_from_dict(
-            self.cookies.get_cookies(), cookiejar=None, overwrite=True)
-
         res = self.session.get(
-            'https://play.wetv.vip/getvinfo', params=params, cookies=cookies, headers=headers)
+            self.config['api']['getvinfo'], params=params, headers=headers, timeout=5)
 
         if res.ok:
             callback = re.sub(
@@ -257,7 +248,7 @@ class WeTV(Service):
         subtitles = []
         for sub in data['fi']:
             self.logger.debug(sub)
-            sub_lang = self.get_language_code(sub['lang'])
+            sub_lang = get_language_code(sub['lang'])
             if sub_lang in self.subtitle_language:
                 if len(self.subtitle_language) > 1:
                     lang_folder_path = os.path.join(folder_path, sub_lang)
@@ -292,16 +283,14 @@ class WeTV(Service):
                 convert_subtitle(
                     folder_path=lang_path, lang=self.locale)
             convert_subtitle(folder_path=folder_path,
-                             platform=Platform.WETV, lang=self.locale)
+                             platform=self.platform, lang=self.locale)
             if self.output:
                 shutil.move(folder_path, self.output)
 
     def main(self):
         """Download subtitle from WeTV"""
 
-        self.cookies.load_cookies('guid')
-
-        res = self.session.get(url=self.url)
+        res = self.session.get(url=self.url, timeout=5)
         if res.ok:
             match = re.search(
                 r'<script id=\"__NEXT_DATA__" type=\"application/json\">(.+?)<\/script>', res.text)

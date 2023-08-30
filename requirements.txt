@@ -15,3 +15,5 @@ pycryptodome
 cn2an
 tmdbv3api
 opencc
+rtoml
+validators

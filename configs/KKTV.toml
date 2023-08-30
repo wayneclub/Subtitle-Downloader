@@ -1,0 +1,2 @@
+[api]
+play = 'https://www.kktv.me/play/{title_id}010001'

@@ -1,0 +1,18 @@
+credentials = 'cookies'
+required = 'media-user-token'
+user_agent = 'AppleTV6,2/11.1' # AppleTV6,2/11.1 | ATVE/1.1 FireOS/6.2.6.8 build/4A93 maker/Amazon model/FireTVStick4K FW/NS6268/2315
+
+[api]
+title = 'https://tv.apple.com/api/uts/v3/{content_type}/{id}'
+shows = 'https://tv.apple.com/api/uts/v3/shows/{id}/episodes'
+episode = 'https://tv.apple.com/api/uts/v3/episodes/{id}'
+configurations = 'https://tv.apple.com/api/uts/v3/configurations'
+
+[device]
+utscf = 'OjAAAAAAAAA~'
+utsk = '6e3013c6d6fae3c2::::::ca09fd2bb1996546' # 6e3013c6d6fae3c2::::::e08f7cfb96228836 (?),  6e3013c6d6fae3c2::::::235656c069bb0efb (web)
+caller = 'web'                                  # ?, vz, web
+sf = '143470'                                   # "storefront", country | 143441: US, 143444: GB, 143470:TW
+v = '68'                                        # "version" | latest: 46
+pfm = 'web'                                     # "platform" | appletv, vz, web
+locale = 'en-US'                                # 'zh-Hant'

@@ -1,0 +1,13 @@
+# Netscape HTTP Cookie File
+# http://curl.haxx.se/rfc/cookie_spec.html
+# This is a generated file!  Do not edit.
+
+.wetv.vip	TRUE	/	FALSE	1707385961	guid	54b58ec44955cc12
+.wetv.vip	TRUE	/	FALSE	1707385961	video_guid	54b58ec44955cc12
+.wetv.vip	TRUE	/	FALSE	1707385961	uin	54b58ec44955cc12
+.wetv.vip	TRUE	/	FALSE	1694425961	wetv_pt	v
+.wetv.vip	TRUE	/	FALSE	1708974899	video_appid	1200004
+.wetv.vip	TRUE	/	FALSE	0	vplatform	2
+.wetv.vip	TRUE	/	FALSE	1693509291	country_code	153514
+.wetv.vip	TRUE	/	FALSE	1696014899	lang_code	1491937
+.wetv.vip	TRUE	/	FALSE	1696014899	wetv_lang	id

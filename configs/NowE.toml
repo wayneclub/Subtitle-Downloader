@@ -1,0 +1,7 @@
+credentials = 'cookies'
+required = 'OTTSESSIONID'
+
+[api]
+product_detail = 'https://bridge.nowe.com/BridgeEngine/getProductDetail'
+update_session = 'https://webtvapi.nowe.com/16/1/updateSession'
+get_vod = 'https://webtvapi.nowe.com/16/1/getVodURL'

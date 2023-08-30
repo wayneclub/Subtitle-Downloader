@@ -5,7 +5,7 @@
 This module is to download subtitle from AppleTV+
 """
 
-import logging
+import math
 import os
 import re
 import shutil
@@ -15,44 +15,29 @@ from typing import Optional
 from urllib.parse import unquote, urljoin
 import m3u8
 import orjson
-import requests
-from configs.config import Platform
-from utils.cookies import Cookies
-from utils.helper import get_locale, download_files
+from configs.config import user_agent
+from utils.helper import get_language_code, get_locale, download_files
 from utils.subtitle import convert_subtitle, merge_subtitle_fragments
 from services.service import Service
 
 
 class AppleTVPlus(Service):
+    """
+    Service code for Apple's TV Plus streaming service (https://tv.apple.com).
+
+    Authorization: Cookies
+    """
+
     def __init__(self, args):
         super().__init__(args)
-        self.logger = logging.getLogger(__name__)
         self._ = get_locale(__name__, self.locale)
 
-        self.credential = self.config.credential(Platform.APPLETVPLUS)
-        self.cookies = Cookies(self.credential)
-
-        self.id = ''
-        self.content_type = ''
-
-        self.api = {
-            'title': 'https://tv.apple.com/api/uts/v3/{content_type}/{id}',
-            'shows': 'https://tv.apple.com/api/uts/v3/shows/{id}/episodes',
-            'episode': 'https://tv.apple.com/api/uts/v3/episodes/{id}',
-            'configurations': 'https://tv.apple.com/api/uts/v3/configurations'
-        }
-
-        self.device = {
-            'utscf': 'OjAAAAAAAAA~',
-            'utsk': '6e3013c6d6fae3c2::::::ca09fd2bb1996546',
-            'caller': 'web',
-            'sf': '143470',  # "storefront", country | 143441: US, 143444: GB, 143470:TW
-            'v': '68',
-            'pfm': 'web',
-            'locale': 'zh-Hant',  # en-US
-        }
+        self.title_id = os.path.basename(self.url.split('?')[0])
+        self.content_type = 'movies' if '/movie/' in self.url else 'shows'
 
     def get_all_languages(self, available_languages):
+        """Get all subtitles language"""
+
         if 'all' in self.subtitle_language:
             self.subtitle_language = available_languages
 
@@ -80,7 +65,7 @@ class AppleTVPlus(Service):
         if os.path.exists(folder_path):
             shutil.rmtree(folder_path)
 
-        file_name = f'{title}.WEB-DL.{Platform.APPLETVPLUS}.vtt'
+        file_name = f'{title}.WEB-DL.{self.platform}.vtt'
         playable_id = data['smartPlayables'][-1]['playableId']
 
         m3u8_url = ''
@@ -110,7 +95,7 @@ class AppleTVPlus(Service):
             subtitle_list, folder_path, file_name)
 
         convert_subtitle(folder_path=folder_path,
-                         platform=Platform.APPLETVPLUS, lang=self.locale)
+                         platform=self.platform, lang=self.locale)
         if self.output:
             shutil.move(folder_path, self.output)
 
@@ -123,32 +108,60 @@ class AppleTVPlus(Service):
 
         self.logger.info(self._("\n%s total: %s season(s)"), title, season_num)
 
-        for season in seasons:
-            season_id = season['id']
-            season_index = data['seasons'][season_id]['seasonNumber']
-            if season_index == 1:
-                params = self.device | {'nextToken': '0:10'}
-            elif season_index == 2:
-                params = self.device | {'nextToken': '10:10'}
-            else:
-                self.logger.error("Can't find nextToken!")
-                sys.exit()
+        params = self.config['device'] | {'selectedSeasonEpisodesOnly': False}
+        res = self.session.get(self.config['api']['shows'].format(
+            id=self.title_id), params=params, timeout=1)
+        if res.ok:
+            total = res.json()['data']['totalEpisodeCount']
+        else:
+            self.logger.error(res.text)
+            sys.exit(1)
 
-            res = self.session.get(self.api['shows'].format(
-                id=self.id), params=params, timeout=1)
+        pages = math.ceil(total / 10)
+
+        next_tokens = [f'{(n)*10}:10' for n in range(pages)]
+
+        episode_list = []
+        for next_token in next_tokens:
+            params = self.config['device'] | {'nextToken': next_token}
+
+            res = self.session.get(self.config['api']['shows'].format(
+                id=self.title_id), params=params, timeout=1)
             if res.ok:
-                episodes = res.json()['data']['episodes']
+                episode_list += res.json()['data']['episodes']
             else:
                 self.logger.error(res.text)
                 sys.exit(1)
 
-            episode_num = len(episodes)
-
-            episodes = list(filter(
-                lambda episode: not episode.get('comingSoon'), episodes))
-            current_eps = int(episodes[-1]['episodeNumber'])
+        for season in seasons:
+            season_id = season['id']
+            season_index = data['seasons'][season_id]['seasonNumber']
 
             if not self.download_season or season_index in self.download_season:
+                episodes = list(filter(
+                    lambda episode: episode['seasonNumber'] == season_index, episode_list))
+                episode_num = len(episodes)
+
+                if self.last_episode:
+                    self.logger.info(self._("\nSeason %s total: %s episode(s)\tdownload season %s last episode\n---------------------------------------------------------------"),
+                                     season_index,
+                                     episode_num,
+                                     season_index)
+
+                    episodes = [list(filter(
+                        lambda episode: not episode.get('comingSoon'), episodes))[-1]]
+                else:
+                    if filter(lambda episode: episode.get('comingSoon'), episodes):
+                        current_eps = int(list(filter(lambda episode: not episode.get(
+                            'comingSoon'), episodes))[-1]['episodeNumber'])
+
+                    if current_eps and current_eps != episode_num:
+                        self.logger.info(self._("\nSeason %s total: %s episode(s)\tupdate to episode %s\tdownload all episodes\n---------------------------------------------------------------"),
+                                         season_index, episode_num, current_eps)
+                    else:
+                        self.logger.info(self._("\nSeason %s total: %s episode(s)\tdownload all episodes\n---------------------------------------------------------------"),
+                                         season_index,
+                                         episode_num)
 
                 name = self.ripprocess.rename_file_name(
                     f'{title}.S{str(season_index).zfill(2)}')
@@ -157,29 +170,16 @@ class AppleTVPlus(Service):
                 if os.path.exists(folder_path):
                     shutil.rmtree(folder_path)
 
-                if self.last_episode:
-                    self.logger.info(self._("\nSeason %s total: %s episode(s)\tdownload season %s last episode\n---------------------------------------------------------------"),
-                                     season_index,
-                                     episode_num,
-                                     season_index)
-
-                    episodes = [list(episodes)[-1]]
-                else:
-                    if current_eps != episode_num:
-                        self.logger.info(self._("\nSeason %s total: %s episode(s)\tupdate to episode %s\tdownload all episodes\n---------------------------------------------------------------"),
-                                         season_index, episode_num, current_eps)
-                    else:
-                        self.logger.info(self._("\nSeason %s total: %s episode(s)\tdownload all episodes\n---------------------------------------------------------------"),
-                                         season_index,
-                                         episode_num)
-
                 for episode in episodes:
-                    episode_index = int(episode['episodeNumber'])
-                    if not self.download_episode or episode_index in self.download_episode:
-                        file_name = f'{name}E{str(episode_index).zfill(2)}.WEB-DL.{Platform.APPLETVPLUS}.vtt'
+                    if episode.get('comingSoon'):
+                        continue
 
-                        res = self.session.get(self.api['episode'].format(
-                            id=episode['id']), params=self.device, timeout=5)
+                    episode_index = episode['episodeNumber']
+                    if not self.download_episode or episode_index in self.download_episode:
+                        file_name = f'{name}E{str(episode_index).zfill(2)}.WEB-DL.{self.platform}.vtt'
+
+                        res = self.session.get(self.config['api']['episode'].format(
+                            id=episode['id']), params=self.config['device'], timeout=5)
                         if res.ok:
                             episode_data = res.json()['data']
                             playable_id = episode_data['smartPlayables'][-1]['playableId']
@@ -189,7 +189,8 @@ class AppleTVPlus(Service):
                             self.logger.error(res.text)
                             sys.exit(1)
 
-                        subtitle_list = self.parse_m3u(m3u8_url=m3u8_url)
+                        subtitle_list = self.parse_m3u(
+                            m3u8_url=m3u8_url)
 
                         if not subtitle_list:
                             self.logger.error(
@@ -201,10 +202,10 @@ class AppleTVPlus(Service):
                         self.get_subtitle(
                             subtitle_list, folder_path, file_name)
 
-                convert_subtitle(folder_path=folder_path,
-                                 platform=Platform.APPLETVPLUS, lang=self.locale)
-                if self.output:
-                    shutil.move(folder_path, self.output)
+            convert_subtitle(folder_path=folder_path,
+                             platform=self.platform, lang=self.locale)
+        if self.output:
+            shutil.move(folder_path, self.output)
 
     def parse_m3u(self, m3u8_url):
 
@@ -214,7 +215,7 @@ class AppleTVPlus(Service):
         for media in playlists[0].media:
             if media.type == 'SUBTITLES':
                 if media.language:
-                    sub_lang = self.get_language_code(media.language)
+                    sub_lang = get_language_code(media.language)
                 if media.forced == 'YES':
                     sub_lang += '-forced'
 
@@ -275,7 +276,7 @@ class AppleTVPlus(Service):
 
     def get_token(self) -> str:
         """Loads environment config data from WEB App's <meta> tag."""
-        res = self.session.get('https://tv.apple.com', timeout=1)
+        res = self.session.get('https://tv.apple.com', timeout=5)
         if res.ok:
             env = re.search(
                 r'web-tv-app/config/environment"[\s\S]*?content="([^"]+)', res.text)
@@ -296,7 +297,7 @@ class AppleTVPlus(Service):
         """Get configurations"""
 
         res = self.session.get(
-            self.api['configurations'], params=self.device, timeout=1)
+            self.config['api']['configurations'], params=self.config['device'], timeout=1)
         if res.ok:
             configurations = res.json(
             )['data']['applicationProps']['requiredParamsMap']['Default']
@@ -318,29 +319,21 @@ class AppleTVPlus(Service):
                     display = False
 
     def main(self):
-        self.cookies.load_cookies('media-user-token')
         token = self.get_token()
 
-        cookies = self.cookies.get_cookies()
-
         self.session.headers.update({
-            'User-Agent': self.user_agent,
+            'User-Agent': user_agent,
             'Authorization': f'Bearer {token}',
-            'media-user-token': cookies['media-user-token'],
-            'x-apple-music-user-token': cookies['media-user-token']
+            'media-user-token': self.cookies['media-user-token'],
+            'x-apple-music-user-token': self.cookies['media-user-token']
         })
 
         configurations = self.get_configurations()
         if configurations:
-            self.device = configurations
+            self.config['device'] = configurations
 
-        self.session.cookies = requests.utils.cookiejar_from_dict(
-            cookies, cookiejar=None, overwrite=True)
-
-        self.id = os.path.basename(self.url.split('?')[0])
-        self.content_type = 'movies' if '/movie/' in self.url else 'shows'
-        res = self.session.get(self.api['title'].format(
-            content_type=self.content_type, id=self.id), params=self.device, timeout=1)
+        res = self.session.get(self.config['api']['title'].format(
+            content_type=self.content_type, id=self.title_id), params=self.config['device'], timeout=1)
         if res.ok:
             data = res.json()['data']
             if self.content_type == 'movies':

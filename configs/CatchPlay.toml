@@ -1,0 +1,7 @@
+credentials = 'cookies'
+required = 'connect.sid'
+
+[api]
+media_info = 'https://vcmsapi.catchplay.com/video/v3/mediaInfo/{video_id}'
+auth = 'https://www.catchplay.com/ssr-oauth/getOauth'
+play = 'https://hp2-api.catchplay.com/me/play'

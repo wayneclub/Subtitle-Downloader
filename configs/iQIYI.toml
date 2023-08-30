@@ -1,0 +1,6 @@
+credentials = 'cookies'
+required = '__dfp'
+
+[api]
+episode_list = 'https://pcw-api.iq.com/api/episodeListSource/{album_id}?platformId=3&modeCode={mode_code}&langCode={lang_code}&deviceId=21fcb553c8e206bb515b497bb6376aa4&endOrder={end_order}&startOrder={start_order}'
+meta = 'https://meta.video.iqiyi.com'

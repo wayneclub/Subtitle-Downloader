@@ -7,30 +7,29 @@ This module is to download subtitle from iTunes
 
 import re
 import os
-import logging
 import shutil
 from urllib.parse import urljoin
 import m3u8
 import orjson
-from configs.config import Platform
+from configs.config import user_agent
 from utils.helper import get_locale, download_files
 from utils.subtitle import convert_subtitle, merge_subtitle_fragments
 from services.service import Service
 
 
 class iTunes(Service):
+    """
+    Service code for iTunes streaming service (https://itunes.apple.com/).
+
+    Authorization: None
+    """
 
     def __init__(self, args):
         super().__init__(args)
-        self.logger = logging.getLogger(__name__)
         self._ = get_locale(__name__, self.locale)
 
-        self.api = {
-            'configurations': 'https://tv.apple.com/api/uts/v3/configurations?caller=web&sfh=143470&v=56&pfm=web&locale=zh-tw&ts={time}'
-        }
-
     def get_configurations(self):
-        res = self.session.get(url=self.api['configurations'])
+        res = self.session.get(url=self.config['api']['configurations'])
         if res.ok:
             return res.json()['data']['applicationProps']['requiredParamsMap']
         else:
@@ -105,7 +104,7 @@ class iTunes(Service):
                         folder_path=lang_path, file_name=os.path.basename(lang_path.replace('tmp_', '')), lang=self.locale, display=display)
                     display = False
             convert_subtitle(folder_path=folder_path,
-                             platform=Platform.ITUNES, lang=self.locale)
+                             platform=self.platform, lang=self.locale)
             if self.output:
                 shutil.move(folder_path, self.output)
 
@@ -116,7 +115,7 @@ class iTunes(Service):
             'pragma': 'no-cache',
             'cache-control': 'no-cache',
             'upgrade-insecure-requests': '1',
-            'user-agent': self.user_agent,
+            'user-agent': user_agent,
             'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
             'sec-gpc': '1',
             'sec-fetch-site': 'none',
@@ -125,7 +124,7 @@ class iTunes(Service):
             'sec-fetch-dest': 'document',
             'accept-language': 'zh-TW,zh;q=0.9',
         }
-        res = self.session.get(url=self.url, headers=headers)
+        res = self.session.get(url=self.url, headers=headers, timeout=5)
 
         if res.ok:
             match = re.search(
@@ -143,7 +142,7 @@ class iTunes(Service):
                 if os.path.exists(folder_path):
                     shutil.rmtree(folder_path)
 
-                file_name = f'{title}.WEB-DL.{Platform.ITUNES}.vtt'
+                file_name = f'{title}.WEB-DL.{self.platform}.vtt'
 
                 offer_id = movie['data']['relationships']['offers']['data'][0]['id']
                 m3u8_url = next(offer['attributes']['assets'][0]['hlsUrl']
@@ -152,4 +151,4 @@ class iTunes(Service):
                 subtitle_list = self.parse_m3u(m3u8_url)
                 self.get_subtitle(subtitle_list, folder_path, file_name)
             else:
-                self.logger.error("No subtitles found!")
+                self.logger.error("\nNo subtitles found!")

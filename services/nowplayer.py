@@ -4,44 +4,38 @@
 """
 This module is to download video from NowPlayer
 """
-import re
+from pathlib import Path
 import sys
-import logging
 import os
 import shutil
 import time
 from urllib.parse import parse_qs, urlparse
+from requests.utils import cookiejar_from_dict
 from services.service import Service
-from configs.config import Platform
-from utils.cookies import Cookies
+from configs.config import config, credentials, user_agent
 from utils.subtitle import convert_subtitle
 
 
 class NowPlayer(Service):
+    """
+    Service code for Now Player streaming service (https://www.nowtv.now.com/).
+
+    Authorization: Cookies
+    """
+
     def __init__(self, args):
         super().__init__(args)
-        self.logger = logging.getLogger(__name__)
-
-        self.credential = self.config.credential(Platform.NOWPLAYER)
-        self.cookies = Cookies(self.credential)
-
-        self.access_token = ''
-        self.api = {
-            'series': 'https://nowplayer.now.com/vodplayer/getSeriesJson/?seriesId={series_id}',
-            'movie': 'https://nowplayer.now.com/vodplayer/getProductJson/?productId={product_id}',
-            'play': 'https://nowplayer.now.com/vodplayer/play/',
-            'license': 'https://fwp.now.com/wrapperWV'
-        }
 
     def generate_caller_reference_no(self):
         return f"NPXWC{int(time.time() * 1000)}"
 
     def movie_metadata(self, content_id):
-        cookies = self.cookies.get_cookies()
-        cookies['LANG'] = 'en'
+        self.cookies['LANG'] = 'en'
+        self.session.cookies.update(cookiejar_from_dict(
+            self.cookies, cookiejar=None, overwrite=True))
 
         res = self.session.get(
-            self.api["movie"].format(product_id=content_id), cookies=cookies)
+            self.config['api']['movie'].format(product_id=content_id))
 
         if res.ok:
             data = res.json()[0]
@@ -49,10 +43,12 @@ class NowPlayer(Service):
             title = data['episodeTitle']
             release_year = ""
 
-            chinese_cookies = cookies
+            chinese_cookies = self.cookies
             chinese_cookies['LANG'] = 'zh'
+            self.session.cookies.update(cookiejar_from_dict(
+                chinese_cookies, cookiejar=None, overwrite=True))
             chinese_title = self.session.get(
-                self.api["movie"].format(product_id=content_id), cookies=chinese_cookies).json()[0]['episodeTitle']
+                self.config['api']['movie'].format(product_id=content_id)).json()[0]['episodeTitle']
 
             movie_info = self.get_movie_info(
                 title=chinese_title, title_aliases=[title])
@@ -73,7 +69,7 @@ class NowPlayer(Service):
                                    title=file_name, folder_path=folder_path, default_language=default_language)
 
             convert_subtitle(folder_path=folder_path,
-                             platform=Platform.NOWPLAYER, lang=self.locale)
+                             platform=self.platform, lang=self.locale)
 
             if self.output:
                 shutil.move(folder_path, self.output)
@@ -83,10 +79,12 @@ class NowPlayer(Service):
             sys.exit(1)
 
     def series_metadata(self, content_id):
-        cookies = self.cookies.get_cookies()
-        cookies['LANG'] = 'en'
+        self.cookies['LANG'] = 'en'
+        self.session.cookies.update(cookiejar_from_dict(
+            self.cookies, cookiejar=None, overwrite=True))
+
         res = self.session.get(
-            self.api["series"].format(series_id=content_id), cookies=cookies)
+            self.config['api']["series"].format(series_id=content_id))
 
         if res.ok:
             data = res.json()[0]
@@ -130,7 +128,7 @@ class NowPlayer(Service):
                                                title=file_name, folder_path=folder_path)
 
             convert_subtitle(folder_path=folder_path,
-                             platform=Platform.NOWPLAYER, lang=self.locale)
+                             platform=self.platform, lang=self.locale)
 
             if self.output:
                 shutil.move(folder_path, self.output)
@@ -140,13 +138,6 @@ class NowPlayer(Service):
             sys.exit(1)
 
     def download_subtitle(self, content_id, title, folder_path, default_language=""):
-
-        headers = {
-            'user-agent': self.user_agent
-        }
-
-        cookies = self.cookies.get_cookies()
-
         data = {
             'callerReferenceNo': self.generate_caller_reference_no(),
             'productId': content_id,
@@ -154,14 +145,15 @@ class NowPlayer(Service):
         }
 
         res = self.session.post(
-            self.api["play"], headers=headers, data=data, cookies=cookies)
+            self.config['api']["play"], data=data)
         if res.ok:
             data = res.json()
             if not data.get('asset'):
                 if data.get('responseCode') == "NEED_LOGIN":
                     self.logger.error(
                         "Please renew the cookies, and make sure config.py USERR_AGENT is same as login browser!")
-                    os.remove(self.credential['cookies_file'])
+                    os.remove(
+                        Path(config.directories['cookies']) / credentials[self.platform]['cookies'])
                     sys.exit(1)
                 else:
                     self.logger.error("Error: %s", data.get('responseCode'))
@@ -177,30 +169,28 @@ class NowPlayer(Service):
             mpd_url = media_src
 
             headers = {
-                'user-agent': self.user_agent,
+                'user-agent': user_agent,
                 'referer': 'https://nowplayer.now.com/'
             }
 
             timescale = self.ripprocess.get_time_scale(mpd_url, headers)
 
             self.ripprocess.download_subtitles_from_mpd(
-                url=mpd_url, title=title, folder_path=folder_path, headers=headers, proxy=self.proxy, debug=self.debug, timescale=timescale)
+                url=mpd_url, title=title, folder_path=folder_path, headers=headers, proxy=self.proxy, debug=False, timescale=timescale)
 
         else:
             print()
 
     def main(self):
-        self.cookies.load_cookies('NOWSESSIONID')
-
         params = parse_qs(urlparse(self.url).query)
 
-        if params.get("id"):
-            content_id = params.get("id")[0]
+        if params.get('id'):
+            content_id = params.get('id')[0]
         else:
-            self.logger.error("Unable to find content id!")
+            self.logger.error("\nUnable to find content id!")
             sys.exit(1)
 
-        if params.get("type") and params.get("type")[0] == "product":
+        if params.get('type') and params.get('type')[0] == 'product':
             self.movie_metadata(content_id)
         else:
             self.series_metadata(content_id)

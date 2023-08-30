@@ -5,47 +5,35 @@
 This module is to download subtitles from NowE
 """
 import math
+from pathlib import Path
 import random
 import sys
-import logging
 import os
 import re
 import shutil
 import time
 from services.service import Service
-from configs.config import Platform
-from utils.cookies import Cookies
+from configs.config import config, credentials, user_agent
 from utils.subtitle import convert_subtitle
 
 
 class NowE(Service):
+    """
+    Service code for Now E streaming service (https://www.nowe.com/).
+
+    Authorization: Cookies
+    """
+
     def __init__(self, args):
         super().__init__(args)
-        self.logger = logging.getLogger(__name__)
-
-        self.credential = self.config.credential(Platform.NOWE)
-        self.cookies = Cookies(self.credential)
-
-        self.access_token = ''
-        self.api = {
-            'product_detail': 'https://bridge.nowe.com/BridgeEngine/getProductDetail',
-            'update_session': 'https://webtvapi.nowe.com/16/1/updateSession',
-            'get_vod': 'https://webtvapi.nowe.com/16/1/getVodURL'
-        }
 
     def generate_caller_reference_no(self):
         return f"W{int(time.time() * 1000)}{math.floor((1 + random.random()) * 900) + 100}"
 
     def update_session(self):
 
-        headers = {
-            'user-agent': self.user_agent
-        }
-
-        cookies = self.cookies.get_cookies()
-
-        session_id = cookies.get('OTTSESSIONID')
-        device_id = cookies.get('NMAF_uuid')
+        session_id = self.cookies.get('OTTSESSIONID')
+        device_id = self.cookies.get('NMAF_uuid')
 
         payload = {
             'deviceId': device_id,
@@ -55,10 +43,10 @@ class NowE(Service):
             'callerReferenceNo': self.generate_caller_reference_no()
         }
 
-        update_session_url = self.api['update_session']
+        update_session_url = self.config['api']['update_session']
 
         res = self.session.post(
-            url=update_session_url, headers=headers, json=payload)
+            url=update_session_url, json=payload)
 
         if res.ok:
             data = res.json()
@@ -66,27 +54,24 @@ class NowE(Service):
                 return data['OTTSESSIONID']
             else:
                 self.logger.error(
-                    "Please renew the cookies, and make sure config.py NowE's user_agent is same as login browser!")
-                os.remove(self.credential['cookies_file'])
+                    "\nPlease renew the cookies, and make sure config.py NowE's user_agent is same as login browser!")
+                os.remove(
+                    Path(config.directories['cookies']) / credentials[self.platform]['cookies'])
                 sys.exit(1)
         else:
             self.logger.error(res.text)
 
     def get_metadata(self, content_id):
-        headers = {
-            'user-agent': self.user_agent
-        }
-
         payload = {
             'lang': 'zh',
             'productIdList': [content_id],
             'callerReferenceNo': self.generate_caller_reference_no()
         }
 
-        product_detail_url = self.api['product_detail']
+        product_detail_url = self.config['api']['product_detail']
 
         res = self.session.post(
-            url=product_detail_url, headers=headers, json=payload)
+            url=product_detail_url, json=payload)
 
         if res.ok:
             return res.json()['productDetailList'][0]
@@ -104,13 +89,13 @@ class NowE(Service):
         if os.path.exists(folder_path):
             shutil.rmtree(folder_path)
 
-        file_name = f'{title}.WEB-DL.{Platform.NOWE}'
+        file_name = f'{title}.WEB-DL.{self.platform}'
 
         self.download_subtitle(content_id=content_id,
                                title=file_name, folder_path=folder_path)
 
         convert_subtitle(folder_path=folder_path,
-                         platform=Platform.NOWE, lang=self.locale)
+                         platform=self.platform, lang=self.locale)
 
         if self.output:
             shutil.move(folder_path, self.output)
@@ -149,7 +134,7 @@ class NowE(Service):
             if not self.download_season or season_index in self.download_season:
                 if not self.download_episode or episode_index in self.download_episode:
                     content_id = episode['episodeId']
-                    file_name = f'{title}E{str(episode_index).zfill(2)}.WEB-DL.{Platform.NOWE}'
+                    file_name = f'{title}E{str(episode_index).zfill(2)}.WEB-DL.{self.platform}'
 
                     self.logger.info("\n%s", file_name)
 
@@ -157,19 +142,14 @@ class NowE(Service):
                                            title=file_name, folder_path=folder_path)
 
         convert_subtitle(folder_path=folder_path,
-                         platform=Platform.NOWE, lang=self.locale)
+                         platform=self.platform, lang=self.locale)
 
         if self.output:
             shutil.move(folder_path, self.output)
 
     def download_subtitle(self, content_id, title, folder_path):
 
-        headers = {
-            'user-agent': self.user_agent
-        }
-
-        cookies = self.cookies.get_cookies()
-        device_id = cookies.get('NMAF_uuid')
+        device_id = self.cookies.get('NMAF_uuid')
 
         session_id = self.update_session()
 
@@ -185,9 +165,9 @@ class NowE(Service):
             'profileId': session_id
         }
 
-        media_info_url = self.api['get_vod']
+        media_info_url = self.config['api']['get_vod']
         res = self.session.post(
-            url=media_info_url, headers=headers, json=payload)
+            url=media_info_url, json=payload)
 
         if res.ok:
             data = res.json()
@@ -203,7 +183,9 @@ class NowE(Service):
 
             mpd_url = data['asset']
 
-            timescale = self.ripprocess.get_time_scale(mpd_url, headers)
+            timescale = self.ripprocess.get_time_scale(mpd_url=mpd_url, headers={
+                'user-agent': user_agent
+            })
 
             self.ripprocess.download_subtitles_from_mpd(
                 url=mpd_url, title=title, folder_path=folder_path, timescale=timescale)
@@ -212,7 +194,6 @@ class NowE(Service):
             self.logger.error(res.text)
 
     def main(self):
-        self.cookies.load_cookies('OTTSESSIONID')
 
         content_id = re.search(r'(season|movie)\/([^\/]+)', self.url)
         if not content_id:

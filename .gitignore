@@ -9,6 +9,10 @@ logs/
 *.log
 cookies_*.txt
 *.zip
+*.mp4
+*.mpd
+*.m3u8
 *.html
 test.py
 .vscode/
+raw.json

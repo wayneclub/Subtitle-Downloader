@@ -11,35 +11,30 @@ import re
 import os
 from shlex import quote
 import shutil
-import logging
 import subprocess
 import sys
 from time import time
 from urllib.parse import urlencode
 import orjson
 from cn2an import cn2an
-from configs.config import Platform
-from utils.cookies import Cookies
-from utils.helper import get_locale, download_files
+from utils.helper import get_locale, get_language_code, download_files
 from utils.subtitle import convert_subtitle
 from services.service import Service
 
 
 class IQIYI(Service):
+    """
+    Service code for iQIYI streaming service (https://www.iq.com/).
+
+    Authorization: Cookies
+    """
+
     def __init__(self, args):
         super().__init__(args)
-        self.logger = logging.getLogger(__name__)
         self._ = get_locale(__name__, self.locale)
 
-        self.credential = self.config.credential(Platform.IQIYI)
-        self.cookies = Cookies(self.credential)
-
-        self.api = {
-            'episode_list': 'https://pcw-api.iq.com/api/episodeListSource/{album_id}?platformId=3&modeCode={mode_code}&langCode={lang_code}&deviceId=21fcb553c8e206bb515b497bb6376aa4&endOrder={end_order}&startOrder={start_order}',
-            'meta': 'https://meta.video.iqiyi.com'
-        }
-
     def get_all_languages(self, data):
+        """Get all subtitles language"""
 
         if not 'stl' in data:
             self.logger.error(
@@ -47,7 +42,7 @@ class IQIYI(Service):
             sys.exit(0)
 
         available_languages = tuple(
-            [self.get_language_code(sub['_name']) for sub in data['stl']])
+            [get_language_code(sub['_name']) for sub in data['stl']])
 
         if 'all' in self.subtitle_language:
             self.subtitle_language = available_languages
@@ -67,7 +62,7 @@ class IQIYI(Service):
     def get_vid(self, play_url):
         vid = ''
 
-        res = self.session.get(play_url)
+        res = self.session.get(play_url, timeout=5)
         if res.ok:
             match = re.search(r'({\"props\":{.*})', res.text)
 
@@ -100,7 +95,7 @@ class IQIYI(Service):
         if os.path.exists(folder_path):
             shutil.rmtree(folder_path)
 
-        file_name = f'{title}.WEB-DL.{Platform.IQIYI}.vtt'
+        file_name = f'{title}.WEB-DL.{self.platform}.vtt'
 
         self.logger.info(self._(
             "\nDownload: %s\n---------------------------------------------------------------"), file_name)
@@ -167,7 +162,7 @@ class IQIYI(Service):
             if end_order > current_eps:
                 end_order = current_eps
 
-            episode_list_url = self.api['episode_list'].format(
+            episode_list_url = self.config['api']['episode_list'].format(
                 album_id=album_id, mode_code=mode_code, lang_code=lang_code, end_order=current_eps, start_order=start_order)
             self.logger.debug("episode_list_url: %s", episode_list_url)
             res = self.session.get(url=episode_list_url)
@@ -214,7 +209,7 @@ class IQIYI(Service):
                 episode_index = int(episode['order'])
                 if not self.download_season or season_index in self.download_season:
                     if not self.download_episode or episode_index in self.download_episode:
-                        file_name = f'{title}E{str(episode_index).zfill(2)}.WEB-DL.{Platform.IQIYI}.vtt'
+                        file_name = f'{title}E{str(episode_index).zfill(2)}.WEB-DL.{self.platform}.vtt'
                         self.logger.info(
                             self._("Finding %s ..."), file_name)
 
@@ -256,8 +251,6 @@ class IQIYI(Service):
         return md.hexdigest()
 
     def get_dash_url(self, vid, tvid):
-        cookies = self.cookies.get_cookies()
-
         params = {
             "tvid": tvid,
             "bid": "",
@@ -265,10 +258,10 @@ class IQIYI(Service):
             "src": "01011021010010000000",
             "vt": "0",
             "rs": "1",
-            "uid": cookies.get('P00003') if cookies.get('P00003') else '0',
+            "uid": self.cookies.get('P00003') if self.cookies.get('P00003') else '0',
             "ori": "pcw",
             "ps": "0",
-            "k_uid": cookies['QC005'],
+            "k_uid": self.cookies['QC005'],
             "pt": "0",
             "d": "0",
             "s": "",
@@ -280,7 +273,7 @@ class IQIYI(Service):
             "k_tag": "1",
             "ost": "0",
             "ppt": "0",
-            "dfp": cookies['__dfp'],
+            "dfp": self.cookies['__dfp'],
             "locale": "zh_cn",
             "prio": '{"ff":"","code":}',
             "k_err_retries": "0",
@@ -311,7 +304,7 @@ class IQIYI(Service):
         subtitles = []
         for sub in data['stl']:
             self.logger.debug(sub)
-            sub_lang = self.get_language_code(sub['_name'])
+            sub_lang = get_language_code(sub['_name'])
             if sub_lang in self.subtitle_language:
                 if len(self.subtitle_language) > 1:
                     lang_folder_path = os.path.join(folder_path, sub_lang)
@@ -328,7 +321,7 @@ class IQIYI(Service):
                     subtitle_file_name = file_name.replace(
                         '.vtt', f'.{sub_lang}.xml')
 
-                subtitle_link = self.api['meta'] + \
+                subtitle_link = self.config['api']['meta'] + \
                     subtitle_link.replace('\\/', '/')
 
                 os.makedirs(lang_folder_path,
@@ -348,13 +341,11 @@ class IQIYI(Service):
                 convert_subtitle(
                     folder_path=lang_path, lang=self.locale)
             convert_subtitle(folder_path=folder_path,
-                             platform=Platform.IQIYI, lang=self.locale)
+                             platform=self.platform, lang=self.locale)
             if self.output:
                 shutil.move(folder_path, self.output)
 
     def main(self):
-        self.cookies.load_cookies('__dfp')
-
         if 'play/' in self.url:
             content_id = re.search(
                 r'https://www.iq.com/play/.+\-([^-]+)\?lang=.+', self.url)

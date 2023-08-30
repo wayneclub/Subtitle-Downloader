@@ -14,22 +14,22 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: services/friday.py:125
+#: services/fridayvideo.py:125
 #, python-format
 msgid ""
 "\n"
 "%s total: %s season(s)"
 msgstr "\n%s 共有：%s 季"
 
-#: services/friday.py:130
+#: services/fridayvideo.py:130
 msgid "(Provide bilingual subtitles)"
 msgstr "（提供雙語字幕）"
 
-#: services/friday.py:132
+#: services/fridayvideo.py:132
 msgid "(Provide Japanese subtitles)"
 msgstr "（提供日語字幕）"
 
-#: services/friday.py:135
+#: services/fridayvideo.py:135
 #, python-format
 msgid ""
 "\n"
@@ -37,7 +37,7 @@ msgid ""
 "---------------------------------------------------------------"
 msgstr "\n第 %s 季 共有：%s 集\t下載最後一集\n---------------------------------------------------------------"
 
-#: services/friday.py:142 services/friday.py:155
+#: services/fridayvideo.py:142 services/fridayvideo.py:155
 #, python-format
 msgid ""
 "\n"
@@ -45,7 +45,7 @@ msgid ""
 "---------------------------------------------------------------"
 msgstr "\n第 %s 季 共有：%s 集\t下載全集\n---------------------------------------------------------------"
 
-#: services/friday.py:150
+#: services/fridayvideo.py:150
 #, python-format
 msgid ""
 "\n"
@@ -53,12 +53,12 @@ msgid ""
 "---------------------------------------------------------------"
 msgstr "\n共有：%s 集\t下載全集\n---------------------------------------------------------------"
 
-#: services/friday.py:167
+#: services/fridayvideo.py:167
 #, python-format
 msgid "Finding %s ..."
 msgstr "尋找 %s ..."
 
-#: services/friday.py:225
+#: services/fridayvideo.py:225
 #, python-format
 msgid ""
 "\n"
@@ -66,13 +66,13 @@ msgid ""
 "---------------------------------------------------------------"
 msgstr "\n下載：%s\n---------------------------------------------------------------"
 
-#: services/friday.py:234 services/friday.py:261
+#: services/fridayvideo.py:234 services/fridayvideo.py:261
 msgid ""
 "\n"
 "Sorry, there's no embedded subtitles in this video!"
 msgstr "\n抱歉，此劇只有硬字幕，可去其他串流平台查看"
 
-#: services/friday.py:237
+#: services/fridayvideo.py:237
 msgid ""
 "\n"
 "The film isn't released."

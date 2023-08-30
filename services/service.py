@@ -4,23 +4,36 @@
 """
 This module is default service
 """
-import locale
-import logging
-import sys
-import requests
+from __future__ import annotations
+import html
+import os
 import ssl
+import sys
+from http.cookiejar import MozillaCookieJar
+from urllib3 import poolmanager
+from typing import Optional, Union
+from pathlib import Path
+import requests
 import opencc
-from tmdbv3api import TMDb, Search
+from requests import adapters
+from tmdbv3api import TMDb, TV, Movie
 from natsort import natsorted
-from configs.config import Config
+from configs.config import config, credentials, filenames, user_agent
 from utils.ripprocess import ripprocess
 
 
 class Service(object):
+    """
+    BaseService
+    """
 
     def __init__(self, args):
-        self.logger = logging.getLogger(__name__)
+        self.logger = args.log
         self.url = args.url.strip()
+        self.platform = args.platform
+        self.cookies = {}
+        self.config = self.validate_config(args.config)
+        self.movie = False
 
         if args.output:
             self.output = args.output.strip()
@@ -43,13 +56,13 @@ class Service(object):
 
         self.locale = args.locale
 
-        self.config = Config()
         self.session = requests.Session()
         self.session.mount('https://', TLSAdapter())
-        self.user_agent = self.config.get_user_agent()
         self.session.headers = {
-            'user-agent': self.user_agent
+            'user-agent': user_agent
         }
+        self.session.cookies.update(self.cookies)
+        self.cookies = self.session.cookies.get_dict()
 
         self.ip_info = args.proxy
         self.proxy = self.ip_info['proxy']
@@ -66,62 +79,102 @@ class Service(object):
 
         self.ripprocess = ripprocess()
 
-        self.download_path = self.config.paths()['downloads']
+        self.download_path = config.directories['downloads']
 
-        # self.default_language = self.get_default_language(self.locale)
         self.subtitle_language = self.get_language_list(args)
 
         self.tmdb = TMDb()
-        self.tmdb.api_key = self.config.credential("TMDB")['api_key']
-        self.search = Search()
+        self.tmdb.api_key = credentials['TMDB']['api_key']
 
-    def get_language_code(self, lang):
-        language_code = self.config.get_language_code(lang)
-        if language_code:
-            return language_code
+    def validate_config(self, service_config):
+        """ validate service config """
+
+        if service_config['credentials'] == 'cookies':
+            if credentials[self.platform].get('cookies'):
+                self.cookies = self.get_cookie_jar(
+                    service_config.get('required'))
+            else:
+                self.logger.error(
+                    '\nMissing define %s\'s cookies in %s', self.platform, filenames.root_config)
+                sys.exit(1)
+        elif service_config['credentials'] == 'email':
+            if not credentials[self.platform].get('email') and not credentials[self.platform].get('password'):
+                self.logger.error(
+                    '\nMissing define %s\'s email and password in %s', self.platform, filenames.root_config)
+                sys.exit(1)
+
+        return service_config
+
+    def get_cookie_jar(self, required) -> Optional[MozillaCookieJar]:
+        """Get Profile's Cookies as Mozilla Cookie Jar if available."""
+
+        cookie_file = Path(
+            config.directories['cookies']) / credentials[self.platform]['cookies']
+        if cookie_file.is_file():
+            cookie_jar = MozillaCookieJar(cookie_file)
+            cookie_file.write_text(html.unescape(
+                cookie_file.read_text("utf8")), "utf8")
+            cookie_jar.load(ignore_discard=True, ignore_expires=True)
+
+            if required and required not in str(cookie_jar):
+                self.logger.warning(
+                    "\nMissing \"%s\" in %s.\nPlease login to streaming services and renew cookies...",
+                    required,
+                    os.path.basename(cookie_file))
+                os.remove(cookie_file)
+                sys.exit(1)
+
+            return cookie_jar
         else:
-            self.logger.error("\nMissing codec mapping: %s", lang)
+            self.logger.error(
+                f"\nPlease put {os.path.basename(cookie_file)} in {Path(config.directories['cookies'])}")
             sys.exit(1)
 
     def get_language_list(self, args):
+        """ Get language list """
+
         subtitle_language = args.subtitle_language
         if not subtitle_language:
-            subtitle_language = self.config.get_default_language()
+            subtitle_language = config.default_language
 
         return tuple([
             language for language in subtitle_language.split(',')])
 
-    def get_movie_info(self, title, release_year="", title_aliases=[]):
+    def get_movie_info(self, title, title_aliases):
+        """ Get movie details from TMDB """
+
+        if not title_aliases:
+            title_aliases = []
+
         title_aliases.append(opencc.OpenCC('t2s.json').convert(title))
+        movie = Movie()
 
-        query = {'query': title.strip()}
-        if release_year:
-            query['year'] = int(release_year)
-
-        results = self.search.movies(query)
+        results = movie.search(title.strip())
 
         if results:
             return results[0]
         else:
             for alias in title_aliases:
-                query['query'] = alias.strip()
-                results = self.search.movies(query)
+                results = movie.search(alias.strip())
                 if results:
                     return results[0]
 
-    def get_series_info(self, title, title_aliases=[]):
+    def get_series_info(self, title, title_aliases):
+        """Get series details from TMDB """
+
+        if not title_aliases:
+            title_aliases = []
+
         title_aliases.append(opencc.OpenCC('t2s.json').convert(title))
 
-        query = {'query': title.strip()}
-
-        results = self.search.tv_shows(query)
+        tv = TV()
+        results = tv.search(title.strip())
 
         if results:
             return results[0]
         else:
             for alias in title_aliases:
-                query['query'] = alias.strip()
-                results = self.search.tv_shows(query)
+                results = tv.search(alias.strip())
                 if results:
                     return results[0]
 
@@ -136,6 +189,20 @@ class TLSAdapter(requests.adapters.HTTPAdapter):
         ctx.set_ciphers('DEFAULT@SECLEVEL=1')
         kwargs['ssl_context'] = ctx
         return super(TLSAdapter, self).init_poolmanager(*args, **kwargs)
+
+
+# class TLSAdapter(adapters.HTTPAdapter):
+
+#     def init_poolmanager(self, connections, maxsize, block=False):
+#         """Create and initialize the urllib3 PoolManager."""
+#         ctx = ssl.create_default_context()
+#         ctx.set_ciphers('DEFAULT@SECLEVEL=1')
+#         self.poolmanager = poolmanager.PoolManager(
+#             num_pools=connections,
+#             maxsize=maxsize,
+#             block=block,
+#             ssl_version=ssl.PROTOCOL_TLS,
+#             ssl_context=ctx)
 
 
 class EpisodesNumbersHandler(object):

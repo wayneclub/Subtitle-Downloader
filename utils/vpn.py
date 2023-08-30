@@ -4,7 +4,7 @@ import sys
 import random
 import logging
 import orjson
-from configs.config import Config
+from configs.config import user_agent
 
 
 class connect(object):
@@ -13,7 +13,7 @@ class connect(object):
         self.code = code.lower()
 
         self.headers = {
-            "user-agent": Config().get_user_agent()
+            "user-agent": user_agent
         }
 
     def get_nordvpn_server(self):

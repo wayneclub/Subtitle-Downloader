@@ -1,0 +1,8 @@
+credentials = 'cookies'
+required = 'NOWSESSIONID'
+
+[api]
+series = 'https://nowplayer.now.com/vodplayer/getSeriesJson/?seriesId={series_id}'
+movie = 'https://nowplayer.now.com/vodplayer/getProductJson/?productId={product_id}'
+play = 'https://nowplayer.now.com/vodplayer/play/'
+license = 'https://fwp.now.com/wrapperWV'

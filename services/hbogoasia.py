@@ -9,14 +9,13 @@ import re
 import os
 import shutil
 import platform
-import logging
 import sys
 import uuid
 from getpass import getpass
 from pathlib import Path
 from urllib.parse import urlparse
-from configs.config import Platform
-from utils.helper import driver_init, get_locale, download_files
+from configs.config import credentials
+from utils.helper import get_language_code, get_locale, download_files
 from utils.subtitle import convert_subtitle
 from services.service import Service
 
@@ -26,14 +25,18 @@ from selenium.webdriver.common.by import By
 
 
 class HBOGOAsia(Service):
+    """
+    Service code for HBOGO Asia streaming service (https://www.hbogoasia.xx).
+
+    Authorization: email & password
+    """
+
     def __init__(self, args):
         super().__init__(args)
-        self.logger = logging.getLogger(__name__)
         self._ = get_locale(__name__, self.locale)
 
-        self.credential = self.config.credential(Platform.HBOGO)
-        self.username = args.email if args.email else self.credential['username']
-        self.password = args.password if args.password else self.credential['password']
+        self.username = args.email if args.email else credentials[self.platform]['username']
+        self.password = args.password if args.password else credentials[self.platform]['password']
 
         self.device_id = str(uuid.uuid4())
         self.origin = ""
@@ -42,18 +45,9 @@ class HBOGOAsia(Service):
         self.session_token = ""
         self.multi_profile_id = ""
 
-        self.api = {
-            'geo': 'https://api2.hbogoasia.com/v1/geog?lang=zh-Hant&version=0&bundleId={bundle_id}',
-            'login': 'https://api2.hbogoasia.com/v1/hbouser/login?lang=zh-Hant',
-            'device': 'https://api2.hbogoasia.com/v1/hbouser/device?lang=zh-Hant',
-            'tvseason': 'https://api2.hbogoasia.com/v1/tvseason/list?parentId={parent_id}&territory={territory}',
-            'tvepisode': 'https://api2.hbogoasia.com/v1/tvepisode/list?parentId={parent_id}&territory={territory}',
-            'movie': 'https://api2.hbogoasia.com/v1/movie?contentId={content_id}&territory={territory}',
-            'playback': 'https://api2.hbogoasia.com/v1/asset/playbackurl?territory={territory}&contentId={content_id}&sessionToken={session_token}&channelPartnerID={channel_partner_id}&operatorId=SIN&lang=zh-Hant'
-        }
-
     def get_territory(self):
-        geo_url = self.api['geo'].format(bundle_id=urlparse(self.url).netloc)
+        geo_url = self.config['api']['geo'].format(
+            bundle_id=urlparse(self.url).netloc)
         res = self.session.get(url=geo_url)
         if res.ok:
             data = res.json()
@@ -94,7 +88,7 @@ class HBOGOAsia(Service):
             }
         }
 
-        auth_url = self.api['login']
+        auth_url = self.config['api']['login']
 
         res = self.session.post(url=auth_url, headers=headers, json=payload)
         if res.ok:
@@ -111,7 +105,7 @@ class HBOGOAsia(Service):
             sys.exit(1)
 
     def remove_device(self):
-        delete_url = self.api['device']
+        delete_url = self.config['api']['device']
         payload = {
             "sessionToken": self.session_token,
             "multiProfileId": "0",
@@ -124,7 +118,9 @@ class HBOGOAsia(Service):
             self.logger.error(res.text)
 
     def get_all_languages(self, data):
-        available_languages = tuple([self.get_language_code(
+        """Get all subtitles language"""
+
+        available_languages = tuple([get_language_code(
             media['lang']) for media in data['materials'] if media['type'] == 'subtitle'])
 
         if 'all' in self.subtitle_language:
@@ -160,7 +156,7 @@ class HBOGOAsia(Service):
             if os.path.exists(folder_path):
                 shutil.rmtree(folder_path)
 
-            file_name = f'{title}.WEB-DL.{Platform.HBOGO}.vtt'
+            file_name = f'{title}.WEB-DL.{self.platform}.vtt'
 
             self.logger.info(
                 self._("\nDownload: %s\n---------------------------------------------------------------"), file_name)
@@ -195,7 +191,7 @@ class HBOGOAsia(Service):
             for season in season_list:
                 season_index = int(season['seasonNumber'])
                 if not self.download_season or season_index in self.download_season:
-                    season_url = self.api['tvepisode'].format(
+                    season_url = self.config['api']['tvepisode'].format(
                         parent_id=season['contentId'], territory=self.territory)
                     self.logger.debug("season url: %s", season_url)
 
@@ -220,7 +216,7 @@ class HBOGOAsia(Service):
                             if not self.download_episode or episode_index in self.download_episode:
                                 content_id = episode['contentId']
 
-                                file_name = f'{name}E{str(episode_index).zfill(2)}.WEB-DL.{Platform.HBOGO}.vtt'
+                                file_name = f'{name}E{str(episode_index).zfill(2)}.WEB-DL.{self.platform}.vtt'
 
                                 self.logger.info(
                                     self._("Finding %s ..."), file_name)
@@ -235,8 +231,8 @@ class HBOGOAsia(Service):
             self.logger.error(res.text)
 
     def get_subtitle(self, content_id, data, folder_path, file_name):
-        playback_url = self.api['playback'].format(territory=self.territory, content_id=content_id,
-                                                   session_token=self.session_token, channel_partner_id=self.channel_partner_id)
+        playback_url = self.config['api']['playback'].format(territory=self.territory, content_id=content_id,
+                                                             session_token=self.session_token, channel_partner_id=self.channel_partner_id)
         self.logger.debug(playback_url)
         res = self.session.get(url=playback_url)
 
@@ -252,7 +248,7 @@ class HBOGOAsia(Service):
             for media in data['materials']:
                 if media['type'] == 'subtitle':
                     self.logger.debug(media)
-                    sub_lang = self.get_language_code(media['lang'])
+                    sub_lang = get_language_code(media['lang'])
                     if sub_lang in self.subtitle_language:
                         if len(self.subtitle_language) > 1:
                             if category == 'SERIES':
@@ -294,7 +290,7 @@ class HBOGOAsia(Service):
                     convert_subtitle(
                         folder_path=lang_path, lang=self.locale)
             convert_subtitle(folder_path=folder_path,
-                             platform=Platform.HBOGO, lang=self.locale)
+                             platform=self.platform, lang=self.locale)
             if self.output:
                 shutil.move(folder_path, self.output)
 
@@ -329,7 +325,7 @@ class HBOGOAsia(Service):
                 r'https:\/\/www\.hbogoasia.+\/sr(\d+)', self.url)
             if series_id_regex:
                 series_id = series_id_regex.group(1)
-                series_url = self.api['tvseason'].format(
+                series_url = self.config['api']['tvseason'].format(
                     parent_id=series_id, territory=self.territory)
                 self.series_subtitle(series_url)
             else:
@@ -337,7 +333,7 @@ class HBOGOAsia(Service):
                 sys.exit(1)
         else:
             content_id = os.path.basename(self.url)
-            movie_url = self.api['movie'].format(
+            movie_url = self.config['api']['movie'].format(
                 content_id=content_id, territory=self.territory)
             self.movie_subtitle(movie_url=movie_url, content_id=content_id)
         self.remove_device()

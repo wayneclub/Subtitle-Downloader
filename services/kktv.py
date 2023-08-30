@@ -4,30 +4,29 @@
 """
 This module is to download subtitle from KKTV
 """
-
-import logging
+from __future__ import annotations
 import os
 import re
 import shutil
 import sys
 import orjson
-from configs.config import Platform
 from utils.helper import get_locale, check_url_exist, download_files
 from utils.subtitle import convert_subtitle
 from services.service import Service
 
 
 class KKTV(Service):
+    """
+    Service code for the KKTV streaming service (https://www.kktv.me/).
+
+    Authorization: None
+    """
+
     def __init__(self, args):
         super().__init__(args)
-        self.logger = logging.getLogger(__name__)
         self._ = get_locale(__name__, self.locale)
 
-        self.drama_id = ''
-
-        self.api = {
-            'play': 'https://www.kktv.me/play/{drama_id}010001'
-        }
+        self.title_id = os.path.basename(args.url)
 
     def movie_metadata(self, data):
         title = data['title'].strip()
@@ -38,12 +37,10 @@ class KKTV(Service):
         title = self.ripprocess.rename_file_name(f'{title}.{release_year}')
 
         folder_path = os.path.join(self.download_path, title)
-
         episode_id = data['series'][0]['episodes'][0]['id']
+        file_name = f'{title}.WEB-DL.{self.platform}.zh-Hant.vtt'
 
-        file_name = f'{title}.WEB-DL.{Platform.KKTV}.zh-Hant.vtt'
-
-        self.logger.error(
+        self.logger.warning(
             self._("\nSorry, there's no embedded subtitles in this video!"))
         sys.exit(0)
 
@@ -107,7 +104,7 @@ class KKTV(Service):
                                 episode['id'].replace(episode['seriesId'], ''))
 
                         if not self.download_episode or episode_index in self.download_episode:
-                            file_name = f"{name}E{str(episode_index).zfill(fill_num)}.WEB-DL.{Platform.KKTV}.zh-Hant.vtt"
+                            file_name = f"{name}E{str(episode_index).zfill(fill_num)}.WEB-DL.{self.platform}.zh-Hant.vtt"
 
                             if not episode['subtitles']:
                                 self.logger.error(
@@ -127,7 +124,7 @@ class KKTV(Service):
                                     episode_link = episode_link_search.group(
                                         1)
                                     epsiode_search = re.search(
-                                        self.drama_id + '[0-9]{2}([0-9]{4})_', episode_uri)
+                                        self.title_id + '[0-9]{2}([0-9]{4})_', episode_uri)
                                     if epsiode_search:
                                         subtitle_link = f'https://theater-kktv.cdn.hinet.net{episode_link}_sub/zh-Hant.vtt'
 
@@ -189,22 +186,20 @@ class KKTV(Service):
                 convert_subtitle(
                     folder_path=lang_path, lang=self.locale)
             convert_subtitle(folder_path=folder_path,
-                             platform=Platform.KKTV, lang=self.locale)
+                             platform=self.platform, lang=self.locale)
             if self.output:
                 shutil.move(folder_path, self.output)
 
     def main(self):
-        self.drama_id = os.path.basename(self.url)
+        play_url = self.config['api']['play'].format(title_id=self.title_id)
 
-        play_url = self.api['play'].format(drama_id=self.drama_id)
-
-        res = self.session.get(url=play_url)
+        res = self.session.get(url=play_url, timeout=5)
         if res.ok:
             match = re.search(r'({\"props\":{.*})', res.text)
             data = orjson.loads(match.group(1))
 
-            if self.drama_id in data['props']['initialState']['titles']['byId']:
-                data = data['props']['initialState']['titles']['byId'][self.drama_id]
+            if self.title_id in data['props']['initialState']['titles']['byId']:
+                data = data['props']['initialState']['titles']['byId'][self.title_id]
             else:
                 self.logger.error(self._("\nSeries not found!"))
                 sys.exit(0)

@@ -1,0 +1,55 @@
+# Netscape HTTP Cookie File
+# http://curl.haxx.se/rfc/cookie_spec.html
+# This is a generated file!  Do not edit.
+
+video.friday.tw	FALSE	/	TRUE	0	voBrowserName	chrome
+video.friday.tw	FALSE	/	TRUE	0	check_applyStatus	1
+video.friday.tw	FALSE	/	TRUE	0	isUsedFree30	0
+video.friday.tw	FALSE	/	TRUE	1694179502	code_verifier	6Sm5f7IdnwJscmC1QBYPDkdkeC3O7s3v
+video.friday.tw	FALSE	/	TRUE	1694179502	code_challenge	o4kAujP0B4NO-0vsgKb5ZenXJTUJOJh7rWu156oIQ5M
+video.friday.tw	FALSE	/	TRUE	1694179502	x_friday	ZmI9MSZmZXRuZXQ9MQ%3D%3D
+video.friday.tw	FALSE	/	FALSE	1695993700	free30WebFlag	false
+video.friday.tw	FALSE	/	TRUE	1707139505	udid	1691587505337
+video.friday.tw	FALSE	/	TRUE	1694179505	surveyMessageDisplay	0
+video.friday.tw	FALSE	/	FALSE	0	login_redir	https%3A%2F%2Fvideo.friday.tw%2Fdrama%2Fdetail%2F2958/%E6%9C%89%E5%88%A9%E7%9A%84%E8%A9%90%E6%AC%BA-%E7%AC%AC1%E9%9B%86?episode=93666&index=1
+video.friday.tw	FALSE	/	TRUE	1694179564	logined	true
+video.friday.tw	FALSE	/	TRUE	1695992201	uid	27477176029656
+video.friday.tw	FALSE	/	TRUE	1694179564	MSISDN	0983***620
+video.friday.tw	FALSE	/	TRUE	1694179564	showAgree	0
+video.friday.tw	FALSE	/	TRUE	1695993700	memberType	1
+video.friday.tw	FALSE	/	TRUE	1695993700	memberTypeName	%E4%B8%80%E8%88%AC%E6%9C%83%E5%93%A1
+video.friday.tw	FALSE	/	TRUE	1695993700	deviceOver	0
+video.friday.tw	FALSE	/	TRUE	0	bonusPoint	55
+.friday.tw	TRUE	/	FALSE	1693994805	_ga	GA1.1.1401526342.1693389965
+.friday.tw	TRUE	/	FALSE	1693994799	_gcl_au	1.1.536901588.1693389965
+.friday.tw	TRUE	/	FALSE	1693994802	_fbp	fb.1.1693389966726.708863891
+.video.friday.tw	TRUE	/	FALSE	1693994802	__lt__cid	8ef0e5b2-8fc0-40f9-bfa2-60d20cb83e24
+.friday.tw	TRUE	/	FALSE	1693994767	__BWtransf	c1693389967393xaea2f9b33
+.video.friday.tw	TRUE	/	FALSE	1693994767	__BWtransf	c1693389967393xaea2f9b33
+.friday.tw	TRUE	/	FALSE	1693994767	__BWfp	c1693389967393xaea2f9b33
+.video.friday.tw	TRUE	/	FALSE	1693994767	__BWfp	c1693389967393xaea2f9b33
+video.friday.tw	FALSE	/	TRUE	1693476367	fingerprint	22360384237
+.friday.tw	TRUE	/	FALSE	1693994768	__gads	ID=6cee2825116433e4-22e55676c3e70097:T=1693389971:RT=1693389971:S=ALNI_MYlA4Vy-A-TkCMx8mobLZXWhmbd9w
+.friday.tw	TRUE	/	FALSE	1693994768	__gpi	UID=00000c36bf37d73d:T=1693389971:RT=1693389971:S=ALNI_MaOYpJnFps2aYbaCIX5JDZyGForDw
+video.friday.tw	FALSE	/	FALSE	1693456560	book_notice_27477176029656	book_notice
+.friday.tw	TRUE	/	FALSE	1693994769	_clck	1vpwxi1|2|fel|0|1337
+.friday.tw	TRUE	/	FALSE	0	dtSa	-
+video.friday.tw	FALSE	/	FALSE	1693411596	urlTemp	/drama/detail/3062
+.friday.tw	TRUE	/	FALSE	1693476405	_uetsid	df3483f0471c11eeba0ec5f582045835
+.friday.tw	TRUE	/	FALSE	1693994806	_uetvid	f43068b0bade11ecbaf76fe10e71d69a
+.friday.tw	TRUE	/	FALSE	1693994806	cto_bundle	LLl7hF9TSDZtcTNRSjJmT3Q0dSUyRnBFQzZla2JRSVY4JTJCdmFqUThlU0ZXVDdaRkxzVWVpaFNJNVZPdE9SblE5RWslMkZLayUyQmx2cmJEcGNOQTZuN0ZmNDRrJTJGR29YMlRkdkVLekRTJTJGMEdadlJIUWdzZE1xVFA4ZXFWR0xNVkZCdEVvZ1ZkUlMzSnV1WmJWRG1ZU0xBUiUyQjNlYmJQb1I5Z2xOJTJCcWdWYktUWSUyRlNRMGFyS0RSNW4lMkJHZVgwdFQlMkJWdTN5dkFzOUQ3YjJ2
+video.friday.tw	FALSE	/	TRUE	0	MovieNameGS	%E7%84%A1%E7%94%A8%E7%9A%84%E8%AC%8A%E8%A8%80-%E7%AC%AC2%E9%9B%86
+video.friday.tw	FALSE	/	TRUE	1693994809	did	xTvqV6RtK1o0tis9LR6mZ8TrcOv1
+.friday.tw	TRUE	/	FALSE	1693994810	_ga_DB8YVZNV7E	GS1.1.1693389964.1.1.1693390009.15.0.0
+video.friday.tw	FALSE	/	TRUE	0	playContent	%2Fdrama%2Fdetail%2F3062
+video.friday.tw	FALSE	/	TRUE	0	tmpVolume	0.5
+.friday.tw	TRUE	/	FALSE	0	dtPC	-
+video.friday.tw	FALSE	/	TRUE	1693410401	login_accessToken	aPvSNfFxwjCqOkDgrzcYK4reQdsZIzS8
+video.friday.tw	FALSE	/	FALSE	1693410401	user_coupon	aPvSNfFxwjCqOkDgrzcYK4reQdsZIzS8
+video.friday.tw	FALSE	/	TRUE	1695992201	fetToken	c3eqdtRFtphpC6ym50eHZYPLHPJtSut9HH6YxEIp
+video.friday.tw	FALSE	/	FALSE	1695992201	fet_coupon	c3eqdtRFtphpC6ym50eHZYPLHPJtSut9HH6YxEIp
+video.friday.tw	FALSE	/	TRUE	1693410401	idToken	eyJraWQiOiJiWUpMNThuZ0FMY2JoVmU4cmFrNkxLSHZvR2Q0X1c3bU52SkN5dHFtdFljIiwiYWxnIjoiUlMyNTYifQ.eyJydF9oYXNoIjoiMko3cjhtM2ZFOF9xb0ZaZ2pna0ZldyIsInN1Yl90eXBlIjoiMTIiLCJub25jZSI6IjkyN2FkOWMwYjhmMCIsImZldF9tZW1iZXIiOiIxIiwicGFpZF90eXBlIjoiMTYiLCJpYXQiOjE2OTM0MDAyMDcsImlzcyI6Imh0dHBzOi8vbG9naW4yLmZldG5ldC5uZXQiLCJzdWIiOiIyNzQ3NzE3NjAyOTY1NiIsInVpZCI6IjI3NDc3MTc2MDI5NjU2IiwiYXRfaGFzaCI6IlRBUTROQ1IzdFIydzV6Ynp2WmliRGciLCJleHAiOjE2OTM0MDM4MDcsImF1ZCI6IjE4ZGQ0MDViLWI1MzQtNDAwMC1hYzNhLWNiODQzNDEzOWE5NCJ9.P-bq-KtcXXHKO2YjcmBuSyHSBs1JzuY_scAjlZ8iId6JHE71G7rES3r0lsWO2CgekWH3l0NjtnrQ1bfkFgq0k2Atcx5hTTbx9Ecy9iLVC-4CtrzF6yQnyKlg_ndmlsEvCk_2GyUGlCjqCiHaOJzsrj-9IXItnQUAcjRlM8RPFVsKgOJ-UFYod1qk-vhIEFzC9XDQUmdsNJt03HOzKuhu5etbfvNLwfc0I28HQnvtrMlO61QqBuLBO3ZsY8m48ya3o4gQ2AIpg5XKOWDAtq6Xtdrypol_HUm37ZBtUw50cTgauJpFqBw8DlrphnHOeRwGOeP_plfSvx2R0sIEwYdWKA
+video.friday.tw	FALSE	/	TRUE	0	JSESSIONID	AF0493679C9C6E1A8D13CED730D3FE74
+.friday.tw	TRUE	/	FALSE	1693488296	_clsk	10lfunc|1693401896011|1|1|r.clarity.ms/collect
+.friday.tw	TRUE	/	FALSE	0	dtCookie	E8F7AAF18257B2AE2F2763593789F5BD|dmlkZW8uZnJpZGF5LnR3fDF8X2RlZmF1bHR8MQ
+.friday.tw	TRUE	/	FALSE	0	dtLatC	257

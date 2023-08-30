@@ -5,7 +5,6 @@
 This module is to download subtitle from LineTV
 """
 
-import logging
 import os
 import re
 import shutil
@@ -14,22 +13,21 @@ from urllib.parse import quote
 from time import strftime, localtime
 import orjson
 from cn2an import cn2an
-from configs.config import Platform
 from utils.helper import get_locale, check_url_exist, download_files
 from utils.subtitle import convert_subtitle
 from services.service import Service
 
 
 class LineTV(Service):
+    """
+    Service code for Line TV streaming service (https://www.linetv.tw/).
+
+    Authorization: None
+    """
+
     def __init__(self, args):
         super().__init__(args)
-        self.logger = logging.getLogger(__name__)
         self._ = get_locale(__name__, self.locale)
-
-        self.api = {
-            'sub_1': 'https://s3-ap-northeast-1.amazonaws.com/tv-aws-media-convert-input-tokyo/subtitles/{drama_id}/{drama_id}-eps-{episode_name}.vtt',
-            'sub_2': 'https://choco-tv.s3.amazonaws.com/subtitle/{drama_id}-{drama_name}/{drama_id}-eps-{episode_name}.vtt'
-        }
 
     def series_metadata(self, data, drama_id):
         if 'drama_name' in data:
@@ -80,18 +78,18 @@ class LineTV(Service):
                         episode_index = int(episode['number'])
                         if not self.download_season or season_index in self.download_season:
                             if not self.download_episode or episode_index in self.download_episode:
-                                subtitle_link = self.api['sub_1'].format(
+                                subtitle_link = self.config['api']['sub_1'].format(
                                     drama_id=drama_id, episode_name=episode_index)
                                 self.logger.debug(subtitle_link)
 
-                                file_name = f'{title}.S{str(season_index).zfill(2)}E{str(episode_index).zfill(2)}.WEB-DL.{Platform.LINETV}.zh-Hant.vtt'
+                                file_name = f'{title}.S{str(season_index).zfill(2)}E{str(episode_index).zfill(2)}.WEB-DL.{self.platform}.zh-Hant.vtt'
 
                                 if not check_url_exist(subtitle_link):
                                     if check_url_exist(subtitle_link.replace('tv-aws-media-convert-input-tokyo', 'aws-elastic-transcoder-input-tokyo')):
                                         subtitle_link = subtitle_link.replace(
                                             'tv-aws-media-convert-input-tokyo', 'aws-elastic-transcoder-input-tokyo')
                                     else:
-                                        subtitle_link = self.api['sub_2'].format(
+                                        subtitle_link = self.config['api']['sub_2'].format(
                                             drama_id=drama_id, drama_name=quote(title.encode('utf8')), episode_name=episode_index)
                                         if not check_url_exist(subtitle_link):
                                             if episode['free_date']:
@@ -114,7 +112,7 @@ class LineTV(Service):
         if subtitles:
             download_files(subtitles)
             convert_subtitle(folder_path=folder_path,
-                             platform=Platform.LINETV, lang=self.locale)
+                             platform=self.platform, lang=self.locale)
             if self.output:
                 shutil.move(folder_path, self.output)
 
@@ -130,7 +128,7 @@ class LineTV(Service):
             self.logger.error("\nCan't detect content id: %s", self.url)
             sys.exit(-1)
 
-        res = self.session.get(url=self.url)
+        res = self.session.get(url=self.url, timeout=5)
 
         if res.ok:
             match = re.search(

@@ -1,0 +1,11 @@
+[cookies]
+credentials = 'email'
+
+[api]
+'geo' = 'https://api2.hbogoasia.com/v1/geog?lang=zh-Hant&version=0&bundleId={bundle_id}'
+login = 'https://api2.hbogoasia.com/v1/hbouser/login?lang=zh-Hant'
+device = 'https://api2.hbogoasia.com/v1/hbouser/device?lang=zh-Hant'
+tvseason = 'https://api2.hbogoasia.com/v1/tvseason/list?parentId={parent_id}&territory={territory}'
+tvepisode = 'https://api2.hbogoasia.com/v1/tvepisode/list?parentId={parent_id}&territory={territory}'
+movie = 'https://api2.hbogoasia.com/v1/movie?contentId={content_id}&territory={territory}'
+playback = 'https://api2.hbogoasia.com/v1/asset/playbackurl?territory={territory}&contentId={content_id}&sessionToken={session_token}&channelPartnerID={channel_partner_id}&operatorId=SIN&lang=zh-Hant'

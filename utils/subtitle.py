@@ -106,7 +106,7 @@ def archive_subtitle(path, platform="", lang=""):
     path = os.path.normpath(path)
     logger.info("%s.zip", zipname)
 
-    shutil.make_archive(zipname, 'zip', path)
+    shutil.make_archive(Path(path).parent / zipname, 'zip', path)
 
 
 def ms_to_timestamp(ms: int) -> str:

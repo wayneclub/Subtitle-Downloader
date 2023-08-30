@@ -1,0 +1,5 @@
+credentials = ''
+required = ''
+
+[api]
+configurations = 'https://tv.apple.com/api/uts/v3/configurations?caller=web&sfh=143470&v=56&pfm=web&locale=zh-tw&ts={time}'

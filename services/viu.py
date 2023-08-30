@@ -2,38 +2,36 @@
 # coding: utf-8
 
 """
-This module is to download subtitle from Disney+
+This module is to download subtitle from Viu
 """
 
 import re
 import os
-import logging
 import shutil
 import sys
 import orjson
 from cn2an import cn2an
-from configs.config import Platform
-from utils.helper import get_locale, download_files
+from configs.config import user_agent
+from utils.helper import get_locale, get_language_code, download_files
 from utils.subtitle import convert_subtitle, merge_subtitle_fragments
 from services.service import Service
 
 
 class Viu(Service):
+    """
+    Service code for Viu streaming service (https://www.viu.com/).
+
+    Authorization: None
+    """
 
     def __init__(self, args):
         super().__init__(args)
-        self.logger = logging.getLogger(__name__)
         self._ = get_locale(__name__, self.locale)
 
         self.token = ""
 
-        self.api = {
-            'ott': 'https://www.viu.com/ott/{region}/index.php?area_id={area_id}&language_flag_id={language_flag_id}&r=vod/ajax-detail&platform_flag_label=web&area_id={area_id}&language_flag_id={language_flag_id}&product_id={product_id}',
-            'load': 'https://viu.com/ott/web/api/container/load?ver=1.0&fmt=json&aver=5.0&appver=2.0&appid=viu_desktop&platform=desktop&id=playlist-{playlist_id}&start=0&limit=20&filter=mixed&contentCountry={region}&contentFlavour=all&regionid=all&languageid=en&ccode={region}&geo={geo}&iid=41be67db-a75a-4525-9d25-f41034cc578c',
-            'token': 'https://um.viuapi.io/user/identity?ver=1.0&fmt=json&aver=5.0&appver=2.0&appid=viu_desktop&platform=desktop&iid=c1757177-ad9e-4cbb-8025-7f11569645d6'
-        }
-
     def get_all_languages(self, available_languages):
+        """Get all subtitles language"""
 
         if 'all' in self.subtitle_language:
             self.subtitle_language = available_languages
@@ -79,14 +77,14 @@ class Viu(Service):
             'accept': 'application/json; charset=utf-8',
             'content-type': 'application/json; charset=UTF-8',
             'Sec-Fetch-Mode': 'cors',
-            'User-Agent': self.user_agent,
+            'User-Agent': user_agent,
             'Origin': 'https://viu.com',
             'x-session-id': 'ac20455d-5263-45ed-8b07-3e8a215af8fd',
             'x-client': 'browser'
         }
         postdata = {'deviceId': '18b79bc4-73b0-481a-8045-38d4cbc83b07'}
         res = self.session.post(
-            url=self.api['token'], headers=headers, json=postdata)
+            url=self.config['api']['token'], headers=headers, json=postdata)
         if res.ok:
             self.token = res.json()['token']
 
@@ -107,7 +105,7 @@ class Viu(Service):
             self.logger.error(res.text)
             sys.exit(1)
 
-        meta_url = self.api['ott'].format(
+        meta_url = self.config['api']['ott'].format(
             region=region, area_id=area_id, language_flag_id=language_flag_id, product_id=product_id)
         self.logger.debug("meta url: %s", meta_url)
 
@@ -169,7 +167,7 @@ class Viu(Service):
                         episode_url = re.sub(r'(.+product_id=).+', '\\1',
                                              meta_url) + episode['product_id']
 
-                        file_name = f'{title}E{str(episode_index).zfill(2)}.WEB-DL.{Platform.VIU}.vtt'
+                        file_name = f'{title}E{str(episode_index).zfill(2)}.WEB-DL.{self.platform}.vtt'
 
                         self.logger.info(self._("Finding %s ..."), file_name)
                         episode_res = self.session.get(url=episode_url)
@@ -179,7 +177,7 @@ class Viu(Service):
                             )['data']['current_product']['subtitle']
 
                             available_languages = tuple(
-                                [self.get_language_code(sub['code']) for sub in episode_data])
+                                [get_language_code(sub['code']) for sub in episode_data])
                             self.get_all_languages(available_languages)
 
                             subs, lang_paths = self.get_subtitle(
@@ -196,7 +194,7 @@ class Viu(Service):
 
     def series_metadata_playlist(self, playlist_id):
         self.get_token()
-        res = self.session.get(url=self.url)
+        res = self.session.get(url=self.url, timeout=5)
         if res.ok:
             match = re.search(
                 r'window\.__INITIAL_STATE__=(\{.+?\});', res.text)
@@ -211,7 +209,7 @@ class Viu(Service):
             self.logger.error(res.text)
             sys.exit(1)
 
-        meta_url = self.api['load'].format(
+        meta_url = self.config['api']['load'].format(
             region=region, geo=geo, playlist_id=playlist_id)
         self.logger.debug("meta url: %s", meta_url)
 
@@ -220,7 +218,7 @@ class Viu(Service):
             'authorization': f'Bearer {self.token}',
             'content-type': 'application/json; charset=UTF-8',
             'Sec-Fetch-Mode': 'cors',
-            'User-Agent': self.user_agent
+            'User-Agent': user_agent
         }
 
         meta_res = self.session.get(url=meta_url, headers=headers)
@@ -260,12 +258,12 @@ class Viu(Service):
                 if not self.download_season or season_index in self.download_season:
                     if not self.download_episode or episode_index in self.download_episode:
 
-                        file_name = f'{title}E{str(episode_index).zfill(2)}.WEB-DL.{Platform.VIU}.vtt'
+                        file_name = f'{title}E{str(episode_index).zfill(2)}.WEB-DL.{self.platform}.vtt'
 
                         self.logger.info(self._("Finding %s ..."), file_name)
 
                         subtitle_data = episode['media']['subtitles']['subtitle']
-                        available_languages = set([self.get_language_code(
+                        available_languages = set([get_language_code(
                             sub['language']) for sub in subtitle_data])
                         self.get_all_languages(available_languages)
 
@@ -288,7 +286,7 @@ class Viu(Service):
         subtitles = []
         for sub in data:
             self.logger.debug(sub['code'])
-            sub_lang = self.get_language_code(sub['code'])
+            sub_lang = get_language_code(sub['code'])
             if sub_lang in self.subtitle_language:
                 subtitle = dict()
                 if len(self.subtitle_language) > 1:
@@ -336,7 +334,7 @@ class Viu(Service):
         subtitles = []
         for sub in data:
             self.logger.debug(sub['language'])
-            sub_lang = self.get_language_code(sub['language'])
+            sub_lang = get_language_code(sub['language'])
             if sub_lang in self.subtitle_language and sub['format'] == 'vtt':
                 subtitle = dict()
                 if len(self.subtitle_language) > 1:
@@ -378,7 +376,7 @@ class Viu(Service):
                     folder_path=lang_path, lang=self.locale)
 
             convert_subtitle(folder_path=folder_path,
-                             platform=Platform.VIU, lang=self.locale)
+                             platform=self.platform, lang=self.locale)
             if self.output:
                 shutil.move(folder_path, self.output)
 
@@ -392,4 +390,4 @@ class Viu(Service):
             playlist_id = playlist_id.group(1)
             self.series_metadata_playlist(playlist_id=playlist_id)
         else:
-            self.logger.error("Please provide valid url!")
+            self.logger.error("\nPlease provide valid url!")

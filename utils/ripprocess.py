@@ -13,8 +13,10 @@ from pathlib import Path
 from urllib.parse import urlparse
 import requests
 import orjson
-from configs.config import Config
+from configs.config import user_agent
+from constants import LANGUAGE_LIST
 from utils.subtitle import merge_subtitle_fragments
+from utils.helper import get_language_code
 from tools.XstreamDL_CLI.extractor import Extractor
 from tools.XstreamDL_CLI.downloader import Downloader
 from tools.pyshaka.main import parse
@@ -77,19 +79,16 @@ class pyshakaArgs(object):
 
 class ripprocess(object):
     def __init__(self):
-        self.config = Config()
-        self.user_agent = self.config.get_user_agent()
         self.logger = logging.getLogger(__name__)
-        self.language_list = self.config.language_list()
 
     def download_subtitles_from_mpd(self, url, title, folder_path, url_patch=False, headers="", proxy="", debug=False, timescale=""):
-        self.logger.info("\nDownloading subtitles...")
+        # self.logger.info("\nDownloading subtitles...")
 
         os.makedirs(folder_path, exist_ok=True)
 
         if not headers:
             headers = {
-                'user-agent': self.user_agent
+                'user-agent': user_agent
             }
 
         if url_patch:
@@ -123,11 +122,11 @@ class ripprocess(object):
         for segments_path in glob.glob(os.path.join(folder_path, "*subtitle*")):
             subtitle_language = re.findall(
                 r'_subtitle_.+?_([^_\.]+)', segments_path)[0]
-            subtitle_language = self.config.get_language_code(
+            subtitle_language = get_language_code(
                 subtitle_language)
 
             subtitle_language = next((
-                language[1] for language in self.language_list if subtitle_language in language), subtitle_language)
+                language[1] for language in LANGUAGE_LIST if subtitle_language in language), subtitle_language)
             file_name = f"{title}.{subtitle_language}.vtt"
             if os.path.exists(os.path.join(segments_path, 'init.mp4')):
                 if os.path.isdir(segments_path):
@@ -163,7 +162,7 @@ class ripprocess(object):
         parse(args)
 
     def get_time_scale(self, mpd_url, headers):
-        res = requests.get(url=mpd_url, headers=headers)
+        res = requests.get(url=mpd_url, headers=headers, timeout=5)
         if res.ok:
             timescale = re.search(r'(?<=timescale=\")\d*(?=\")', res.text)
             return float(timescale.group())

@@ -2,36 +2,31 @@
 # coding: utf-8
 
 """
-This module is to download subtitle from Friday影音
+This module is to download subtitle from Friday Video
 """
 
-import logging
 import os
+from pathlib import Path
 import re
 import shutil
 import sys
 import time
-from configs.config import Platform
-from utils.cookies import Cookies
-from utils.helper import get_locale, download_files
+from configs.config import config, credentials, user_agent
+from utils.helper import get_locale, get_language_code, download_files
 from utils.subtitle import convert_subtitle
 from services.service import Service
 
 
-class Friday(Service):
+class FridayVideo(Service):
+    """
+    Service code for Friday Video streaming service (https://video.friday.tw).
+
+    Authorization: Cookies
+    """
+
     def __init__(self, args):
         super().__init__(args)
-        self.logger = logging.getLogger(__name__)
         self._ = get_locale(__name__, self.locale)
-
-        self.credential = self.config.credential(Platform.FRIDAY)
-        self.cookies = Cookies(self.credential)
-
-        self.api = {
-            'title': 'https://video.friday.tw/api2/content/get?contentId={content_id}&contentType={content_type}&srcRecommendId=-1&recommendId=-1&eventPageId=&offset=0&length=1',
-            'episode_list': 'https://video.friday.tw/api2/episode/list?contentId={content_id}&contentType={content_type}&offset=0&length=40&mode=2',
-            'media_info': 'https://video.friday.tw/api2/streaming/get?streamingId={streaming_id}&streamingType={streaming_type}&contentType={content_type}&contentId={content_id}&clientId={client_id}&haveSubtitle={subtitle}&isEst=false&_={time_stamp}',
-        }
 
     def get_content_type(self, content_type):
         program = {
@@ -64,23 +59,23 @@ class Friday(Service):
             'subtitle': False
         }
 
-        file_name = f"{title}.WEB-DL.{Platform.FRIDAY}.zh-Hant.vtt"
+        file_name = f"{title}.WEB-DL.{self.platform}.zh-Hant.vtt"
 
         languages = set()
         subtitles = []
-        subs, lang_paths = self.get_subtitle(media_info=media_info, folder_path=folder_path, file_name=file_name)
+        subs, lang_paths = self.get_subtitle(
+            media_info=media_info, folder_path=folder_path, file_name=file_name)
         subtitles += subs
         languages = set.union(languages, lang_paths)
 
         if subtitles:
             self.logger.info(
-            self._(
-                "\nDownload: %s\n---------------------------------------------------------------"),
-            file_name)
+                self._(
+                    "\nDownload: %s\n---------------------------------------------------------------"),
+                file_name)
 
         self.download_subtitle(
-                        subtitles=subtitles, languages=languages, folder_path=folder_path)
-
+            subtitles=subtitles, languages=languages, folder_path=folder_path)
 
     def filter_episode_list(self, data):
         episode_list = []
@@ -123,7 +118,7 @@ class Friday(Service):
                     season_index = 0
                     episode_index = 1
 
-            file_name = f"{title}.S{str(season_index).zfill(2)}E{str(episode_index).zfill(2)}.WEB-DL.{Platform.FRIDAY}.zh-Hant.vtt"
+            file_name = f"{title}.S{str(season_index).zfill(2)}E{str(episode_index).zfill(2)}.WEB-DL.{self.platform}.zh-Hant.vtt"
 
             episode['season_index'] = season_index
             episode['episode_index'] = episode_index
@@ -140,7 +135,7 @@ class Friday(Service):
         title = re.sub(r'(.+?)(第.+[季|彈])*', '\\1', data['chineseName']).strip()
         original_title = data['englishName'].replace('，', ',')
 
-        episode_list_url = self.api['episode_list'].format(
+        episode_list_url = self.config['api']['episode_list'].format(
             content_id=data['contentId'], content_type=data['contentType'])
         self.logger.debug(episode_list_url)
 
@@ -200,7 +195,8 @@ class Friday(Service):
                             'subtitle':  'false'
                         }
 
-                        subs, lang_paths = self.get_subtitle(media_info=media_info, folder_path=folder_path, file_name=file_name)
+                        subs, lang_paths = self.get_subtitle(
+                            media_info=media_info, folder_path=folder_path, file_name=file_name)
                         subtitles += subs
                         languages = set.union(languages, lang_paths)
 
@@ -212,37 +208,36 @@ class Friday(Service):
             sys.exit(1)
 
     def get_media_info(self, media_info):
-        cookies = self.cookies.get_cookies()
 
-        client_id = cookies['uid']
-        client_device_id = cookies['udid']
-        x_friday = cookies['x_friday']
-        fet_token = cookies['fetToken']
-        login_access_token = cookies['login_accessToken']
-        id_token = cookies['idToken']
+        client_id = self.cookies['uid']
+        client_device_id = self.cookies['udid']
+        x_friday = self.cookies['x_friday']
+        fet_token = self.cookies['fetToken']
+        login_access_token = self.cookies['login_accessToken']
+        id_token = self.cookies['idToken']
 
-        headers = {
-            'user-agent': self.user_agent,
-            'Cookie': f'udid={client_device_id};x_friday={x_friday};logined=true;uid={client_id};login_accessToken={login_access_token};idToken={id_token};fetToken={fet_token};'
-        }
+        # headers = {
+        #     'user-agent': user_agent,
+        #     'Cookie': f'udid={client_device_id};x_friday={x_friday};logined=true;uid={client_id};login_accessToken={login_access_token};idToken={id_token};fetToken={fet_token};'
+        # }
 
-        media_info_url = self.api['media_info'].format(streaming_id=media_info['streaming_id'],
-                                                       streaming_type=media_info['streaming_type'],
-                                                       content_type=media_info['content_type'],
-                                                       content_id=media_info['content_id'],
-                                                       subtitle=media_info['subtitle'],
-                                                       client_id=client_id,
-                                                       time_stamp=int(time.time())*1000)
+        media_info_url = self.config['api']['media_info'].format(streaming_id=media_info['streaming_id'],
+                                                                 streaming_type=media_info['streaming_type'],
+                                                                 content_type=media_info['content_type'],
+                                                                 content_id=media_info['content_id'],
+                                                                 subtitle=media_info['subtitle'],
+                                                                 client_id=client_id,
+                                                                 time_stamp=int(time.time())*1000)
 
-        res = self.session.get(
-            url=media_info_url, headers=headers)
+        res = self.session.get(url=media_info_url, timeout=5)
         if res.ok:
             if 'redirectUri' in res.text:
                 self.logger.debug(res.text)
                 self.logger.info(
                     "\nLogin access token (%s) is expired!\nPlease log out (https://video.friday.tw/logout), login, and re-download cookies", login_access_token)
-                os.remove(self.credential['cookies_file'])
-                sys.exit()
+                os.remove(
+                    Path(config.directories['cookies']) / credentials[self.platform]['cookies'])
+                sys.exit(1)
             else:
                 data = res.json()
                 if 'data' in data:
@@ -255,8 +250,6 @@ class Friday(Service):
             self.logger.error(res.text)
             sys.exit(1)
 
-
-
     def get_subtitle(self, media_info, folder_path, file_name):
         data = self.get_media_info(media_info)
 
@@ -266,8 +259,8 @@ class Friday(Service):
         if data and 'subtitleList' in data and data['subtitleList']:
 
             for sub in data['subtitleList']:
-                sub_lang = self.config.get_language_code(
-                os.path.splitext(os.path.basename(sub['url']))[0].split('.')[-1])
+                sub_lang = get_language_code(
+                    os.path.splitext(os.path.basename(sub['url']))[0].split('.')[-1])
                 if sub_lang == 'deu':
                     sub_lang = 'mul'
 
@@ -293,7 +286,6 @@ class Friday(Service):
 
         return subtitles, lang_paths
 
-
     def download_subtitle(self, subtitles, folder_path, languages=None):
         if subtitles:
             download_files(subtitles)
@@ -302,14 +294,12 @@ class Friday(Service):
                     convert_subtitle(
                         folder_path=lang_path, lang=self.locale)
             convert_subtitle(folder_path=folder_path,
-                             platform=Platform.FRIDAY, lang=self.locale)
+                             platform=self.platform, lang=self.locale)
             if self.output:
                 shutil.move(folder_path, self.output)
 
     def main(self):
         """Download subtitle from friDay"""
-
-        self.cookies.load_cookies('uid')
 
         content_search = re.search(
             r'https:\/\/video\.friday\.tw\/(drama|anime|movie|show)\/detail\/(\d+)', self.url)
@@ -321,8 +311,9 @@ class Friday(Service):
             self.logger.error("\nCan't detect content id: %s", self.url)
             sys.exit(-1)
 
-        res = self.session.post(self.api['title'].format(
+        res = self.session.post(self.config['api']['title'].format(
             content_id=content_id, content_type=content_type))
+
         if res.ok:
             data = res.json()
             if data.get('data'):

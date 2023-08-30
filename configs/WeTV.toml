@@ -1,0 +1,6 @@
+credentials = 'cookies'
+required = 'guid'
+
+[api]
+play = 'https://wetv.vip/id/play/{series_id}/{episode_id}'
+getvinfo = 'https://play.wetv.vip/getvinfo'

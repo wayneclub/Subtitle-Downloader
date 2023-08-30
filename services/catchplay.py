@@ -2,65 +2,42 @@
 # coding: utf-8
 
 """
-This module is to download subtitle from CatchPlay
+This module is to download subtitle from Catch Play
 """
-import logging
 import os
+from pathlib import Path
 import re
 import shutil
 import sys
-import requests
 import orjson
-from configs.config import Platform
-from utils.cookies import Cookies
-from utils.helper import get_locale, download_files
+from configs.config import user_agent, config, credentials
+from utils.helper import get_locale, get_language_code, download_files
 from utils.subtitle import convert_subtitle
 from services.service import Service
 
 
 class CatchPlay(Service):
+    """
+    Service code for CatchPlay streaming service (https://www.catchplay.com).
+
+    Authorization: Cookies
+    """
+
     def __init__(self, args):
         super().__init__(args)
-        self.logger = logging.getLogger(__name__)
         self._ = get_locale(__name__, self.locale)
+        self.access_token = self.get_access_token()
 
-        self.credential = self.config.credential(Platform.CATCHPLAY)
-        self.cookies = Cookies(self.credential)
+    def get_access_token(self):
 
-        self.access_token = ''
-        self.api = {
-            'auth': 'https://www.catchplay.com/ssr-oauth/getOauth',
-            'play': 'https://hp2-api.catchplay.com/me/play',
-            'media_info': 'https://vcmsapi.catchplay.com/video/v3/mediaInfo/{video_id}'
-        }
-
-    def get_language_code(self, lang):
-        language_code = {
-            'zh-TW': 'zh-Hant',
-            'en': 'en'
-        }
-
-        if language_code.get(lang):
-            return language_code.get(lang)
-
-    def get_access_token(self, cookies):
-
-        headers = {
-            'user-agent': self.user_agent,
-        }
-
-        cookies = requests.utils.cookiejar_from_dict(
-            cookies, cookiejar=None, overwrite=True)
-
-        auth_url = self.api['auth']
-        res = self.session.get(url=auth_url, headers=headers, cookies=cookies)
+        res = self.session.get(url=self.config['api']['auth'])
         if res.ok:
             if '</html>' in res.text:
                 self.logger.error("Out of services!")
                 sys.exit(1)
             data = res.json()
             self.logger.debug("User: %s", data)
-            self.access_token = data['access_token']
+            return data['access_token']
         else:
             self.logger.error(res.text)
             sys.exit(1)
@@ -78,17 +55,18 @@ class CatchPlay(Service):
         if os.path.exists(folder_path):
             shutil.rmtree(folder_path)
 
-        file_name = f'{title}.WEB-DL.{Platform.CATCHPLAY}.vtt'
+        file_name = f'{title}.WEB-DL.{self.platform}.vtt'
 
         self.logger.info(
             self._("\nDownload: %s\n---------------------------------------------------------------"), file_name)
 
-        play_video_id, play_token = self.get_vcms_access_token(program_id)
-        if play_video_id and play_token:
+        vcms_access_token = self.get_vcms_access_token(program_id)
+        if vcms_access_token:
             self.get_subtitle(
-                play_video_id, play_token, folder_path, file_name)
+                vcms_access_token['play_video_id'], vcms_access_token['play_token'], folder_path, file_name)
+
             convert_subtitle(folder_path=folder_path,
-                             platform=Platform.CATCHPLAY, lang=self.locale)
+                             platform=self.platform, lang=self.locale)
 
             if self.output:
                 shutil.move(folder_path, self.output)
@@ -132,16 +110,20 @@ class CatchPlay(Service):
 
                 for episode_index, episode in enumerate(episode_list, start=1):
                     if not self.download_episode or episode_index in self.download_episode:
-                        file_name = f'{name}E{str(episode_index).zfill(2)}.WEB-DL.{Platform.CATCHPLAY}.vtt'
+                        file_name = f'{name}E{str(episode_index).zfill(2)}.WEB-DL.{self.platform}.vtt'
                         episode_id = episode['__ref'].replace('Program:', '')
-                        play_video_id, play_token = self.get_vcms_access_token(
+                        vcms_access_token = self.get_vcms_access_token(
                             episode_id)
-                        if play_video_id and play_token:
+                        if vcms_access_token:
+                            self.logger.info(
+                                self._("\nDownload: %s\n---------------------------------------------------------------"), file_name)
                             self.get_subtitle(
-                                play_video_id, play_token, folder_path, file_name)
+                                vcms_access_token['play_video_id'], vcms_access_token['play_token'], folder_path, file_name)
+                        else:
+                            break
 
                 convert_subtitle(folder_path=folder_path,
-                                 platform=Platform.CATCHPLAY, lang=self.locale)
+                                 platform=self.platform, lang=self.locale)
 
                 if self.output:
                     shutil.move(folder_path, self.output)
@@ -150,7 +132,7 @@ class CatchPlay(Service):
         headers = {
             'content-type': 'application/json;charset=UTF-8',
             'authorization': f'Bearer {self.access_token}',
-            'user-agent': self.user_agent,
+            'user-agent': user_agent,
         }
 
         payload = {
@@ -160,28 +142,30 @@ class CatchPlay(Service):
             'watchType': 'movie'
         }
 
-        play_url = self.api['play']
-
-        res = self.session.post(url=play_url, headers=headers, json=payload)
+        res = self.session.post(
+            url=self.config['api']['play'], headers=headers, json=payload)
         if res.ok:
             data = res.json()
             self.logger.debug(data)
-            play_video_id = data['data']['catchplayVideoId']
-            play_token = data['data']['playToken']
-            return play_video_id, play_token
+            return {
+                'play_video_id': data['data']['catchplayVideoId'],
+                'play_token': data['data']['playToken']
+            }
         else:
             error_msg = res.json()['message']
             if 'No subscribe record' in error_msg:
                 self.logger.error(
-                    "Please check your subscription plan, and make sure you are able to watch it online!")
+                    "\nPlease check your subscription plan, and make sure you are able to watch it online!")
             elif 'Insufficient permission to access' in error_msg:
                 self.logger.error(
-                    "Please renew the cookies!")
-                os.remove(self.credential['cookies_file'])
+                    "\nPlease renew the cookies!")
+                os.remove(
+                    Path(config.directories['cookies']) / credentials[self.platform]['cookies'])
             else:
                 self.logger.error(
                     "Error: %s", error_msg)
-            sys.exit(1)
+
+            return None
 
     def get_subtitle(self, play_video_id, play_token, folder_path, file_name):
         headers = {
@@ -189,13 +173,14 @@ class CatchPlay(Service):
             'asiaplay-device-model': 'mac os',
             'asiaplay-app-version': '3.0',
             'authorization': f'Bearer {play_token}',
-            'user-agent': self.user_agent,
+            'user-agent': user_agent,
             'asiaplay-platform': 'desktop',
             'asiaplay-os-version': '97.0.4692',
             'asiaplay-device-type': 'web'
         }
 
-        media_info_url = self.api['media_info'].format(video_id=play_video_id)
+        media_info_url = self.config['api']['media_info'].format(
+            video_id=play_video_id)
         res = self.session.get(url=media_info_url, headers=headers)
 
         if res.ok:
@@ -205,7 +190,7 @@ class CatchPlay(Service):
                 lang_paths = set()
                 subtitles = []
                 for sub in data['subtitleInfo']:
-                    sub_lang = self.get_language_code(sub['language'])
+                    sub_lang = get_language_code(sub['language'])
                     lang_folder_path = folder_path
                     lang_paths.add(lang_folder_path)
                     subtitle_file_name = file_name.replace(
@@ -231,9 +216,7 @@ class CatchPlay(Service):
             self.logger.error(res.text)
 
     def main(self):
-        self.cookies.load_cookies('connect.sid')
-        self.get_access_token(self.cookies.get_cookies())
-        res = self.session.get(url=self.url)
+        res = self.session.get(url=self.url, timeout=5)
         if res.ok:
             match = re.search(
                 r'<script id=\"__NEXT_DATA__" type=\"application/json\">(.+?)<\/script>', res.text)

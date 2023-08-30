@@ -4,29 +4,20 @@
 """
 This module is to download subtitle from stream services.
 """
-
 import argparse
 import logging
 from datetime import datetime
 import os
-from configs.config import Config, script_name, __version__
-from services.kktv import KKTV
-from services.linetv import LineTV
-from services.friday import Friday
-from services.catchplay import CatchPlay
-from services.iqiyi.iqiyi import IQIYI
-from services.nowplayer import NowPlayer
-from services.wetv.wetv import WeTV
-from services.viu import Viu
-from services.nowe import NowE
-from services.disneyplus.disneyplus import DisneyPlus
-from services.hbogoasia import HBOGOAsia
-from services.itunes import iTunes
-from services.appletvplus import AppleTVPlus
+import sys
+import validators
+from configs.config import Platform, config, app_name, __version__, filenames
+from services import service_map
 from utils.helper import get_locale
+from utils.io import load_toml
 from utils.proxy_environ import proxy_env
 
-if __name__ == "__main__":
+
+def main() -> None:
     _ = get_locale('main')
 
     parser = argparse.ArgumentParser(
@@ -115,20 +106,17 @@ if __name__ == "__main__":
         '-v',
         '--version',
         action='version',
-        version='{script_name} {version}'.format(
-            script_name=script_name, version=__version__)
+        version='{app_name} {version}'.format(
+            app_name=app_name, version=__version__)
     )
 
     args = parser.parse_args()
 
-    config = Config()
-    paths = config.paths()
-
     if args.debug:
-        os.makedirs(paths['logs'], exist_ok=True)
+        os.makedirs(config.directories['logs'], exist_ok=True)
         log_time = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
-        log_file_path = os.path.join(
-            paths['logs'], f"Subtitle-Downloader_{log_time}.log")
+        log_file_path = str(filenames.log).format(
+            app_name=app_name, log_time=log_time)
         logging.basicConfig(
             format='%(asctime)s - %(name)s - %(lineno)d - %(message)s',
             datefmt='%Y-%m-%d %H:%M:%S',
@@ -148,48 +136,34 @@ if __name__ == "__main__":
     args.proxy = ip_info
 
     start = datetime.now()
-    if 'kktv' in args.url:
-        kktv = KKTV(args)
-        kktv.main()
-    elif 'linetv' in args.url:
-        linetv = LineTV(args)
-        linetv.main()
-    elif 'video.friday' in args.url:
-        friday = Friday(args)
-        friday.main()
-    elif 'catchplay.com' in args.url:
-        catchplay = CatchPlay(args)
-        catchplay.main()
-    elif 'iq.com' in args.url:
-        iqiyi = IQIYI(args)
-        iqiyi.main()
-    elif 'wetv.vip' in args.url:
-        wetv = WeTV(args)
-        wetv.main()
-    elif 'viu.com' in args.url:
-        viu = Viu(args)
-        viu.main()
-    elif 'nowe.com' in args.url:
-        nowe = NowE(args)
-        nowe.main()
-    elif 'nowplayer' in args.url:
-        nowplayer = NowPlayer(args)
-        nowplayer.main()
-    elif 'disneyplus' in args.url:
-        disneyplus = DisneyPlus(args)
-        disneyplus.main()
-    elif 'hbogoasia' in args.url:
-        hbogoasia = HBOGOAsia(args)
-        hbogoasia.main()
-    elif 'itunes.apple.com' in args.url:
-        itunes = iTunes(args)
-        itunes.main()
-    elif 'tv.apple.com' in args.url:
-        appletvplus = AppleTVPlus(args)
-        appletvplus.main()
-    else:
-        logging.info(
-            _("Only support downloading subtitles from Disney Plus, HBOGO Asia, KKTV, LineTV, friDay Video, iq.com, Viu, CatchPlay, WeTV ,and iTunes."))
 
-    logging.info("\n%s took %s seconds", script_name,
+    if not validators.url(args.url):
+        logging.warning(
+            _("\nPlease input correct url!"))
+        sys.exit(1)
+
+    service = next((service for service in service_map
+                   if service['keyword'] in args.url), None)
+
+    if service:
+        log = logging.getLogger(service['class'].__module__)
+
+        service_config = load_toml(
+            str(filenames.config).format(service=service['name']))
+
+        args.log = log
+        args.config = service_config
+        args.platform = service['name']
+        service['class'](args).main()
+    else:
+        logging.warning(
+            _("\nOnly support downloading subtitles from %s"), ', '.join(sorted([v for k, v in Platform.__dict__.items()
+                                                                                 if not k.startswith("__")])))
+        sys.exit(1)
+
+    logging.info("\n%s took %s seconds", app_name,
                  int(float((datetime.now() - start).total_seconds())))
+
+
+if __name__ == "__main__":
+    main()

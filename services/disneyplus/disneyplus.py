@@ -6,13 +6,12 @@ This module is to download subtitle from Disney+
 """
 
 import os
-import logging
 import math
 import shutil
 import sys
 from urllib.parse import urljoin
 import m3u8
-from configs.config import Platform
+from configs.config import credentials, user_agent
 from utils.helper import get_locale, download_audio, download_files, fix_filename
 from utils.subtitle import convert_subtitle, merge_subtitle_fragments
 from services.disneyplus.disneyplus_login import Login
@@ -20,29 +19,28 @@ from services.service import Service
 
 
 class DisneyPlus(Service):
+    """
+    Service code for DisneyPlus streaming service (https://www.disneyplus.com).
+
+    Authorization: email & password
+    """
 
     def __init__(self, args):
         super().__init__(args)
-        self.logger = logging.getLogger(__name__)
         self._ = get_locale(__name__, self.locale)
 
-        self.credential = self.config.credential(Platform.DISNEYPLUS)
-        self.email = args.email if args.email else self.credential['email']
-        self.password = args.password if args.password else self.credential['password']
+        self.email = args.email if args.email else credentials[self.platform]['email']
+        self.password = args.password if args.password else credentials[
+            self.platform]['password']
 
         self.audio_language = args.audio_language
 
         self.profile = dict()
         self.access_token = ''
 
-        self.api = {
-            'DmcSeriesBundle': 'https://disney.content.edge.bamgrid.com/svc/content/DmcSeriesBundle/version/5.1/region/{region}/audience/false/maturity/1850/language/{language}/encodedSeriesId/{series_id}',
-            'DmcEpisodes': 'https://disney.content.edge.bamgrid.com/svc/content/DmcEpisodes/version/5.1/region/{region}/audience/false/maturity/1850/language/{language}/seasonId/{season_id}/pageSize/30/page/{page}',
-            'DmcVideo': 'https://disney.content.edge.bamgrid.com/svc/content/DmcVideoBundle/version/5.1/region/{region}/audience/false/maturity/1850/language/{language}/encodedFamilyId/{family_id}',
-            'playback': 'https://disney.playback.edge.bamgrid.com/media/{media_id}/scenarios/tvs-drm-cbcs'
-        }
-
     def get_all_languages(self, available_languages):
+        """Get all subtitles language"""
+
         if 'all' in self.subtitle_language:
             self.subtitle_language = available_languages
 
@@ -59,7 +57,7 @@ class DisneyPlus(Service):
                 self._("\nUnsupport %s subtitle, available languages: %s"), ", ".join(set(self.subtitle_language).symmetric_difference(intersect)), ", ".join(available_languages))
 
     def movie_subtitle(self):
-        movie_url = self.api['DmcVideo'].format(
+        movie_url = self.config['api']['DmcVideo'].format(
             region=self.profile['region'],
             language=self.profile['language'],
             family_id=os.path.basename(self.url))
@@ -83,7 +81,7 @@ class DisneyPlus(Service):
             media_id = data['mediaMetadata']['mediaId']
             m3u8_url = self.get_m3u8_url(media_id)
 
-            file_name = f'{title}.{release_year}.WEB-DL.{Platform.DISNEYPLUS}.vtt'
+            file_name = f'{title}.{release_year}.WEB-DL.{self.platform}.vtt'
             subtitle_list, audio_list = self.parse_m3u(m3u8_url)
 
             if not subtitle_list:
@@ -99,14 +97,14 @@ class DisneyPlus(Service):
                 self.get_audio(audio_list, folder_path, file_name)
 
             convert_subtitle(folder_path=folder_path,
-                             platform=Platform.DISNEYPLUS, lang=self.locale)
+                             platform=self.platform, lang=self.locale)
             if self.output:
                 shutil.move(folder_path, self.output)
         else:
             self.logger.error(res.text)
 
     def series_subtitle(self):
-        series_url = self.api['DmcSeriesBundle'].format(
+        series_url = self.config['api']['DmcSeriesBundle'].format(
             region=self.profile['region'],
             language=self.profile['language'],
             series_id=os.path.basename(self.url))
@@ -160,7 +158,7 @@ class DisneyPlus(Service):
                             m3u8_url = self.get_m3u8_url(media_id)
                             self.logger.debug(m3u8_url)
 
-                            file_name = f'{name}E{str(episode_index).zfill(2)}.WEB-DL.{Platform.DISNEYPLUS}.vtt'
+                            file_name = f'{name}E{str(episode_index).zfill(2)}.WEB-DL.{self.platform}.vtt'
                             subtitle_list, audio_list = self.parse_m3u(
                                 m3u8_url)
 
@@ -178,7 +176,7 @@ class DisneyPlus(Service):
                                     audio_list, folder_path, file_name)
 
                     convert_subtitle(folder_path=folder_path,
-                                     platform=Platform.DISNEYPLUS, lang=self.locale)
+                                     platform=self.platform, lang=self.locale)
                     if self.output:
                         shutil.move(folder_path, self.output)
         else:
@@ -188,7 +186,7 @@ class DisneyPlus(Service):
         episodes = []
         page_size = math.ceil(episode_num / 30)
         for page in range(1, page_size+1):
-            episode_page_url = self.api['DmcEpisodes'].format(
+            episode_page_url = self.config['api']['DmcEpisodes'].format(
                 region=self.profile['region'],
                 language=self.profile['language'],
                 season_id=season_id, page=page)
@@ -206,7 +204,7 @@ class DisneyPlus(Service):
     def get_m3u8_url(self, media_id):
         headers = {
             'accept': 'application/vnd.media-service+json; version=6',
-            'User-Agent': self.user_agent,
+            'User-Agent': user_agent,
             'x-bamsdk-platform': "macOS",
             'x-bamsdk-version': '23.1',
             'x-dss-edge-accept': 'vnd.dss.edge+json; version=2',
@@ -214,7 +212,7 @@ class DisneyPlus(Service):
             'Origin': 'https://www.disneyplus.com',
             'authorization': self.access_token
         }
-        playback_url = self.api['playback'].format(
+        playback_url = self.config['api']['playback'].format(
             media_id=media_id)
         self.logger.debug("playback url: %s", playback_url)
 

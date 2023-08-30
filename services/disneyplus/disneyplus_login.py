@@ -11,7 +11,7 @@ import json
 from getpass import getpass
 import sys
 import requests
-from configs.config import Config
+from configs.config import user_agent
 from utils.helper import get_locale
 
 
@@ -20,7 +20,6 @@ class Login(object):
         self.logger = logging.getLogger(__name__)
         self._ = get_locale(__name__, locale)
 
-        self.config = Config()
         self.email = email
         self.password = password
 
@@ -29,10 +28,9 @@ class Login(object):
         self.latitude = location[0]
         self.longitude = location[1]
 
-        self.user_agent = self.config.get_user_agent()
         self.session = requests.Session()
         self.session.headers = {
-            'user-agent': self.user_agent
+            'user-agent': user_agent
         }
 
         self.proxy = ip_info['proxy']
@@ -127,7 +125,7 @@ class Login(object):
             'Origin': 'https://www.disneyplus.com',
             'Referer': 'https://www.disneyplus.com/login/password',
             'Sec-Fetch-Mode': 'cors',
-            'User-Agent': self.user_agent,
+            'User-Agent': user_agent,
             'x-bamsdk-platform': 'macintosh',
             'x-bamsdk-version': '3.10',
         }
@@ -156,7 +154,7 @@ class Login(object):
             'Origin': 'https://www.disneyplus.com',
             'Referer': 'https://www.disneyplus.com/login/password',
             'Sec-Fetch-Mode': 'cors',
-            'User-Agent': self.user_agent,
+            'User-Agent': user_agent,
             'x-bamsdk-platform': 'macintosh',
             'x-bamsdk-version': '3.10',
         }
@@ -209,7 +207,7 @@ class Login(object):
             'authorization': f'Bearer {token}',
             'content-type': 'application/json; charset=UTF-8',
             'Sec-Fetch-Mode': 'cors',
-            'User-Agent': self.user_agent,
+            'User-Agent': user_agent,
             'x-bamsdk-client-id': client_id,
             'x-bamsdk-platform': 'macintosh',
             'x-bamsdk-version': '3.10',
@@ -238,7 +236,7 @@ class Login(object):
             "Accept": "application/vnd.session-service+json; version=1",
             "Authorization": token,
             "Content-Type": "application/json",
-            'User-Agent': self.user_agent
+            'User-Agent': user_agent
         }
 
         session_url = self.api['session']

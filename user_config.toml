@@ -1,0 +1,57 @@
+# This is an example Subtitle-Downloader's config file.
+
+# Subtitle default language: all/en/zh-Hant/zh-Hans/zh-HK
+default-language = 'zh-Hant'
+
+# Default cookies dir: Subtitle-Downloader/cookies
+#         downloads dir: Subtitle-Downloader/downloads
+[directories]
+cookies = ''
+downloads = ''
+
+# Copy user-agent from login browser (https://www.whatsmyua.info/)
+[headers]
+User-Agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36'
+
+[credentials]
+
+[credentials.TMDB]
+api_key = '305cd2702459761c82756596508900d7'
+
+[credentials.AppleTVPlus]
+cookies = 'tv.apple.com_cookies.txt'
+
+[credentials.CatchPlay]
+cookies = 'www.catchplay.com_cookies.txt'
+
+[credentials.DisneyPlus]
+email = ''
+password = ''
+
+[credentials.FridayVideo]
+cookies = 'video.friday.tw_cookies.txt'
+
+[credentials.HBOGOAsia]
+email = ''
+password = ''
+
+[credentials.iQIYI]
+cookies = 'www.iq.com_cookies.txt'
+
+[credentials.NowE]
+cookies = 'nowe.com_cookies.txt'
+
+[credentials.NowPlayer]
+cookies = 'now.com_cookies.txt'
+
+[credentials.WeTV]
+cookies = 'wetv.vip_cookies.txt'
+
+
+[nordvpn]
+# Like `proxies` above, this does the same thing except it automatically generates a proxy string
+# for a nordvpn server automatically.
+# The credentials should be `Service credentials` NOT your Nord account details!
+# https://my.nordaccount.com/dashboard/nordvpn/ (Under advanced configuration).
+username = ''
+password = ''

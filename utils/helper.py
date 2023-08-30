@@ -20,8 +20,8 @@ import requests
 from tqdm import tqdm
 from selenium import webdriver
 import chromedriver_autoinstaller
-
-from configs.config import Config
+from configs.config import user_agent
+from constants import ISO_6391
 
 
 def get_locale(name, lang=""):
@@ -43,6 +43,14 @@ def get_locale(name, lang=""):
         return gettext.gettext
 
 
+def get_language_code(lang=''):
+    uniform = lang.lower().replace('_', '-')
+    if ISO_6391.get(uniform):
+        return ISO_6391.get(uniform)
+    else:
+        return lang
+
+
 def check_url_exist(url, print_error=False):
     """Check url exist"""
     # try:
@@ -62,7 +70,7 @@ def check_url_exist(url, print_error=False):
 
     # Get Url
     res = requests.get(
-        url, headers={'User-Agent': Config().get_user_agent()}, stream=True, timeout=5)
+        url, headers={'User-Agent': user_agent}, stream=True, timeout=5)
     # if the request succeeds
     if res.status_code == 200:
         return True
@@ -99,7 +107,7 @@ def driver_init(headless=True):
     chromedriver_autoinstaller.install()
     driver = webdriver.Chrome('chromedriver', options=options)
     driver.execute_cdp_cmd('Network.setUserAgentOverride', {
-                           "userAgent": Config().get_user_agent()})
+                           "userAgent": user_agent})
     # driver.set_page_load_timeout(3000)
     return driver
 
@@ -141,7 +149,7 @@ def download_file(url, output_path, lang=""):
     if check_url_exist(url):
 
         resp = requests.get(
-            url, headers={'User-Agent': Config().get_user_agent()}, stream=True, timeout=5)
+            url, headers={'User-Agent': user_agent}, stream=True, timeout=5)
         total = int(resp.headers.get('content-length', 0))
         with open(output_path, 'wb') as file, tqdm(
             desc=os.path.basename(output_path),
