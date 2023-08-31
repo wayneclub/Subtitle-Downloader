@@ -75,18 +75,6 @@ def main() -> None:
                         dest='proxy',
                         nargs='?',
                         help="proxy")
-    parser.add_argument("--pv",
-                        '--private-vpn',
-                        action="store",
-                        dest="privtvpn",
-                        help="add country for privtvpn proxies.",
-                        default=0)
-    parser.add_argument("-n",
-                        '--nord-vpn',
-                        action="store",
-                        dest="nordvpn",
-                        help="add country for nordvpn proxies.",
-                        default=0)
     parser.add_argument(
         '-d',
         '--debug',
