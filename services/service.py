@@ -89,7 +89,7 @@ class Service(object):
     def validate_config(self, service_config):
         """ validate service config """
 
-        if service_config['credentials'] == 'cookies':
+        if service_config.get('credentials') == 'cookies':
             if credentials[self.platform].get('cookies'):
                 self.cookies = self.get_cookie_jar(
                     service_config.get('required'))
@@ -97,7 +97,7 @@ class Service(object):
                 self.logger.error(
                     '\nMissing define %s\'s cookies in %s', self.platform, filenames.root_config)
                 sys.exit(1)
-        elif service_config['credentials'] == 'email':
+        elif service_config.get('credentials') == 'email':
             if not credentials[self.platform].get('email') and not credentials[self.platform].get('password'):
                 self.logger.error(
                     '\nMissing define %s\'s email and password in %s', self.platform, filenames.root_config)
