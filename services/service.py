@@ -5,27 +5,31 @@
 This module is default service
 """
 from __future__ import annotations
+from utils.ripprocess import ripprocess
+from utils.proxy import get_ip_info, get_proxy
+from utils.helper import EpisodesNumbersHandler
+from configs.config import config, credentials, filenames, user_agent
+from tmdbv3api import TMDb, TV, Movie
+import opencc
 import html
 import os
 import ssl
 import sys
 from http.cookiejar import MozillaCookieJar
-from urllib3 import poolmanager
-from typing import Optional, Union
+from typing import Optional
 from pathlib import Path
 import requests
-import opencc
-from requests import adapters
-from tmdbv3api import TMDb, TV, Movie
-from natsort import natsorted
-from configs.config import config, credentials, filenames, user_agent
-from utils.ripprocess import ripprocess
+import urllib3
+urllib3.disable_warnings()
 
 
 class Service(object):
     """
     BaseService
     """
+
+    # list of ip regions required to use the service. empty list == global available.
+    GEOFENCE: list[str] = []
 
     def __init__(self, args):
         self.logger = args.log
@@ -64,13 +68,23 @@ class Service(object):
         self.session.cookies.update(self.cookies)
         self.cookies = self.session.cookies.get_dict()
 
-        self.ip_info = args.proxy
-        self.proxy = self.ip_info['proxy']
-        if self.proxy:
-            self.session.proxies.update(self.proxy)
-            self.proxy = list(self.proxy.values())[0]
-        else:
-            self.proxy = ''
+        self.ip_info = get_ip_info()
+        self.logger.info(
+            'ip: %s (%s)', self.ip_info['ip'], self.ip_info['country'])
+
+        proxy = args.proxy or next(iter(self.GEOFENCE), None)
+        if proxy:
+            if len("".join(i for i in proxy if not i.isdigit())) == 2:  # e.g. ie, ie12, us1356
+                proxy = get_proxy(region=proxy, ip_info=self.ip_info)
+            if proxy:
+                if "://" not in proxy:
+                    # assume a https proxy port
+                    proxy = f"https://{proxy}"
+                self.session.proxies.update({"all": proxy})
+                self.logger.info(" + Set Proxy")
+            else:
+                self.logger.info(
+                    " + Proxy was skipped as current region matches")
 
         if args.region:
             self.region = args.region.upper()
@@ -83,8 +97,8 @@ class Service(object):
 
         self.subtitle_language = self.get_language_list(args)
 
-        self.tmdb = TMDb()
-        self.tmdb.api_key = credentials['TMDB']['api_key']
+        tmdb = TMDb()
+        tmdb.api_key = credentials['TMDB']['api_key']
 
     def validate_config(self, service_config):
         """ validate service config """
@@ -178,9 +192,6 @@ class Service(object):
                 if results:
                     return results[0]
 
-    def replace_title(self, title):
-        return title.replace(":", " ").replace("!", " ").replace("?", " ").replace("#", " ").replace("’", "'").replace("  ", " ").strip()
-
 
 class TLSAdapter(requests.adapters.HTTPAdapter):
 
@@ -189,68 +200,3 @@ class TLSAdapter(requests.adapters.HTTPAdapter):
         ctx.set_ciphers('DEFAULT@SECLEVEL=1')
         kwargs['ssl_context'] = ctx
         return super(TLSAdapter, self).init_poolmanager(*args, **kwargs)
-
-
-# class TLSAdapter(adapters.HTTPAdapter):
-
-#     def init_poolmanager(self, connections, maxsize, block=False):
-#         """Create and initialize the urllib3 PoolManager."""
-#         ctx = ssl.create_default_context()
-#         ctx.set_ciphers('DEFAULT@SECLEVEL=1')
-#         self.poolmanager = poolmanager.PoolManager(
-#             num_pools=connections,
-#             maxsize=maxsize,
-#             block=block,
-#             ssl_version=ssl.PROTOCOL_TLS,
-#             ssl_context=ctx)
-
-
-class EpisodesNumbersHandler(object):
-    def __init__(self, episodes):
-        self.episodes = episodes
-
-    def number_range(self, start: int, end: int):
-        if list(range(start, end + 1)) != []:
-            return list(range(start, end + 1))
-
-        if list(range(end, start + 1)) != []:
-            return list(range(end, start + 1))
-
-        return [start]
-
-    def list_number(self, number: str):
-        if number.isdigit():
-            return [int(number)]
-
-        if number.strip() == "~" or number.strip() == "":
-            return self.number_range(1, 999)
-
-        if "-" in number:
-            start, end = number.split("-")
-            if start.strip() == "" or end.strip() == "":
-                raise ValueError("wrong number: {}".format(number))
-            return self.number_range(int(start), int(end))
-
-        if "~" in number:
-            start, _ = number.split("~")
-            if start.strip() == "":
-                raise ValueError("wrong number: {}".format(number))
-            return self.number_range(int(start), 999)
-
-        return
-
-    def sort_numbers(self, numbers):
-        sorted_numbers = []
-        for number in numbers.split(","):
-            sorted_numbers += self.list_number(number.strip())
-
-        return natsorted(list(set(sorted_numbers)))
-
-    def get_episodes(self):
-        return (
-            self.sort_numbers(
-                str(self.episodes).lstrip("0")
-            )
-            if self.episodes
-            else self.sort_numbers("~")
-        )

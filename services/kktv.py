@@ -10,7 +10,8 @@ import re
 import shutil
 import sys
 import orjson
-from utils.helper import get_locale, check_url_exist, download_files
+from utils.io import rename_filename, download_files
+from utils.helper import get_locale, check_url_exist
 from utils.subtitle import convert_subtitle
 from services.service import Service
 
@@ -34,7 +35,7 @@ class KKTV(Service):
 
         self.logger.info("\n%s (%s)", title, release_year)
 
-        title = self.ripprocess.rename_file_name(f'{title}.{release_year}')
+        title = rename_filename(f'{title}.{release_year}')
 
         folder_path = os.path.join(self.download_path, title)
         episode_id = data['series'][0]['episodes'][0]['id']
@@ -65,7 +66,7 @@ class KKTV(Service):
                         r'第(.+)季', season['title'])[0].strip())
                 if not self.download_season or season_index in self.download_season:
                     episode_num = len(season['episodes'])
-                    name = self.ripprocess.rename_file_name(
+                    name = rename_filename(
                         f'{title}.S{str(season_index).zfill(2)}')
                     folder_path = os.path.join(self.download_path, name)
 

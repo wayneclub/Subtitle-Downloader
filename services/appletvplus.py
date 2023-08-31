@@ -16,7 +16,8 @@ from urllib.parse import unquote, urljoin
 import m3u8
 import orjson
 from configs.config import user_agent
-from utils.helper import get_language_code, get_locale, download_files
+from utils.io import rename_filename, download_files
+from utils.helper import get_language_code, get_locale
 from utils.subtitle import convert_subtitle, merge_subtitle_fragments
 from services.service import Service
 
@@ -59,7 +60,7 @@ class AppleTVPlus(Service):
             data['content']['releaseDate'] / 1000).year
         self.logger.info("\n%s (%s)", title, release_year)
 
-        title = self.ripprocess.rename_file_name(f'{title}.{release_year}')
+        title = rename_filename(f'{title}.{release_year}')
 
         folder_path = os.path.join(self.download_path, title)
         if os.path.exists(folder_path):
@@ -163,7 +164,7 @@ class AppleTVPlus(Service):
                                          season_index,
                                          episode_num)
 
-                name = self.ripprocess.rename_file_name(
+                name = rename_filename(
                     f'{title}.S{str(season_index).zfill(2)}')
                 folder_path = os.path.join(self.download_path, name)
 

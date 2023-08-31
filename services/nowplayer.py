@@ -11,9 +11,10 @@ import shutil
 import time
 from urllib.parse import parse_qs, urlparse
 from requests.utils import cookiejar_from_dict
-from services.service import Service
 from configs.config import config, credentials, user_agent
+from utils.io import rename_filename
 from utils.subtitle import convert_subtitle
+from services.service import Service
 
 
 class NowPlayer(Service):
@@ -63,7 +64,7 @@ class NowPlayer(Service):
             file_name = f'{title} {release_year}'
 
             folder_path = os.path.join(
-                self.download_path, self.ripprocess.rename_file_name(file_name))
+                self.download_path, rename_filename(file_name))
 
             self.download_subtitle(content_id=data['episodeId'],
                                    title=file_name, folder_path=folder_path, default_language=default_language)
@@ -98,7 +99,7 @@ class NowPlayer(Service):
             self.logger.info("\n%s Season %s", title, season_index)
 
             folder_path = os.path.join(
-                self.download_path, f'{self.ripprocess.rename_file_name(title)}.S{season_name}')
+                self.download_path, f'{rename_filename(title)}.S{season_name}')
 
             episode_list = data['episode']
 

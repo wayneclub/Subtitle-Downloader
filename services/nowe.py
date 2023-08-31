@@ -12,9 +12,10 @@ import os
 import re
 import shutil
 import time
-from services.service import Service
 from configs.config import config, credentials, user_agent
+from utils.io import rename_filename
 from utils.subtitle import convert_subtitle
+from services.service import Service
 
 
 class NowE(Service):
@@ -84,7 +85,7 @@ class NowE(Service):
         content_id = data['episodeId']
         self.logger.info("\n%s", title)
 
-        title = self.ripprocess.rename_file_name(title)
+        title = rename_filename(title)
         folder_path = os.path.join(self.download_path, title)
         if os.path.exists(folder_path):
             shutil.rmtree(folder_path)
@@ -105,7 +106,7 @@ class NowE(Service):
         season_index = int(data['episode'][0]['seasonNum'])
 
         self.logger.info("\n%s Season %s", title, season_index)
-        title = self.ripprocess.rename_file_name(
+        title = rename_filename(
             f'{title}.S{str(season_index).zfill(2)}')
         folder_path = os.path.join(self.download_path, title)
         if os.path.exists(folder_path):

@@ -15,7 +15,8 @@ from getpass import getpass
 from pathlib import Path
 from urllib.parse import urlparse
 from configs.config import credentials
-from utils.helper import get_language_code, get_locale, download_files
+from utils.io import rename_filename, download_files
+from utils.helper import get_language_code, get_locale
 from utils.subtitle import convert_subtitle
 from services.service import Service
 
@@ -149,7 +150,7 @@ class HBOGOAsia(Service):
             release_year = movie['metadata']['releaseDate'][:4]
 
             self.logger.info("\n%s (%s)", title, release_year)
-            title = self.ripprocess.rename_file_name(f'{title}.{release_year}')
+            title = rename_filename(f'{title}.{release_year}')
 
             folder_path = os.path.join(self.download_path, title)
 
@@ -195,7 +196,7 @@ class HBOGOAsia(Service):
                         parent_id=season['contentId'], territory=self.territory)
                     self.logger.debug("season url: %s", season_url)
 
-                    name = self.ripprocess.rename_file_name(
+                    name = rename_filename(
                         f'{title}.S{str(season_index).zfill(2)}')
                     folder_path = os.path.join(self.download_path, name)
                     if os.path.exists(folder_path):

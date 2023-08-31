@@ -12,7 +12,8 @@ import sys
 import orjson
 from cn2an import cn2an
 from configs.config import user_agent
-from utils.helper import get_locale, get_language_code, download_files
+from utils.io import rename_filename, download_files
+from utils.helper import get_locale, get_language_code
 from utils.subtitle import convert_subtitle, merge_subtitle_fragments
 from services.service import Service
 
@@ -134,9 +135,9 @@ class Viu(Service):
             self.logger.info(self._("\n%s Season %s"),
                              title, season_index)
 
-            title = self.ripprocess.rename_file_name(
+            name = rename_filename(
                 f'{title}.S{str(season_index).zfill(2)}')
-            folder_path = os.path.join(self.download_path, title)
+            folder_path = os.path.join(self.download_path, name)
 
             if os.path.exists(folder_path):
                 shutil.rmtree(folder_path)
@@ -240,7 +241,7 @@ class Viu(Service):
             self.logger.info(self._("\n%s Season %s"),
                              title, season_index)
 
-            title = self.ripprocess.rename_file_name(
+            title = rename_filename(
                 f'{title}.S{str(season_index).zfill(2)}')
             folder_path = os.path.join(self.download_path, title)
 

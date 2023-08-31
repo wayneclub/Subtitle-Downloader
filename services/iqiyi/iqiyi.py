@@ -17,7 +17,8 @@ from time import time
 from urllib.parse import urlencode
 import orjson
 from cn2an import cn2an
-from utils.helper import get_locale, get_language_code, download_files
+from utils.helper import get_locale, get_language_code
+from utils.io import download_files, rename_filename
 from utils.subtitle import convert_subtitle
 from services.service import Service
 
@@ -88,7 +89,7 @@ class IQIYI(Service):
         release_year = data['year']
         self.logger.info("\n%s (%s)", title, release_year)
 
-        title = self.ripprocess.rename_file_name(f'{title}.{release_year}')
+        title = rename_filename(f'{title}.{release_year}')
 
         folder_path = os.path.join(self.download_path, title)
 
@@ -191,10 +192,10 @@ class IQIYI(Service):
                     episode_num,
                     current_eps)
 
-        title = self.ripprocess.rename_file_name(
+        name = rename_filename(
             f'{title}.S{str(season_index).zfill(2)}')
 
-        folder_path = os.path.join(self.download_path, title)
+        folder_path = os.path.join(self.download_path, name)
 
         if os.path.exists(folder_path):
             shutil.rmtree(folder_path)
@@ -209,7 +210,7 @@ class IQIYI(Service):
                 episode_index = int(episode['order'])
                 if not self.download_season or season_index in self.download_season:
                     if not self.download_episode or episode_index in self.download_episode:
-                        file_name = f'{title}E{str(episode_index).zfill(2)}.WEB-DL.{self.platform}.vtt'
+                        file_name = f'{name}E{str(episode_index).zfill(2)}.WEB-DL.{self.platform}.vtt'
                         self.logger.info(
                             self._("Finding %s ..."), file_name)
 

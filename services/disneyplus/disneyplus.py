@@ -12,7 +12,8 @@ import sys
 from urllib.parse import urljoin
 import m3u8
 from configs.config import credentials, user_agent
-from utils.helper import get_locale, download_audio, download_files, fix_filename
+from utils.helper import get_locale
+from utils.io import rename_filename, download_files, download_audio
 from utils.subtitle import convert_subtitle, merge_subtitle_fragments
 from services.disneyplus.disneyplus_login import Login
 from services.service import Service
@@ -70,7 +71,7 @@ class DisneyPlus(Service):
                 release['releaseYear'] for release in data['releases'] if release['releaseType'] == 'original')
 
             self.logger.info("\n%s (%s)", title, release_year)
-            title = fix_filename(title)
+            title = rename_filename(f'{title}.{release_year}')
 
             folder_path = os.path.join(self.download_path, title)
             if os.path.exists(folder_path):
@@ -121,7 +122,6 @@ class DisneyPlus(Service):
 
             self.logger.info(self._("\n%s total: %s season(s)"),
                              title, len(seasons))
-            title = fix_filename(title)
 
             for season in seasons:
                 season_index = int(season['seasonSequenceNumber'])
@@ -131,7 +131,7 @@ class DisneyPlus(Service):
                     episodes = self.get_episodes(
                         season_id=season_id, episode_num=episode_num)
 
-                    name = self.ripprocess.rename_file_name(
+                    name = rename_filename(
                         f'{title}.S{str(season_index).zfill(2)}')
                     folder_path = os.path.join(self.download_path, name)
 
@@ -235,7 +235,7 @@ class DisneyPlus(Service):
             },
         }
         res = self.session.post(
-            url=playback_url, headers=headers, json=json_data,)
+            url=playback_url, headers=headers, json=json_data, timeout=10)
         if res.ok:
             data = res.json()['stream']['sources'][0]['complete']
             self.logger.debug(data)
@@ -250,7 +250,11 @@ class DisneyPlus(Service):
         languages = set()
         audio_url_list = []
 
-        playlists = m3u8.load(m3u_link).playlists
+        headers = {
+            'user-agent': user_agent
+        }
+
+        playlists = m3u8.load(uri=m3u_link, headers=headers).playlists
         self.logger.debug("playlists: %s", playlists)
 
         quality_list = [
@@ -316,8 +320,6 @@ class DisneyPlus(Service):
 
             languages.add(lang_folder_path)
 
-            self.logger.debug(file_name, len(sub['urls']))
-
             for url in sub['urls']:
                 subtitle = dict()
                 subtitle['name'] = file_name
@@ -353,7 +355,9 @@ class DisneyPlus(Service):
         user = Login(email=self.email,
                      password=self.password,
                      ip_info=self.ip_info,
-                     locale=self.locale)
+                     locale=self.locale,
+                     config=self.config,
+                     session=self.session)
         self.profile, self.access_token = user.get_auth_token()
         # self.profile['language'] = 'en'
         if self.region:

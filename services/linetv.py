@@ -13,7 +13,8 @@ from urllib.parse import quote
 from time import strftime, localtime
 import orjson
 from cn2an import cn2an
-from utils.helper import get_locale, check_url_exist, download_files
+from utils.io import rename_filename, download_files
+from utils.helper import get_locale, check_url_exist
 from utils.subtitle import convert_subtitle
 from services.service import Service
 
@@ -48,8 +49,8 @@ class LineTV(Service):
         if 'current_eps' in data:
             episode_num = data['current_eps']
 
-            folder_path = os.path.join(
-                self.download_path, f'{self.ripprocess.rename_file_name(title)}.S{season_name}')
+            name = rename_filename(f'{title}.S{str(season_index).zfill(2)}')
+            folder_path = os.path.join(self.download_path, name)
 
             if self.last_episode:
                 data['eps_info'] = [list(data['eps_info'])[-1]]

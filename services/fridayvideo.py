@@ -12,7 +12,8 @@ import shutil
 import sys
 import time
 from configs.config import config, credentials, user_agent
-from utils.helper import get_locale, get_language_code, download_files
+from utils.io import rename_filename, download_files
+from utils.helper import get_locale, get_language_code
 from utils.subtitle import convert_subtitle
 from services.service import Service
 
@@ -49,7 +50,7 @@ class FridayVideo(Service):
         title = f'{title}.{release_year}'
 
         folder_path = os.path.join(
-            self.download_path, self.ripprocess.rename_file_name(title))
+            self.download_path, rename_filename(title))
 
         media_info = {
             'streaming_id': data['streamingId'],
@@ -78,6 +79,7 @@ class FridayVideo(Service):
             subtitles=subtitles, languages=languages, folder_path=folder_path)
 
     def filter_episode_list(self, data):
+
         episode_list = []
         season_list = []
         for episode in data['episodeList']:
@@ -186,7 +188,7 @@ class FridayVideo(Service):
                     if not self.download_episode or episode['episode_index'] in self.download_episode:
                         file_name = episode['file_name']
                         folder_path = os.path.join(
-                            self.download_path, self.ripprocess.rename_file_name(file_name.split('E')[0]))
+                            self.download_path, rename_filename(file_name.split('E')[0]))
                         media_info = {
                             'streaming_id': episode['streamingId'],
                             'streaming_type': episode['streamingType'],
@@ -220,6 +222,8 @@ class FridayVideo(Service):
                                                                  time_stamp=int(time.time())*1000)
 
         res = self.session.get(url=media_info_url, timeout=5)
+        self.fet_monitor(self.monitor_url)
+
         if res.ok:
             if 'redirectUri' in res.text:
                 self.logger.debug(res.text)
@@ -241,6 +245,23 @@ class FridayVideo(Service):
             self.logger.error(res.text)
             sys.exit(1)
 
+    def fet_monitor(self, url):
+        """Check api call from friday website"""
+
+        data = f'${int(time.time())*1000}'
+
+        res = self.session.post(
+            url=self.config['api']['fet_monitor'].format(url=url), data=data)
+        if res.ok:
+            if res.text == 'OK(Webserver)':
+                return True
+            else:
+                self.logger.error(res.text)
+                sys.exit(-1)
+        else:
+            self.logger.error(res.text)
+            sys.exit(-1)
+
     def get_subtitle(self, media_info, folder_path, file_name):
         data = self.get_media_info(media_info, file_name)
 
@@ -248,7 +269,6 @@ class FridayVideo(Service):
         subtitles = []
 
         if data and 'subtitleList' in data and data['subtitleList']:
-
             for sub in data['subtitleList']:
                 sub_lang = get_language_code(
                     os.path.splitext(os.path.basename(sub['url']))[0].split('.')[-1])
@@ -274,7 +294,9 @@ class FridayVideo(Service):
 
     def download_subtitle(self, subtitles, folder_path, languages=None):
         if subtitles:
-            download_files(subtitles)
+            headers = {'user-agent': user_agent,
+                       'referer': 'https://video.friday.tw/'}
+            download_files(subtitles, headers)
             if languages:
                 for lang_path in sorted(languages):
                     convert_subtitle(
@@ -288,29 +310,40 @@ class FridayVideo(Service):
         """Download subtitle from friDay"""
 
         content_search = re.search(
-            r'https:\/\/video\.friday\.tw\/(drama|anime|movie|show)\/detail\/(\d+)', self.url)
+            r'(https:\/\/video\.friday\.tw\/(drama|anime|movie|show)\/detail\/(\d+))', self.url)
 
         if content_search:
-            content_id = content_search.group(2)
-            content_type = self.get_content_type(content_search.group(1))
+            self.monitor_url = content_search.group(1)
+            content_id = content_search.group(3)
+            content_type = self.get_content_type(content_search.group(2))
         else:
             self.logger.error("\nCan't detect content id: %s", self.url)
             sys.exit(-1)
 
-        res = self.session.post(self.config['api']['title'].format(
-            content_id=content_id, content_type=content_type), timeout=5)
+        title_url = self.config['api']['title'].format(
+            content_id=content_id, content_type=content_type)
+        res = self.session.post(title_url, timeout=5)
+        self.fet_monitor(self.monitor_url)
 
         if res.ok:
-            data = res.json()
-            if data.get('data'):
-                data = data['data']['content']
-            else:
-                self.logger.error(data['message'])
-                sys.exit(-1)
+            try:
+                data = res.json()
+                if data.get('data'):
+                    data = data['data']['content']
+                else:
+                    self.logger.error(data['message'])
+                    sys.exit(-1)
 
-            if content_type == 1:
-                self.movie_metadata(data)
-            else:
-                self.series_metadata(data)
+                if content_type == 1:
+                    self.movie_metadata(data)
+                else:
+                    self.series_metadata(data)
+            except:
+                if '/pkmslogout' in res.text:
+                    self.logger.info(
+                        "\nCookies is expired!\nPlease log out (https://video.friday.tw/logout), login, and re-download cookies!")
+                    os.remove(
+                        Path(config.directories['cookies']) / credentials[self.platform]['cookies'])
+                    sys.exit(-1)
         else:
             self.logger.error(res.text)

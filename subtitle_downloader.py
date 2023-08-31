@@ -14,7 +14,6 @@ from configs.config import Platform, config, app_name, __version__, filenames
 from services import service_map
 from utils.helper import get_locale
 from utils.io import load_toml
-from utils.proxy_environ import proxy_env
 
 
 def main() -> None:
@@ -73,9 +72,8 @@ def main() -> None:
     )
     parser.add_argument('-p',
                         '--proxy',
+                        action="store",
                         dest='proxy',
-                        nargs='?',
-                        const=True,
                         help="proxy")
     parser.add_argument("--pv",
                         '--private-vpn',
@@ -131,9 +129,6 @@ def main() -> None:
             format='%(message)s',
             level=logging.INFO,
         )
-
-    ip_info = proxy_env(args).Load()
-    args.proxy = ip_info
 
     start = datetime.now()
 

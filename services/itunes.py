@@ -12,7 +12,8 @@ from urllib.parse import urljoin
 import m3u8
 import orjson
 from configs.config import user_agent
-from utils.helper import get_locale, download_files
+from utils.io import rename_filename, download_files
+from utils.helper import get_locale
 from utils.subtitle import convert_subtitle, merge_subtitle_fragments
 from services.service import Service
 
@@ -134,7 +135,7 @@ class iTunes(Service):
                 title = movie['data']['attributes']['name']
                 release_year = movie['data']['attributes']['releaseDate'][:4]
                 self.logger.info("\n%s (%s)", title, release_year)
-                title = self.ripprocess.rename_file_name(
+                title = rename_filename(
                     f'{title}.{release_year}')
 
                 folder_path = os.path.join(self.download_path, title)

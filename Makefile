@@ -1,6 +1,7 @@
 Subtitle-Downloader:
 	msgfmt -o locales/zh-Hant/LC_MESSAGES/main.mo locales/zh-Hant/LC_MESSAGES/main
 	msgfmt -o locales/zh-Hant/LC_MESSAGES/utils.helper.mo locales/zh-Hant/LC_MESSAGES/utils.helper
+	msgfmt -o locales/zh-Hant/LC_MESSAGES/utils.io.mo locales/zh-Hant/LC_MESSAGES/utils.io
 	msgfmt -o locales/zh-Hant/LC_MESSAGES/utils.subtitle.mo locales/zh-Hant/LC_MESSAGES/utils.subtitle
 	msgfmt -o locales/zh-Hant/LC_MESSAGES/services.disneyplus.disneyplus.mo locales/zh-Hant/LC_MESSAGES/services.disneyplus.disneyplus
 	msgfmt -o locales/zh-Hant/LC_MESSAGES/services.disneyplus.disneyplus_login.mo locales/zh-Hant/LC_MESSAGES/services.disneyplus.disneyplus_login

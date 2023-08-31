@@ -5,3 +5,12 @@ DmcSeriesBundle = 'https://disney.content.edge.bamgrid.com/svc/content/DmcSeries
 DmcEpisodes = 'https://disney.content.edge.bamgrid.com/svc/content/DmcEpisodes/version/5.1/region/{region}/audience/false/maturity/1850/language/{language}/seasonId/{season_id}/pageSize/30/page/{page}'
 DmcVideo = 'https://disney.content.edge.bamgrid.com/svc/content/DmcVideoBundle/version/5.1/region/{region}/audience/false/maturity/1850/language/{language}/encodedFamilyId/{family_id}'
 playback = 'https://disney.playback.edge.bamgrid.com/media/{media_id}/scenarios/tvs-drm-cbcs'
+
+# DisneyPlus Login
+login_page = 'https://www.disneyplus.com/login'
+devices = 'https://global.edge.bamgrid.com/devices'
+login = 'https://global.edge.bamgrid.com/idp/login'
+token = 'https://global.edge.bamgrid.com/token'
+grant = 'https://global.edge.bamgrid.com/accounts/grant'
+current_account = 'https://global.edge.bamgrid.com/accounts/me'
+session = 'https://disney.api.edge.bamgrid.com/session'

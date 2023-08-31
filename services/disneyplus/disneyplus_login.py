@@ -10,45 +10,30 @@ import re
 import json
 from getpass import getpass
 import sys
-import requests
 from configs.config import user_agent
 from utils.helper import get_locale
 
 
 class Login(object):
-    def __init__(self, email, password, ip_info, locale):
+    """
+    DisneyPlus login authentication, retrieve access_token
+    """
+
+    def __init__(self, email, password, ip_info, locale, config, session):
         self.logger = logging.getLogger(__name__)
         self._ = get_locale(__name__, locale)
 
         self.email = email
         self.password = password
+        self.config = config
 
         location = ip_info['loc'].split(',')
-
         self.latitude = location[0]
         self.longitude = location[1]
-
-        self.session = requests.Session()
-        self.session.headers = {
-            'user-agent': user_agent
-        }
-
-        self.proxy = ip_info['proxy']
-        if self.proxy:
-            self.session.proxies.update(self.proxy)
-
-        self.api = {
-            'login_page': 'https://www.disneyplus.com/login',
-            'devices': 'https://global.edge.bamgrid.com/devices',
-            'login': 'https://global.edge.bamgrid.com/idp/login',
-            'token': 'https://global.edge.bamgrid.com/token',
-            'grant': 'https://global.edge.bamgrid.com/accounts/grant',
-            'current_account': 'https://global.edge.bamgrid.com/accounts/me',
-            'session': 'https://disney.api.edge.bamgrid.com/session'
-        }
+        self.session = session
 
     def client_info(self):
-        res = self.session.get(self.api['login_page'])
+        res = self.session.get(self.config['api']['login_page'])
         match = re.search('window.server_path = ({.*});', res.text)
         data = json.loads(match.group(1))
         client_id = data['sdk']['clientId']
@@ -68,7 +53,7 @@ class Login(object):
 
         header = {'authorization': f'Bearer {client_apikey}',
                   'Origin': 'https://www.disneyplus.com'}
-        res = self.session.post(url=self.api['devices'],
+        res = self.session.post(url=self.config['api']['devices'],
                                 headers=header, json=postdata)
         assertion = res.json()['assertion']
         self.logger.debug("assertion: %s", assertion)
@@ -89,7 +74,7 @@ class Login(object):
         }
 
         res = self.session.post(
-            url=self.api['token'], headers=header, data=postdata)
+            url=self.config['api']['token'], headers=header, data=postdata)
 
         if res.status_code == 200:
             access_token = res.json()['access_token']
@@ -132,7 +117,7 @@ class Login(object):
 
         data = {'email': email, 'password': password}
         res = self.session.post(
-            url=self.api['login'], data=json.dumps(data), headers=headers)
+            url=self.config['api']['login'], data=json.dumps(data), headers=headers)
         if res.status_code == 200:
             id_token = res.json()['id_token']
             self.logger.debug("id_token: %s", id_token)
@@ -162,7 +147,7 @@ class Login(object):
         data = {'id_token': id_token}
 
         res = self.session.post(
-            url=self.api['grant'], data=json.dumps(data), headers=headers)
+            url=self.config['api']['grant'], data=json.dumps(data), headers=headers)
         if res.ok:
             return res.json()['assertion']
         else:
@@ -184,7 +169,7 @@ class Login(object):
         }
 
         res = self.session.post(
-            url=self.api['token'], headers=header, data=postdata)
+            url=self.config['api']['token'], headers=header, data=postdata)
 
         if res.status_code == 200:
             self.logger.debug(res.json())
@@ -214,7 +199,7 @@ class Login(object):
         }
 
         res = self.session.get(
-            url=self.api['current_account'], headers=headers)
+            url=self.config['api']['current_account'], headers=headers)
 
         if res.ok:
             self.logger.debug(res.json())
@@ -239,7 +224,7 @@ class Login(object):
             'User-Agent': user_agent
         }
 
-        session_url = self.api['session']
+        session_url = self.config['api']['session']
 
         res = self.session.get(url=session_url, headers=headers)
         if res.ok:

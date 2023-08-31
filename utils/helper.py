@@ -13,8 +13,7 @@ import re
 from operator import itemgetter
 import multiprocessing
 import sys
-from urllib import request
-from urllib.error import HTTPError, URLError
+from natsort import natsorted
 import orjson
 import requests
 from tqdm import tqdm
@@ -24,7 +23,59 @@ from configs.config import user_agent
 from constants import ISO_6391
 
 
+class EpisodesNumbersHandler(object):
+    def __init__(self, episodes):
+        self.episodes = episodes
+
+    def number_range(self, start: int, end: int):
+        if list(range(start, end + 1)) != []:
+            return list(range(start, end + 1))
+
+        if list(range(end, start + 1)) != []:
+            return list(range(end, start + 1))
+
+        return [start]
+
+    def list_number(self, number: str):
+        if number.isdigit():
+            return [int(number)]
+
+        if number.strip() == "~" or number.strip() == "":
+            return self.number_range(1, 999)
+
+        if "-" in number:
+            start, end = number.split("-")
+            if start.strip() == "" or end.strip() == "":
+                raise ValueError("wrong number: {}".format(number))
+            return self.number_range(int(start), int(end))
+
+        if "~" in number:
+            start, _ = number.split("~")
+            if start.strip() == "":
+                raise ValueError("wrong number: {}".format(number))
+            return self.number_range(int(start), 999)
+
+        return
+
+    def sort_numbers(self, numbers):
+        sorted_numbers = []
+        for number in numbers.split(","):
+            sorted_numbers += self.list_number(number.strip())
+
+        return natsorted(list(set(sorted_numbers)))
+
+    def get_episodes(self):
+        return (
+            self.sort_numbers(
+                str(self.episodes).lstrip("0")
+            )
+            if self.episodes
+            else self.sort_numbers("~")
+        )
+
+
 def get_locale(name, lang=""):
+    """Get environment locale"""
 
     if locale.getdefaultlocale():
         current_locale = locale.getdefaultlocale()[0]
@@ -44,6 +95,8 @@ def get_locale(name, lang=""):
 
 
 def get_language_code(lang=''):
+    """Convert subtitle language code to ISO_6391 format"""
+
     uniform = lang.lower().replace('_', '-')
     if ISO_6391.get(uniform):
         return ISO_6391.get(uniform)
@@ -51,38 +104,27 @@ def get_language_code(lang=''):
         return lang
 
 
-def check_url_exist(url, print_error=False):
-    """Check url exist"""
-    # try:
-    #     request.urlopen(url)
-    # except HTTPError as exception:
-    #     # Return code error (e.g. 404, 501, ...)
-    #     if print_error:
-    #         logger.error("HTTPError: %s", exception.code)
-    #     return False
-    # except URLError as exception:
-    #     # Not an HTTP-specific error (e.g. connection refused)
-    #     if print_error:
-    #         logger.error("URLError: %s", exception.reason)
-    #     return False
-    # else:
-    #     return True
+def check_url_exist(url, headers={}):
+    """Validate url exist"""
 
-    # Get Url
-    res = requests.get(
-        url, headers={'User-Agent': user_agent}, stream=True, timeout=5)
-    # if the request succeeds
-    if res.status_code == 200:
-        return True
-    else:
-        if print_error:
-            logger.error("%s: is Not reachable, %s - %s",
-                         url, res.status_code, res.reason)
-        return False
+    try:
+        response = requests.options(url, timeout=10)
+        if response.ok:
+            return True
+        else:
+            logger.error(
+                "Failure - API is accessible but sth is not right. Response codde : %s", response.status_code)
+    except (requests.exceptions.HTTPError, requests.exceptions.ConnectionError) as error:
+        logger.error("Failure - Unable to establish connection: %s.", error)
+    except Exception as error:
+        logger.error("Failure - Unknown error occurred: %s.", error)
+
+    return False
 
 
 def driver_init(headless=True):
     """Get html render by js"""
+
     kill_process()
     options = webdriver.ChromeOptions()
     if headless:
@@ -133,65 +175,6 @@ def get_network_url(driver, search_url, lang=""):
 
 def kill_process():
     os.system('killall chromedriver > /dev/null 2>&1')
-
-
-def pretty_print_json(json_obj):
-    return orjson.dumps(
-        json_obj, option=orjson.OPT_INDENT_2).decode('utf-8')
-
-
-def fix_filename(name, max_length=255):
-    return re.sub(r'[/\\:|<>"?*\0-\x1f]|^(AUX|COM[1-9]|CON|LPT[1-9]|NUL|PRN)(?![^.])|^\s|[\s.]$', "", name[:max_length], flags=re.IGNORECASE)
-
-
-def download_file(url, output_path, lang=""):
-    _ = get_locale(__name__, lang)
-    if check_url_exist(url):
-
-        resp = requests.get(
-            url, headers={'User-Agent': user_agent}, stream=True, timeout=5)
-        total = int(resp.headers.get('content-length', 0))
-        with open(output_path, 'wb') as file, tqdm(
-            desc=os.path.basename(output_path),
-            total=total,
-            unit='B',
-            unit_scale=True,
-            unit_divisor=1024,
-        ) as bar:
-            for data in resp.iter_content(chunk_size=1024):
-                size = file.write(data)
-                bar.update(size)
-
-    else:
-        logger.warning(_("\nFile not found!"))
-
-
-def download_files(files):
-    cpus = multiprocessing.cpu_count()
-    max_pool_size = 8
-    pool = multiprocessing.Pool(
-        cpus if cpus < max_pool_size else max_pool_size)
-
-    lang_paths = []
-    for file in sorted(files, key=itemgetter('name')):
-        if 'url' in file and 'name' in file and 'path' in file:
-            if 'segment' in file and file['segment']:
-                extension = Path(file['name']).suffix
-                sequence = str(lang_paths.count(file['path'])).zfill(3)
-                file_name = os.path.join(file['path'], file['name'].replace(
-                    extension, f'-seg_{sequence}{extension}'))
-                lang_paths.append(file['path'])
-            else:
-                file_name = os.path.join(file['path'], file['name'])
-            pool.apply_async(download_file, args=(
-                file['url'], file_name))
-    pool.close()
-    pool.join()
-
-
-def download_audio(m3u8_url, output):
-    os.system(
-        f'ffmpeg -protocol_whitelist file,http,https,tcp,tls,crypto -i "{m3u8_url}" -c copy "{output}" -preset ultrafast -loglevel warning -hide_banner -stats')
 
 
 if __name__:

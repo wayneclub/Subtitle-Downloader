@@ -16,7 +16,8 @@ import orjson
 from time import time
 from cn2an import cn2an
 from configs.config import user_agent
-from utils.helper import get_locale, get_language_code, download_files
+from utils.io import rename_filename, download_files
+from utils.helper import get_locale, get_language_code
 from utils.subtitle import convert_subtitle
 from services.service import Service
 from services.wetv.ckey import CKey
@@ -64,7 +65,7 @@ class WeTV(Service):
         release_year = data['videoInfo']['videoCheckUpTime'][:4]
         self.logger.info("\n%s (%s)", title, release_year)
 
-        title = self.ripprocess.rename_file_name(f'{title}.{release_year}')
+        title = rename_filename(f'{title}.{release_year}')
 
         folder_path = os.path.join(self.download_path, title)
         if os.path.exists(folder_path):
@@ -132,9 +133,9 @@ class WeTV(Service):
                     episode_num,
                     current_eps)
 
-        title = self.ripprocess.rename_file_name(
+        name = rename_filename(
             f'{title}.S{str(season_index).zfill(2)}')
-        folder_path = os.path.join(self.download_path, title)
+        folder_path = os.path.join(self.download_path, name)
         if os.path.exists(folder_path):
             shutil.rmtree(folder_path)
 
@@ -152,7 +153,7 @@ class WeTV(Service):
                             series_id=series_id, episode_id=episode_id)
                         self.logger.debug(episode_url)
 
-                        file_name = f'{title}E{str(episode_index).zfill(2)}.WEB-DL.{self.platform}.vtt'
+                        file_name = f'{name}E{str(episode_index).zfill(2)}.WEB-DL.{self.platform}.vtt'
                         self.logger.info(
                             self._("Finding %s ..."), file_name)
 

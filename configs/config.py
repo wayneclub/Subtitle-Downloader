@@ -44,12 +44,12 @@ class Platform:
 
 
 VPN = {
-    "proxies": "http://127.0.0.1:7890",
+    "proxies": "http://133.167.113.61:7890",
     "nordvpn": {
         "port": "80",
         # Advanced configuration (https://my.nordaccount.com/dashboard/nordvpn/)
-        "username": "",
-        "password": "",
+        "username": "me@wayneclub.com",
+        "password": "W.wei0414&tw@VPN",
         "http": "http://{email}:{passwd}@{ip}:{port}",
     },
     "private": {
@@ -70,6 +70,7 @@ class Config:
         self.directories: dict = kwargs.get("directories") or {}
         self.headers: dict = kwargs.get("headers") or {}
         self.nordvpn: dict = kwargs.get("nordvpn") or {}
+        self.proxies: dict = kwargs.get("proxies") or {}
 
     @classmethod
     def from_toml(cls, path: Path) -> Config:
@@ -112,6 +113,10 @@ directories = Directories()
 filenames = Filenames()
 
 config = Config.from_toml(filenames.root_config)
-config.directories = mergeDictsOverwriteEmpty(default_path, config.directories)
+if not config.directories.get('cookies'):
+    config.directories['cookies'] = directories.cookies
+if not config.directories.get('downloads'):
+    config.directories['downloads'] = directories.downloads
+config.directories['logs'] = directories.logs
 credentials = config.credentials
 user_agent = config.headers['User-Agent']

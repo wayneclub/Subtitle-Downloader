@@ -168,23 +168,3 @@ class ripprocess(object):
             return float(timescale.group())
         else:
             self.logger.error(res.text)
-
-    def rename_file_name(self, filename):
-
-        filename = (
-            filename.replace(" ", ".")
-            .replace("'", "")
-            .replace('"', "")
-            .replace(",", "")
-            .replace("-", "")
-            .replace(":", "")
-            .replace("’", "")
-            .replace('"', '')
-            .replace("-.", ".")
-            .replace(".-.", ".")
-        )
-        filename = re.sub(" +", ".", filename)
-        for i in range(10):
-            filename = re.sub(r"(\.\.)", ".", filename)
-
-        return filename

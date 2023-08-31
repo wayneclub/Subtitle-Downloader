@@ -11,7 +11,8 @@ import shutil
 import sys
 import orjson
 from configs.config import user_agent, config, credentials
-from utils.helper import get_locale, get_language_code, download_files
+from utils.io import rename_filename, download_files
+from utils.helper import get_locale, get_language_code
 from utils.subtitle import convert_subtitle
 from services.service import Service
 
@@ -33,7 +34,7 @@ class CatchPlay(Service):
         res = self.session.get(url=self.config['api']['auth'])
         if res.ok:
             if '</html>' in res.text:
-                self.logger.error("Out of services!")
+                self.logger.error("\nOut of services!")
                 sys.exit(1)
             data = res.json()
             self.logger.debug("User: %s", data)
@@ -48,7 +49,7 @@ class CatchPlay(Service):
         release_year = data['apolloState'][f'Program:{program_id}']['releaseYear']
         self.logger.info("\n%s (%s) [%s]", title, english_title, release_year)
 
-        title = self.ripprocess.rename_file_name(f'{title}.{release_year}')
+        title = rename_filename(f'{title}.{release_year}')
 
         folder_path = os.path.join(self.download_path, title)
 
@@ -87,7 +88,7 @@ class CatchPlay(Service):
                 data['apolloState'][season_id]['title']['short'].replace('S', ''))
 
             if not self.download_season or season_index in self.download_season:
-                name = self.ripprocess.rename_file_name(
+                name = rename_filename(
                     f'{title}.S{str(season_index).zfill(2)}')
                 folder_path = os.path.join(self.download_path, name)
                 if os.path.exists(folder_path):
