@@ -31,7 +31,7 @@ class CatchPlay(Service):
 
     def get_access_token(self):
 
-        res = self.session.get(url=self.config['api']['auth'])
+        res = self.session.get(url=self.config['api']['auth'], timeout=5)
         if res.ok:
             if '</html>' in res.text:
                 self.logger.error("\nOut of services!")
