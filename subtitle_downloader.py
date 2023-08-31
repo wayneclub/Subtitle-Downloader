@@ -72,8 +72,8 @@ def main() -> None:
     )
     parser.add_argument('-p',
                         '--proxy',
-                        action="store",
                         dest='proxy',
+                        nargs='?',
                         help="proxy")
     parser.add_argument("--pv",
                         '--private-vpn',
