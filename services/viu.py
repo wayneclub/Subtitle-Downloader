@@ -378,8 +378,6 @@ class Viu(Service):
 
             convert_subtitle(folder_path=folder_path,
                              platform=self.platform, lang=self.locale)
-            if self.output:
-                shutil.move(folder_path, self.output)
 
     def main(self):
         product_id = re.search(r'vod\/(\d+)\/', self.url)

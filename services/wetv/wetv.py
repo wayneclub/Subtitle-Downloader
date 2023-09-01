@@ -285,8 +285,6 @@ class WeTV(Service):
                     folder_path=lang_path, lang=self.locale)
             convert_subtitle(folder_path=folder_path,
                              platform=self.platform, lang=self.locale)
-            if self.output:
-                shutil.move(folder_path, self.output)
 
     def main(self):
         """Download subtitle from WeTV"""

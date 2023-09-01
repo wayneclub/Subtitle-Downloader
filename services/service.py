@@ -39,10 +39,10 @@ class Service(object):
         self.config = self.validate_config(args.config)
         self.movie = False
 
-        if args.output:
-            self.output = args.output.strip()
-        else:
-            self.output = None
+        if args.output and os.path.exists(args.output):
+            config.directories['downloads'] = args.output.strip()
+
+        self.download_path = config.directories['downloads']
 
         if args.season:
             self.download_season = EpisodesNumbersHandler(
@@ -94,8 +94,6 @@ class Service(object):
             self.region = self.ip_info['country']
 
         self.ripprocess = ripprocess()
-
-        self.download_path = config.directories['downloads']
 
         self.subtitle_language = self.get_language_list(args)
 

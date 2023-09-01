@@ -98,9 +98,6 @@ class NowE(Service):
         convert_subtitle(folder_path=folder_path,
                          platform=self.platform, lang=self.locale)
 
-        if self.output:
-            shutil.move(folder_path, self.output)
-
     def series_metadata(self, data):
         title = data['episode'][0]['brandName']
         season_index = int(data['episode'][0]['seasonNum'])
@@ -144,9 +141,6 @@ class NowE(Service):
 
         convert_subtitle(folder_path=folder_path,
                          platform=self.platform, lang=self.locale)
-
-        if self.output:
-            shutil.move(folder_path, self.output)
 
     def download_subtitle(self, content_id, title, folder_path):
 

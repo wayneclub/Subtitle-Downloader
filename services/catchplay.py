@@ -69,9 +69,6 @@ class CatchPlay(Service):
             convert_subtitle(folder_path=folder_path,
                              platform=self.platform, lang=self.locale)
 
-            if self.output:
-                shutil.move(folder_path, self.output)
-
     def series_subtitle(self, data, program_id):
         main_program = 'getMainProgram({\"id\":\"' + program_id + '\"})'
         main_id = data['apolloState']['ROOT_QUERY'][main_program]['__ref']
@@ -125,9 +122,6 @@ class CatchPlay(Service):
 
                 convert_subtitle(folder_path=folder_path,
                                  platform=self.platform, lang=self.locale)
-
-                if self.output:
-                    shutil.move(folder_path, self.output)
 
     def get_vcms_access_token(self, video_id):
         headers = {

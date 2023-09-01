@@ -72,9 +72,6 @@ class NowPlayer(Service):
             convert_subtitle(folder_path=folder_path,
                              platform=self.platform, lang=self.locale)
 
-            if self.output:
-                shutil.move(folder_path, self.output)
-
         else:
             self.logger.error(res.text)
             sys.exit(1)
@@ -130,9 +127,6 @@ class NowPlayer(Service):
 
             convert_subtitle(folder_path=folder_path,
                              platform=self.platform, lang=self.locale)
-
-            if self.output:
-                shutil.move(folder_path, self.output)
 
         else:
             self.logger.error(res.text)

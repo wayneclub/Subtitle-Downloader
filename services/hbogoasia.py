@@ -292,8 +292,6 @@ class HBOGOAsia(Service):
                         folder_path=lang_path, lang=self.locale)
             convert_subtitle(folder_path=folder_path,
                              platform=self.platform, lang=self.locale)
-            if self.output:
-                shutil.move(folder_path, self.output)
 
     def main(self):
         self.origin = f"https://{urlparse(self.url).netloc}"

@@ -97,8 +97,6 @@ class AppleTVPlus(Service):
 
         convert_subtitle(folder_path=folder_path,
                          platform=self.platform, lang=self.locale)
-        if self.output:
-            shutil.move(folder_path, self.output)
 
     def series_subtitle(self, data):
 
@@ -205,8 +203,6 @@ class AppleTVPlus(Service):
 
             convert_subtitle(folder_path=folder_path,
                              platform=self.platform, lang=self.locale)
-        if self.output:
-            shutil.move(folder_path, self.output)
 
     def parse_m3u(self, m3u8_url):
 
