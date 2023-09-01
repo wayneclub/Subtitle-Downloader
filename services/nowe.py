@@ -100,7 +100,7 @@ class NowE(Service):
         else:
             self.logger.info("\n%s", title)
 
-        title = rename_filename(title)
+        title = rename_filename(f'{title}.{release_year}')
         folder_path = os.path.join(self.download_path, title)
         if os.path.exists(folder_path):
             shutil.rmtree(folder_path)

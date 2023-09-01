@@ -5,6 +5,7 @@
 This module is to download video from NowPlayer
 """
 from pathlib import Path
+import shutil
 import sys
 import os
 import time
@@ -65,10 +66,12 @@ class NowPlayer(Service):
 
             default_language = data['language']
 
-            file_name = f'{title} {release_year}'
+            title = rename_filename(f'{title}.{release_year}')
+            folder_path = os.path.join(self.download_path, title)
+            if os.path.exists(folder_path):
+                shutil.rmtree(folder_path)
 
-            folder_path = os.path.join(
-                self.download_path, rename_filename(file_name))
+            file_name = f'{title}.WEB-DL.{self.platform}'
 
             self.download_subtitle(content_id=data['episodeId'],
                                    title=file_name, folder_path=folder_path, default_language=default_language)
