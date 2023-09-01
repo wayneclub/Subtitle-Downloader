@@ -8,7 +8,6 @@ This module is to login Disney+
 import logging
 import re
 import json
-from getpass import getpass
 import sys
 from configs.config import user_agent
 from utils.helper import get_locale
@@ -107,7 +106,7 @@ class Login(object):
             'x-bamsdk-version': '3.10',
         }
 
-        data = {'email': email, 'password': password}
+        data = {'email': self.email, 'password': self.password}
         res = self.session.post(
             url=self.config['api']['login'], data=json.dumps(data), headers=headers)
         if res.status_code == 200:

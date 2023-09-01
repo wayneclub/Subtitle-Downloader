@@ -11,7 +11,6 @@ import shutil
 import platform
 import sys
 import uuid
-from getpass import getpass
 from pathlib import Path
 from urllib.parse import urlparse
 from configs.config import credentials
