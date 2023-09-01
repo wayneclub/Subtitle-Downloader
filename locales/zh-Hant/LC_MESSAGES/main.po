@@ -15,10 +15,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #: subtitle_downloader.py:22
-msgid ""
-"Download subtitles from Disney Plus, HBOGO Asia, KKTV, LineTV, friDay Video, "
-"iq.com, and Viu"
-msgstr "從Disney Plus、HBOGO Asia、KKTV、LineTV、friDay影音、愛奇藝、Viu 下載劇集、電影、綜藝、動漫等字幕"
+msgid "Support downloading subtitles from multiple streaming services, such as Disney+, HBOGO Asia, KKTV, LineTV, friDay Video, MyVideo, CatchPlay, iq.com, Viu (support HK and SG without vpn), WeTV, NowE, Now Player, AppleTV+, iTunes and etc."
+msgstr "支持從各大串流平台下載字幕，例如：Disney+、HBOGO Asia、KKTV、LineTV、friDay影音、MyVideo、CatchPlay、iq.com（愛奇藝）、Viu、WeTV、NowE、Now Player、AppleTV+、iTunes等等。"
 
 #: subtitle_downloader.py:24
 msgid "series's/movie's url"
@@ -27,6 +25,10 @@ msgstr "電影、影集的網址"
 #: subtitle_downloader.py:29
 msgid "download season [0-9]"
 msgstr "下載 第[0-9]季"
+
+#: subtitle_downloader.py:29
+msgid "download episode [0-9]"
+msgstr "下載 第[0-9]集"
 
 #: subtitle_downloader.py:34
 msgid "download the latest episode"
@@ -71,8 +73,12 @@ msgid "enable debug logging"
 msgstr "偵錯日誌"
 
 #: subtitle_Downloader.py:74
+msgid "show program's version number and exit"
+msgstr "顯示程式版本"
+
+#: subtitle_Downloader.py:74
 msgid "show this help message and exit"
-msgstr "顯示本訊息，然後結束"
+msgstr "顯示參數說明"
 
 #: subtitle_Downloader.py:74
 msgid ""

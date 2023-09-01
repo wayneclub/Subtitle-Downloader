@@ -29,13 +29,13 @@ pip install -r requriements
 | Friday影音 | Cookies |
 | HBOGO Asia | 帳號、密碼 |
 | 愛奇藝 (iq.com) | Cookies |
-| iTunes | None |
-| KKTV | None |
-| LineTV | None |
+| iTunes | 無 |
+| KKTV | 無 |
+| LineTV | 無 |
 | MyVideo | Cookies |
 | NowE | Cookies |
 | Now Player | Cookies |
-| Viu | None |
+| Viu | 無 |
 | WeTV | Cookies |
 
 ### 取得Cookies
@@ -50,7 +50,7 @@ pip install -r requriements
 
 ## 使用方式
 
-- 線上執行 **_(Colab environment is in the US, if you want to use in other region please execute on local)_**
+- 線上執行 **_(Colab環境在美國，如果部分串流被限制，請在本機執行)_**
   1. 連結 Colab
   2. 環境設定，安裝必要程式 (執行第ㄧ個按鈕)
   3. 依照不同平台填入各項必要資料 (執行其他按鈕)
@@ -61,38 +61,41 @@ pip install -r requriements
 
 - 本機執行
 
-  1. 可根據要下載的平台修改user_config.toml設定檔（填入串流平台帳號、密碼等方便下次直接執行） Subtitle-Downloader/user_config.toml
+  1. 可根據要下載的平台修改user_config.toml設定檔（設定字幕預設語言、串流平台帳號/密碼等，方便下次直接執行） Subtitle-Downloader/user_config.toml
   2. 根據欲下載不同串流平台的字幕放入對應cookies.txt到Subtitle-Downloader/cookies
   3. 在終端機執行python指令或是使用Subtitle-Downloader.bat下載字幕
 
   ```
-  python subtitle_downloader.py URL [OPTIONS]
+  python subtitle_downloader.py 電影、影集的網址 [OPTIONS]
   ```
 
 ## 參數
 
 ```
-  -h, --help                    show this help message and exit
+  -h, --help                    顯示參數說明
 
-  -s --season                   download season [0-9]
+  -s --season                   下載 第[0-9]季
 
-  -e --episode                  download episode [0-9]
+  -e --episode                  下載 第[0-9]集
 
-  -l, --last-episode            download last episode
+  -l, --last-episode            下載 最新一集
 
-  -o, --output                  output directory
+  -o, --output                  下載路徑
 
-  -email, --email               account for Disney Plus and HBOGO Asia
+  -email, --email               串流平台帳號
 
-  -password, --password         password for Disney Plus and HBOGO Asia
+  -password, --password         串流平台密碼
 
-  -slang, --subtitle-language   languages of subtitles; use commas to separate multiple languages
-                                default: Traditional Chinese
-                                all: download all available languages
+  -slang, --subtitle-language   字幕語言，用','分隔
+                                預設: 繁體中文
+                                all: 下載所有語言
 
-  -alang, --audio-language      languages of audio-tracks; use commas to separate multiple languages
+  -alang, --audio-language      音軌語言，用','分隔
 
-  -p, --proxy                   proxy
+  -region, --region             串流平台地區
+  -locale, --locale             界面語言
+
+  -p, --proxy                   代理
 ```
 
 ## 字幕語言
@@ -182,56 +185,9 @@ WeTV
 | es | Spanish | 西班牙文 |
 | ko | Korean | 韓文 |
 
-## Friday影音
-
-1. Install https://chrome.google.com/webstore/detail/get-cookiestxt-locally/cclelndahbckbenkjhflpdbgdldlbecc
-2. Login Friday Video, and use this plugin download video.friday.tw_cookies.txt (Don't modify anything even the file name)
-3. Put cookie.txt into Subtitle-Downloader/cookies
-4. Make sure the movies or series which you're going to download is playable in your region.
-
-## MyVideo
-
-1. Install https://chrome.google.com/webstore/detail/get-cookiestxt-locally/cclelndahbckbenkjhflpdbgdldlbecc
-2. Login Friday Video, and use this plugin download www.myvideo.net.tw_cookies.txt (Don't modify anything even the file name)
-3. Put cookie.txt into Subtitle-Downloader/cookies
-4. Make sure the movies or series which you're going to download is playable in your region.
-
-## CatchPlay
-
-1. Install https://chrome.google.com/webstore/detail/get-cookiestxt-locally/cclelndahbckbenkjhflpdbgdldlbecc
-2. Login CatchPlay, and use this plugin download catchplay.com_cookies.txt (Don't modify anything even the file name)
-3. Put cookie.txt into Subtitle-Downloader/cookies
-4. Make sure the movies or series which you're going to download is playable in your region.
-
 ## Now E, Now Player
 
-1. Install https://chrome.google.com/webstore/detail/get-cookiestxt-locally/cclelndahbckbenkjhflpdbgdldlbecc
-2. Login NowE, and use this plugin download nowe.com_cookies.txt (Don't modify anything even the file name)
-3. Copy user-agent from login browser (https://www.whatsmyua.info/) and paste it in Subtitle-Downloader/user_config.toml (User-Agent). The user-agent must be same as login browser user-agent.
-3. Put cookie.txt into Subtitle-Downloader/cookies
-4. Make sure the movies or series which you're going to download is playable in your region.
-
-## 愛奇藝（iq.com）
-
-1. Install https://chrome.google.com/webstore/detail/get-cookiestxt-locally/cclelndahbckbenkjhflpdbgdldlbecc
-2. Use this plugin download iq.com_cookies.txt (Don't modify anything even the file name)
-3. Put cookie.txt into Subtitle-Downloader/cookies
-4. Install NodeJS https://nodejs.org/en/download (Windows install .msi)
-5. Make sure the movies or series which you're going to download is playable in your region.
-
-## WeTV
-
-1. Install https://chrome.google.com/webstore/detail/get-cookiestxt-locally/cclelndahbckbenkjhflpdbgdldlbecc
-2. Use this plugin download wetv.vip_cookies.txt (Don't modify anything even the file name)
-3. Put cookie.txt into Subtitle-Downloader/cookies
-4. Make sure the movies or series which you're going to download is playable in your region.
-
-## AppleTV+（iTunes）
-
-1. Install https://chrome.google.com/webstore/detail/get-cookiestxt-locally/cclelndahbckbenkjhflpdbgdldlbecc
-2. Use this plugin download tv.apple.com_cookies.txt (Don't modify anything even the file name)
-3. Put cookie.txt into Subtitle-Downloader/cookies
-4. Make sure the movies or series which you're going to download is playable in your region.
+- 從瀏覽器複製 User-Agent (https://www.whatsmyua.info/)，並貼在 Subtitle-Downloader/user_config.toml (User-Agent). User-Agent必須與登入Now E、Now Player相同。
 
 
 ## 更多範例

@@ -21,7 +21,7 @@ def main() -> None:
 
     parser = argparse.ArgumentParser(
         description=_(
-            "Download subtitles from Disney Plus, HBOGO Asia, KKTV, LineTV, friDay Video, iq.com, and Viu"),
+            "Support downloading subtitles from multiple streaming services, such as Disney+, HBOGO Asia, KKTV, LineTV, friDay Video, MyVideo, CatchPlay, iq.com, Viu (support HK and SG without vpn), WeTV, NowE, Now Player, AppleTV+, iTunes and etc."),
         add_help=False)
     parser.add_argument('url',
                         help=_("series's/movie's url"))
@@ -74,7 +74,7 @@ def main() -> None:
                         '--proxy',
                         dest='proxy',
                         nargs='?',
-                        help="proxy")
+                        help=_("proxy"))
     parser.add_argument(
         '-d',
         '--debug',
@@ -93,7 +93,8 @@ def main() -> None:
         '--version',
         action='version',
         version='{app_name} {version}'.format(
-            app_name=app_name, version=__version__)
+            app_name=app_name, version=__version__),
+        help=_("show program's version number and exit")
     )
 
     args = parser.parse_args()
