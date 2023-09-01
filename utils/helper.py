@@ -14,6 +14,7 @@ from natsort import natsorted
 import requests
 from selenium import webdriver
 import chromedriver_autoinstaller
+import validators
 from configs.config import user_agent
 from constants import ISO_6391
 
@@ -106,17 +107,20 @@ def get_language_code(lang=''):
 def check_url_exist(url, headers={}):
     """Validate url exist"""
 
-    try:
-        response = requests.options(url, timeout=10)
-        if response.ok:
-            return True
-        else:
+    if validators.url(url):
+        try:
+            response = requests.options(
+                url, headers={'user-agent': user_agent}, timeout=10)
+            if response.ok:
+                return True
+            else:
+                logger.error(
+                    "Failure - API is accessible but sth is not right. Response codde : %s", response.status_code)
+        except (requests.exceptions.HTTPError, requests.exceptions.ConnectionError) as error:
             logger.error(
-                "Failure - API is accessible but sth is not right. Response codde : %s", response.status_code)
-    except (requests.exceptions.HTTPError, requests.exceptions.ConnectionError) as error:
-        logger.error("Failure - Unable to establish connection: %s.", error)
-    except Exception as error:
-        logger.error("Failure - Unknown error occurred: %s.", error)
+                "Failure - Unable to establish connection: %s.", error)
+        except Exception as error:
+            logger.error("Failure - Unknown error occurred: %s.", error)
 
     return False
 

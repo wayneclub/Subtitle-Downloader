@@ -11,8 +11,10 @@ Subtitle-Downloader:
 	msgfmt -o locales/zh-Hant/LC_MESSAGES/services.kktv.mo locales/zh-Hant/LC_MESSAGES/services.kktv
 	msgfmt -o locales/zh-Hant/LC_MESSAGES/services.linetv.mo locales/zh-Hant/LC_MESSAGES/services.linetv
 	msgfmt -o locales/zh-Hant/LC_MESSAGES/services.fridayvideo.mo locales/zh-Hant/LC_MESSAGES/services.fridayvideo
-		msgfmt -o locales/zh-Hant/LC_MESSAGES/services.myvideo.mo locales/zh-Hant/LC_MESSAGES/services.myvideo
+	msgfmt -o locales/zh-Hant/LC_MESSAGES/services.myvideo.mo locales/zh-Hant/LC_MESSAGES/services.myvideo
 	msgfmt -o locales/zh-Hant/LC_MESSAGES/services.itunes.mo locales/zh-Hant/LC_MESSAGES/services.itunes
 	msgfmt -o locales/zh-Hant/LC_MESSAGES/services.catchplay.mo locales/zh-Hant/LC_MESSAGES/services.catchplay
 	msgfmt -o locales/zh-Hant/LC_MESSAGES/services.wetv.wetv.mo locales/zh-Hant/LC_MESSAGES/services.wetv.wetv
 	msgfmt -o locales/zh-Hant/LC_MESSAGES/services.appletvplus.mo locales/zh-Hant/LC_MESSAGES/services.appletvplus
+	msgfmt -o locales/zh-Hant/LC_MESSAGES/services.nowe.mo locales/zh-Hant/LC_MESSAGES/services.nowe
+	msgfmt -o locales/zh-Hant/LC_MESSAGES/services.nowplayer.mo locales/zh-Hant/LC_MESSAGES/services.nowplayer

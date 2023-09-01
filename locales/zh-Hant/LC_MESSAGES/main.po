@@ -21,7 +21,7 @@ msgid ""
 msgstr "從Disney Plus、HBOGO Asia、KKTV、LineTV、friDay影音、愛奇藝、Viu 下載劇集、電影、綜藝、動漫等字幕"
 
 #: subtitle_downloader.py:24
-msgid "series's/movie's link"
+msgid "series's/movie's url"
 msgstr "電影、影集的網址"
 
 #: subtitle_downloader.py:29
@@ -37,11 +37,11 @@ msgid "output directory"
 msgstr "下載路徑"
 
 #: subtitle_downloader.py:42
-msgid "account for Disney Plus and HBOGO Asia"
+msgid "account for streaming service"
 msgstr "串流平台帳號"
 
 #: subtitle_downloader.py:46
-msgid "password for Disney Plus and HBOGO Asia"
+msgid "password for streaming service"
 msgstr "串流平台密碼"
 
 #: subtitle_downloader.py:50
@@ -62,6 +62,10 @@ msgstr "串流平台地區"
 msgid "interface language"
 msgstr "界面語言"
 
+#: subtitle_Downloader.py:68
+msgid "proxy"
+msgstr "代理"
+
 #: subtitle_Downloader.py:74
 msgid "enable debug logging"
 msgstr "偵錯日誌"
@@ -70,8 +74,13 @@ msgstr "偵錯日誌"
 msgid "show this help message and exit"
 msgstr "顯示本訊息，然後結束"
 
+#: subtitle_Downloader.py:74
+msgid ""
+"\n"
+"Please input correct url!"
+msgstr "\n輸入網址有誤，請檢查網址是否正確！"
+
 #: subtitle_Downloader.py:136
 msgid ""
-"Only support downloading subtitles from Disney Plus, HBOGO Asia, KKTV, "
-"LineTV, friDay Video, iq.com, CatchPlay, WeTV, and iTunes."
-msgstr "目前僅支持從\n1. KKTV\t\t下載電影、影集、綜藝、動漫字幕\n2. LineTV\t下載影集、綜藝字幕\n3. FriDay影音\t下載影集、電影、綜藝、動漫字幕\n4. 愛奇藝\t下載電影、影集\n5. Disney+\t下載電影、影集\n6. HBOGO Asia\t下載電影、影集\n7. Viu\t下載電影、影集\n8. CatchPlay下載電影、影集\n9. WeTV\n\n請確認網站網址無誤"
+"Only support downloading subtitles from %s"
+msgstr "目前僅支持從 %s下載字幕，請確認網站網址無誤"

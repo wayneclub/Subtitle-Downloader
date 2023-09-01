@@ -14,6 +14,7 @@ import shutil
 import time
 from cn2an import cn2an
 from configs.config import config, credentials, user_agent
+from utils.helper import get_locale
 from utils.io import rename_filename
 from utils.subtitle import convert_subtitle
 from services.service import Service
@@ -30,6 +31,7 @@ class NowE(Service):
 
     def __init__(self, args):
         super().__init__(args)
+        self._ = get_locale(__name__, self.locale)
 
     def generate_caller_reference_no(self):
         return f"W{int(time.time() * 1000)}{math.floor((1 + random.random()) * 900) + 100}"
@@ -58,7 +60,7 @@ class NowE(Service):
                 return data['OTTSESSIONID']
             else:
                 self.logger.error(
-                    "\nPlease renew the cookies, and make sure config.py NowE's user_agent is same as login browser!")
+                    self._("\nPlease renew the cookies, and make sure user_config.toml's User-Agent is same as %s in the browser!"), self.platform)
                 os.remove(
                     Path(config.directories['cookies']) / credentials[self.platform]['cookies'])
                 sys.exit(1)
@@ -86,7 +88,7 @@ class NowE(Service):
     def movie_metadata(self, data):
         title = data['brandName'].replace('Now 爆谷台呈獻: ', '')
         content_id = data['episodeId']
-        self.logger.info("\n%s", title)
+        self.logger.info(self._("\n%s"), title)
 
         title = rename_filename(title)
         folder_path = os.path.join(self.download_path, title)
@@ -114,7 +116,7 @@ class NowE(Service):
                 title = data['brandName'].strip()
                 season_index = 1
 
-        self.logger.info("\n%s Season %s", title, season_index)
+        self.logger.info(self._("\n%s Season %s"), title, season_index)
         title = rename_filename(
             f'{title}.S{str(season_index).zfill(2)}')
         folder_path = os.path.join(self.download_path, title)
@@ -127,15 +129,15 @@ class NowE(Service):
 
         if self.last_episode:
             episode_list = [episode_list[-1]]
-            self.logger.info("\nSeason %s total: %s episode(s)\tdownload season %s last episode\n---------------------------------------------------------------",
+            self.logger.info(self._("\nSeason %s total: %s episode(s)\tdownload season %s last episode\n---------------------------------------------------------------"),
                              season_index,
                              episode_num,
                              season_index)
         elif self.download_episode:
             self.logger.info(
-                "\nSeason %s total: %s episode(s)\tdownload episode: %s\n---------------------------------------------------------------", season_index, episode_num, self.download_episode)
+                self._("\nSeason %s total: %s episode(s)\tdownload episode: %s\n---------------------------------------------------------------"), season_index, episode_num, self.download_episode)
         else:
-            self.logger.info("\nSeason %s total: %s episode(s)\tdownload all episodes\n---------------------------------------------------------------",
+            self.logger.info(self._("\nSeason %s total: %s episode(s)\tdownload all episodes\n---------------------------------------------------------------"),
                              season_index,
                              episode_num)
 
@@ -181,7 +183,7 @@ class NowE(Service):
             if data['responseCode'] != 'SUCCESS':
                 if data['responseCode'] == 'NEED_SUB':
                     self.logger.error(
-                        "Please check your subscription plan, and make sure you are able to watch it online!")
+                        self._("\nPlease check your subscription plan, and make sure you are able to watch it online!"))
                 else:
                     self.logger.error("Error: %s", data['responseCode'])
                 sys.exit(1)
@@ -204,7 +206,7 @@ class NowE(Service):
 
         content_id = re.search(r'(season|movie)\/([^\/]+)', self.url)
         if not content_id:
-            self.logger.error("Unable to find content id!")
+            self.logger.error(self._("Unable to find content id!"))
             sys.exit(1)
 
         content_id = content_id.group(2).strip()

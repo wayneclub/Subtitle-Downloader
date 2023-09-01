@@ -132,7 +132,6 @@ class FridayVideo(Service):
         return season_list, episode_list
 
     def series_metadata(self, data):
-        """Download subtitle from friDay"""
 
         title = re.sub(r'(.+?)(第.+[季|彈])*', '\\1', data['chineseName']).strip()
         original_title = data['englishName'].replace('，', ',')

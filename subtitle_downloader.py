@@ -24,7 +24,7 @@ def main() -> None:
             "Download subtitles from Disney Plus, HBOGO Asia, KKTV, LineTV, friDay Video, iq.com, and Viu"),
         add_help=False)
     parser.add_argument('url',
-                        help=_("series's/movie's link"))
+                        help=_("series's/movie's url"))
     parser.add_argument('-s',
                         '--season',
                         dest='season',
@@ -45,11 +45,11 @@ def main() -> None:
     parser.add_argument('-email',
                         '--email',
                         dest='email',
-                        help=_("account for Disney Plus and HBOGO Asia"))
+                        help=_("account for streaming service"))
     parser.add_argument('-password',
                         '--password',
                         dest='password',
-                        help=_("password for Disney Plus and HBOGO Asia"))
+                        help=_("password for streaming service"))
     parser.add_argument('-slang',
                         '--subtitle-language',
                         dest='subtitle_language',
@@ -123,7 +123,7 @@ def main() -> None:
     if not validators.url(args.url):
         logging.warning(
             _("\nPlease input correct url!"))
-        sys.exit(1)
+        sys.exit(0)
 
     service = next((service for service in service_map
                    if service['keyword'] in args.url), None)

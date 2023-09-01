@@ -7,11 +7,11 @@ This module is to download video from NowPlayer
 from pathlib import Path
 import sys
 import os
-import shutil
 import time
 from urllib.parse import parse_qs, urlparse
 from requests.utils import cookiejar_from_dict
 from configs.config import config, credentials, user_agent
+from utils.helper import get_locale
 from utils.io import rename_filename
 from utils.subtitle import convert_subtitle
 from services.service import Service
@@ -26,6 +26,7 @@ class NowPlayer(Service):
 
     def __init__(self, args):
         super().__init__(args)
+        self._ = get_locale(__name__, self.locale)
 
     def generate_caller_reference_no(self):
         return f"NPXWC{int(time.time() * 1000)}"
@@ -146,7 +147,7 @@ class NowPlayer(Service):
             if not data.get('asset'):
                 if data.get('responseCode') == "NEED_LOGIN":
                     self.logger.error(
-                        "Please renew the cookies, and make sure config.py USERR_AGENT is same as login browser!")
+                        self._("\nPlease renew the cookies, and make sure user_config.toml's User-Agent is same as %s in the browser!"), self.platform)
                     os.remove(
                         Path(config.directories['cookies']) / credentials[self.platform]['cookies'])
                     sys.exit(1)
@@ -154,7 +155,7 @@ class NowPlayer(Service):
                     self.logger.error("Error: %s", data.get('responseCode'))
                     sys.exit(1)
         else:
-            self.logger.error("Failed to get tracks: %s", res.text)
+            self.logger.error(self._("Failed to get tracks: %s"), res.text)
             sys.exit(1)
 
         media_src = next(
@@ -182,7 +183,8 @@ class NowPlayer(Service):
         if params.get('id'):
             content_id = params.get('id')[0]
         else:
-            self.logger.error("\nUnable to find content id!")
+            self.logger.error(
+                "\nUnable to find content id, Please check the url is valid.")
             sys.exit(1)
 
         if params.get('type') and params.get('type')[0] == 'product':
