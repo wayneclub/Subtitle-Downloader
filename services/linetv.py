@@ -127,7 +127,7 @@ class LineTV(Service):
             drama_id = drama_id_search.group(1)
         else:
             self.logger.error("\nCan't detect content id: %s", self.url)
-            sys.exit(-1)
+            sys.exit(1)
 
         res = self.session.get(url=self.url, timeout=5)
 

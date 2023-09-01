@@ -4,6 +4,7 @@ ISO_6391 = {
     'tw': 'zh-Hant',
     'zh-hant': 'zh-Hant',
     'zh-tw': 'zh-Hant',
+    'zho': 'zh-Hant',
     'cmn-hant': 'zh-Hant',
     'zh-hk': 'zh-HK',
     'hk': 'zh-HK',

@@ -110,7 +110,7 @@ class KKTV(Service):
                             if not episode['subtitles']:
                                 self.logger.error(
                                     self._("\nSorry, there's no embedded subtitles in this video!"))
-                                sys.exit(0)
+                                break
 
                             if 'ja' in episode['subtitles']:
                                 ja_lang = True

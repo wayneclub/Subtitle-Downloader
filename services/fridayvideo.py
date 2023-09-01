@@ -47,10 +47,8 @@ class FridayVideo(Service):
 
         self.logger.info("\n%s (%s) [%s]", title, original_title, release_year)
 
-        title = f'{title}.{release_year}'
-
-        folder_path = os.path.join(
-            self.download_path, rename_filename(title))
+        title = rename_filename(f'{title}.{release_year}')
+        folder_path = os.path.join(self.download_path, title)
 
         media_info = {
             'streaming_id': data['streamingId'],
@@ -257,10 +255,10 @@ class FridayVideo(Service):
                 return True
             else:
                 self.logger.error(res.text)
-                sys.exit(-1)
+                sys.exit(1)
         else:
             self.logger.error(res.text)
-            sys.exit(-1)
+            sys.exit(1)
 
     def get_subtitle(self, media_info, folder_path, file_name):
         data = self.get_media_info(media_info, file_name)
@@ -318,7 +316,7 @@ class FridayVideo(Service):
             content_type = self.get_content_type(content_search.group(2))
         else:
             self.logger.error("\nCan't detect content id: %s", self.url)
-            sys.exit(-1)
+            sys.exit(1)
 
         title_url = self.config['api']['title'].format(
             content_id=content_id, content_type=content_type)
@@ -332,7 +330,7 @@ class FridayVideo(Service):
                     data = data['data']['content']
                 else:
                     self.logger.error(data['message'])
-                    sys.exit(-1)
+                    sys.exit(1)
 
                 if content_type == 1:
                     self.movie_metadata(data)
@@ -344,6 +342,6 @@ class FridayVideo(Service):
                         "\nCookies is expired!\nPlease log out (https://video.friday.tw/logout), login, and re-download cookies!")
                     os.remove(
                         Path(config.directories['cookies']) / credentials[self.platform]['cookies'])
-                    sys.exit(-1)
+                    sys.exit(1)
         else:
             self.logger.error(res.text)

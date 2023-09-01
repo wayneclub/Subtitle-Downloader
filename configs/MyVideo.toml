@@ -1,0 +1,6 @@
+credentials = 'cookies'
+required = 'clientID'
+
+[api]
+media_info = 'https://www.myvideo.net.tw/ajax/ajaxGetVideoData?contentId={content_id}&engine=html5&isSeries=0&isPreview=false&excludeAVOD=N'
+check_session = 'https://www.myvideo.net.tw/ajax/ajaxCheckSession.do?_={time}'

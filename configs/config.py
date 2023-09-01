@@ -2,7 +2,7 @@
 # coding: utf-8
 
 """
-This module is for config.
+This module is for default setting.
 """
 from __future__ import annotations
 from os.path import dirname
@@ -11,16 +11,10 @@ from typing import Any
 import rtoml
 
 app_name = "Subtitle-Downloader"
-__version__ = "1.0.0"
+__version__ = "2.0.0"
 
 
 dir_path = dirname(dirname(__file__)).replace("\\", "/")
-
-default_path = {
-    "cookies":  f"{dir_path}/cookies",
-    "downloads": f"{dir_path}/downloads",
-    "logs": f"{dir_path}/logs",
-}
 
 
 class Platform:
@@ -28,39 +22,20 @@ class Platform:
     Define all streaming service name
     """
 
-    KKTV = "KKTV"
-    LINETV = "LineTV"
-    FRIDAYVIDEO = "FridayVideo"
+    APPLETVPLUS = 'AppleTVPlus'
     CATCHPLAY = 'CatchPlay'
-    IQIYI = "iQIYI"
-    WETV = 'WeTV'
-    VIU = "Viu"
+    DISNEYPLUS = 'DisneyPlus'
+    FRIDAYVIDEO = 'FridayVideo'
+    HBOGOASIA = 'HBOGOAsia'
+    IQIYI = 'iQIYI'
+    ITUNES = 'iTunes'
+    KKTV = 'KKTV'
+    LINETV = 'LineTV'
+    MYVIDEO = 'MyVideo'
     NOWE = 'NowE'
     NOWPLAYER = 'NowPlayer'
-    DISNEYPLUS = "DisneyPlus"
-    HBOGOASIA = "HBOGOAsia"
-    APPLETVPLUS = 'AppleTVPlus'
-    ITUNES = "iTunes"
-
-
-VPN = {
-    "proxies": "http://133.167.113.61:7890",
-    "nordvpn": {
-        "port": "80",
-        # Advanced configuration (https://my.nordaccount.com/dashboard/nordvpn/)
-        "username": "me@wayneclub.com",
-        "password": "W.wei0414&tw@VPN",
-        "http": "http://{email}:{passwd}@{ip}:{port}",
-    },
-    "private": {
-        "port": "8080",
-        # Enter the email address of your VPN account here
-        "email": "enter your email address here",
-        # Enter the password of your VPN account here
-                "passwd": "enter your password here",
-                "http": "http://{email}:{passwd}@{ip}:{port}",
-    },
-}
+    VIU = 'Viu'
+    WETV = 'WeTV'
 
 
 class Config:
@@ -80,9 +55,6 @@ class Config:
             raise FileNotFoundError(
                 f"Config file path ({path}) is not to a file.")
         return cls(**rtoml.load(path))
-
-    def vpn(self):
-        return VPN
 
 
 class Directories:

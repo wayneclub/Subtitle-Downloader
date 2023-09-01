@@ -81,14 +81,14 @@ class AppleTVPlus(Service):
         if not m3u8_url:
             self.logger.error(
                 self._("\nSorry, you haven't purchased this movie!"))
-            sys.exit(1)
+            sys.exit(0)
 
         subtitle_list = self.parse_m3u(m3u8_url=m3u8_url)
 
         if not subtitle_list:
             self.logger.error(
                 self._("\nSorry, there's no embedded subtitles in this video!"))
-            sys.exit(1)
+            sys.exit(0)
 
         self.logger.info(
             self._("\nDownload: %s\n---------------------------------------------------------------"), file_name)

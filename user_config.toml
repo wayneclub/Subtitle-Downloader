@@ -38,6 +38,9 @@ password = ''
 [credentials.iQIYI]
 cookies = 'www.iq.com_cookies.txt'
 
+[credentials.MyVideo]
+cookies = 'www.myvideo.net.tw_cookies.txt'
+
 [credentials.NowE]
 cookies = 'nowe.com_cookies.txt'
 
