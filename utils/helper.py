@@ -8,15 +8,10 @@ import os
 import locale
 import logging
 import gettext
-from pathlib import Path
 import re
-from operator import itemgetter
-import multiprocessing
 import sys
 from natsort import natsorted
-import orjson
 import requests
-from tqdm import tqdm
 from selenium import webdriver
 import chromedriver_autoinstaller
 from configs.config import user_agent
@@ -24,6 +19,10 @@ from constants import ISO_6391
 
 
 class EpisodesNumbersHandler(object):
+    """
+    Convert user-input episode range to list of int numbers
+    """
+
     def __init__(self, episodes):
         self.episodes = episodes
 

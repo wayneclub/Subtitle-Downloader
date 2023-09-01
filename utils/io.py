@@ -7,22 +7,16 @@ This module is for I/O.
 
 from __future__ import annotations
 import logging
-import locale
-import gettext
 import multiprocessing
 from operator import itemgetter
 import os
-import time
-from typing import Optional, Union
+from typing import Union
 from pathlib import Path
-import html
 import re
-import sys
 from tqdm import tqdm
-from http.cookiejar import MozillaCookieJar
 import requests
 import rtoml
-from configs.config import config, credentials, user_agent
+from configs.config import user_agent
 from utils.helper import check_url_exist, get_locale
 
 
@@ -61,7 +55,7 @@ def rename_filename(filename):
 
 
 def download_file(url, output_path, headers={}):
-    """Downloda file from url"""
+    """Download file from url"""
 
     if check_url_exist(url):
 
