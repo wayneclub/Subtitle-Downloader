@@ -1,6 +1,6 @@
 # Subtitle Downloader
 
-[![zh](https://img.shields.io/badge/lang-中文-blue)](https://github.com/wayneclub/Subtitle-Downloader/blob/main/README.zh-Hant.md) [![python](https://img.shields.io/badge/python-3.8-blue](https://www.python.org/downloads/)
+[![zh](https://img.shields.io/badge/lang-中文-blue)](https://github.com/wayneclub/Subtitle-Downloader/blob/main/README.zh-Hant.md) [![python](https://img.shields.io/badge/python-3.8-blue)](https://www.python.org/downloads/)
 
 **NON-COMMERCIAL USE ONLY**
 
@@ -22,6 +22,7 @@ pip install -r requriements
 ## Service Requirements
 
 | Name | Authentication |
+| ---- | -------------- |
 | Apple TV+ | Cookies |
 | CatchPlay | Cookies |
 | Disney+ | Email & Password |

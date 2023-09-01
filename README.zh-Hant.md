@@ -1,6 +1,6 @@
 # Subtitle Downloader
 
-[![en](https://img.shields.io/badge/lang-English-blue)](https://github.com/wayneclub/Subtitle-Downloader/blob/main/README.md) [![python](https://img.shields.io/badge/python-3.8-blue](https://www.python.org/downloads/)
+[![en](https://img.shields.io/badge/lang-English-blue)](https://github.com/wayneclub/Subtitle-Downloader/blob/main/README.md) [![python](https://img.shields.io/badge/python-3.8-blue)](https://www.python.org/downloads/)
 
 **禁止營利使用，只限個人研究和語言學習，字幕版權皆屬原串流平台所有**
 
@@ -22,6 +22,7 @@ pip install -r requriements
 ## 必要驗證資訊
 
 | Name | 驗證方式 |
+| ---- | ------- |
 | Apple TV+ | Cookies |
 | CatchPlay | Cookies |
 | Disney+ | 帳號、密碼 |
