@@ -102,7 +102,7 @@ class Service(object):
         tmdb.api_key = credentials['TMDB']['api_key']
 
     def validate_config(self, service_config):
-        """ validate service config """
+        """ Validate service config """
 
         if service_config.get('credentials') == 'cookies':
             if credentials[self.platform].get('cookies'):
@@ -155,46 +155,36 @@ class Service(object):
         return tuple([
             language for language in subtitle_language.split(',')])
 
-    def get_movie_info(self, title, title_aliases):
-        """ Get movie details from TMDB """
+    def get_title_info(self, title="", title_aliases=[], is_movie=True):
+        """ Get title info from TMDB """
 
-        if not title_aliases:
-            title_aliases = []
-
+        title_info = {}
         title_aliases.append(opencc.OpenCC('t2s.json').convert(title))
-        movie = Movie()
+        if is_movie:
+            movie = Movie()
+            results = movie.search(title.strip())
+        else:
+            tv = TV()
+            results = tv.search(title.strip())
 
-        results = movie.search(title.strip())
-
-        if results:
-            return results[0]
+        if results.get('results'):
+            title_info = results.get('results')[0]
         else:
             for alias in title_aliases:
-                results = movie.search(alias.strip())
-                if results:
-                    return results[0]
-
-    def get_series_info(self, title, title_aliases):
-        """Get series details from TMDB """
-
-        if not title_aliases:
-            title_aliases = []
-
-        title_aliases.append(opencc.OpenCC('t2s.json').convert(title))
-
-        tv = TV()
-        results = tv.search(title.strip())
-
-        if results:
-            return results[0]
-        else:
-            for alias in title_aliases:
-                results = tv.search(alias.strip())
-                if results:
-                    return results[0]
+                if is_movie:
+                    results = movie.search(alias.strip())
+                else:
+                    results = tv.search(alias.strip())
+                    if results.get('results'):
+                        title_info = results.get('results')[0]
+        if title_info:
+            return title_info
 
 
 class TLSAdapter(requests.adapters.HTTPAdapter):
+    """
+    Fix openssl issue
+    """
 
     def init_poolmanager(self, *args, **kwargs):
         ctx = ssl.create_default_context()

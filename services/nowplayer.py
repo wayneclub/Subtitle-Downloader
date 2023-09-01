@@ -52,13 +52,16 @@ class NowPlayer(Service):
             chinese_title = self.session.get(
                 self.config['api']['movie'].format(product_id=content_id)).json()[0]['episodeTitle']
 
-            movie_info = self.get_movie_info(
+            release_year = ''
+            movie_info = self.get_title_info(
                 title=chinese_title, title_aliases=[title])
             if movie_info:
                 release_year = movie_info['release_date'][:4]
 
-            self.logger.info("\n%s (%s) [%s]", title,
-                             chinese_title, release_year)
+            if release_year:
+                self.logger.info("\n%s (%s)", title, release_year)
+            else:
+                self.logger.info("\n%s", title)
 
             default_language = data['language']
 

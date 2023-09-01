@@ -88,7 +88,17 @@ class NowE(Service):
     def movie_metadata(self, data):
         title = data['brandName'].replace('Now 爆谷台呈獻: ', '')
         content_id = data['episodeId']
-        self.logger.info(self._("\n%s"), title)
+
+        release_year = ''
+        movie_info = self.get_title_info(
+            title=title, title_aliases=[title])
+        if movie_info:
+            release_year = movie_info['release_date'][:4]
+
+        if release_year:
+            self.logger.info("\n%s (%s)", title, release_year)
+        else:
+            self.logger.info("\n%s", title)
 
         title = rename_filename(title)
         folder_path = os.path.join(self.download_path, title)
