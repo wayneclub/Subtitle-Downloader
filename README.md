@@ -1,23 +1,51 @@
 # Subtitle Downloader
 
-[![zh](https://img.shields.io/badge/lang-中文-blue)](https://github.com/wayneclub/Subtitle-Downloader/blob/main/README.zh-Hant.md)
+[![zh](https://img.shields.io/badge/lang-中文-blue)](https://github.com/wayneclub/Subtitle-Downloader/blob/main/README.zh-Hant.md) [![python](https://img.shields.io/badge/python-3.8-blue](https://www.python.org/downloads/)
 
 **NON-COMMERCIAL USE ONLY**
 
-Subtitle-Downloader supports downloading subtitles from multiple streaming services, such as Disney Plus, HBOGO Asia, KKTV, LineTV, friDay Video, CatchPlay, iq.com, Viu (support HK and SG without vpn), WeTV, NowE, Now Player, AppleTV Plus, iTunes and etc.
+Subtitle-Downloader supports downloading subtitles from multiple streaming services, such as Disney Plus, HBOGO Asia, KKTV, LineTV, friDay Video, MyVideo, CatchPlay, iq.com, Viu (support HK and SG without vpn), WeTV, NowE, Now Player, AppleTV Plus, iTunes and etc.
 
 ## DESCRIPTION
 
-Subtitle-Downloader is a command-line program to download subtitles from the most popular streaming platform. It requires the Python interpreter, version 3.6+, and is not platform specific. It should work on Linux, on Windows or on macOS. This project is only for personal research and language learning.
+Subtitle-Downloader is a command-line program to download subtitles from the most popular streaming platform. It requires [Python 3.8+](https://www.python.org/downloads/), and [NodeJS](https://nodejs.org/en/download). It should work on Linux, on Windows or on macOS. This project is only for personal research and language learning.
 
 ## INSTALLATION
 
-- Linux:
+- Linux, macOS:
 ```
 pip install -r requriements
 ```
 
 - Windows: Execute install_requirements.bat
+
+## Service Requirements
+
+| Name | Authentication |
+| Apple TV+ | Cookies |
+| CatchPlay | Cookies |
+| Disney+ | Email & Password |
+| Friday Video | Cookies |
+| HBOGO Asia | Email & Password |
+| iQIYI (iq.com) | Cookies |
+| iTunes | None |
+| KKTV | None |
+| LineTV | None |
+| MyVideo | Cookies |
+| NowE | Cookies |
+| Now Player | Cookies |
+| Viu | None |
+| WeTV | Cookies |
+
+### Get Cookies
+
+1. Install https://chrome.google.com/webstore/detail/get-cookiestxt-locally/cclelndahbckbenkjhflpdbgdldlbecc
+2. Login to the streaming service, and use the plugin to download cookies.txt (Don't modify anything even the file name)
+3. Put cookie.txt into Subtitle-Downloader/cookies
+
+### Email & Password
+
+- Fill your email and password in Subtitle-Downloader/user_config.toml
 
 ## USAGE
 
@@ -154,50 +182,9 @@ WeTV
 | es | Spanish | 西班牙文 |
 | ko | Korean | 韓文 |
 
-## Friday Video
-
-1. Install https://chrome.google.com/webstore/detail/get-cookiestxt-locally/cclelndahbckbenkjhflpdbgdldlbecc
-2. Login Friday Video, and use this plugin download video.friday.tw_cookies.txt (Don't modify anything even the file name)
-3. Put cookie.txt into Subtitle-Downloader/cookies
-4. Make sure the movies or series which you're going to download is playable in your region.
-
-## CatchPlay
-
-1. Install https://chrome.google.com/webstore/detail/get-cookiestxt-locally/cclelndahbckbenkjhflpdbgdldlbecc
-2. Login CatchPlay, and use this plugin download catchplay.com_cookies.txt (Don't modify anything even the file name)
-3. Put cookie.txt into Subtitle-Downloader/cookies
-4. Make sure the movies or series which you're going to download is playable in your region.
-
 ## Now E, Now Player
 
-1. Install https://chrome.google.com/webstore/detail/get-cookiestxt-locally/cclelndahbckbenkjhflpdbgdldlbecc
-2. Login NowE, and use this plugin download nowe.com_cookies.txt (Don't modify anything even the file name)
-3. Copy user-agent from login browser (https://www.whatsmyua.info/) and paste it in Subtitle-Downloader/user_config.toml (User-Agent). The user-agent must be same as login browser user-agent.
-3. Put cookie.txt into Subtitle-Downloader/cookies
-4. Make sure the movies or series which you're going to download is playable in your region.
-
-## iq.com
-
-1. Install https://chrome.google.com/webstore/detail/get-cookiestxt-locally/cclelndahbckbenkjhflpdbgdldlbecc
-2. Use this plugin download iq.com_cookies.txt (Don't modify anything even the file name)
-3. Put cookie.txt into Subtitle-Downloader/cookies
-4. Install NodeJS https://nodejs.org/en/download (Windows install .msi)
-5. Make sure the movies or series which you're going to download is playable in your region.
-
-## WeTV
-
-1. Install https://chrome.google.com/webstore/detail/get-cookiestxt-locally/cclelndahbckbenkjhflpdbgdldlbecc
-2. Use this plugin download wetv.vip_cookies.txt (Don't modify anything even the file name)
-3. Put cookie.txt into Subtitle-Downloader/cookies
-4. Make sure the movies or series which you're going to download is playable in your region.
-
-## AppleTV+ (iTunes)
-
-1. Install https://chrome.google.com/webstore/detail/get-cookiestxt-locally/cclelndahbckbenkjhflpdbgdldlbecc
-2. Use this plugin download tv.apple.com_cookies.txt (Don't modify anything even the file name)
-3. Put cookie.txt into Subtitle-Downloader/cookies
-4. Make sure the movies or series which you're going to download is playable in your region.
-
+- Copy user-agent from login browser (https://www.whatsmyua.info/) and paste it in Subtitle-Downloader/user_config.toml (User-Agent). The user-agent must be same as login browser user-agent.
 
 ## More Examples
 - Download all seasons and all episodes

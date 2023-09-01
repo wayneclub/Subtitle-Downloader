@@ -1,30 +1,58 @@
 # Subtitle Downloader
 
-[![en](https://img.shields.io/badge/lang-English-blue)](https://github.com/wayneclub/Subtitle-Downloader/blob/main/README.md)
+[![en](https://img.shields.io/badge/lang-English-blue)](https://github.com/wayneclub/Subtitle-Downloader/blob/main/README.md) [![python](https://img.shields.io/badge/python-3.8-blue](https://www.python.org/downloads/)
 
 **禁止營利使用，只限個人研究和語言學習，字幕版權皆屬原串流平台所有**
 
-Subtitle-Downloader 支持從各大串流平台下載字幕，例如：Disney Plus、HBOGO Asia、KKTV、LineTV、friDay影音、CatchPlay、iq.com（愛奇藝）、Viu（不需要VPN即可下載香港、新加坡地區的字幕）、WeTV、NowE、Now Player、AppleTV Plus、iTunes等等。
+Subtitle-Downloader 支持從各大串流平台下載字幕，例如：Disney Plus、HBOGO Asia、KKTV、LineTV、friDay影音、MyVideo、CatchPlay、iq.com（愛奇藝）、Viu（不需要VPN即可下載香港、新加坡地區的字幕）、WeTV、NowE、Now Player、AppleTV Plus、iTunes等等。
 
 ## 說明
 
-Subtitle-Downloader 是一個方便您從各大串流平台上下載字幕的程式。需要事先安裝Python，版本為3.6以上（建議安裝最新版本），可以在 Linux、Windows 或 macOS 上執行。
+Subtitle-Downloader 是一個方便您從各大串流平台上下載字幕的程式。需要安裝 [Python](https://www.python.org/downloads/)3.8以上的版本和 [NodeJS](https://nodejs.org/en/download)，可以在 Linux、Windows 或 macOS 上執行。
 
 ## 安裝方式
 
-- Linux:
+- Linux、macOS:
 ```
 pip install -r requriements
 ```
 
 - Windows：執行install_requirements.bat
 
+## 必要驗證資訊
+
+| Name | 驗證方式 |
+| Apple TV+ | Cookies |
+| CatchPlay | Cookies |
+| Disney+ | 帳號、密碼 |
+| Friday影音 | Cookies |
+| HBOGO Asia | 帳號、密碼 |
+| 愛奇藝 (iq.com) | Cookies |
+| iTunes | None |
+| KKTV | None |
+| LineTV | None |
+| MyVideo | Cookies |
+| NowE | Cookies |
+| Now Player | Cookies |
+| Viu | None |
+| WeTV | Cookies |
+
+### 取得Cookies
+
+1. Chrome安裝擴充元件 https://chrome.google.com/webstore/detail/get-cookiestxt-locally/cclelndahbckbenkjhflpdbgdldlbecc
+2. 登入串流平台，並利用擴充元件下載 cookies.txt (請勿更改cookies.txt的檔名及其內容)
+3. 將 cookie.txt 放入 Subtitle-Downloader/cookies
+
+### 帳號、密碼
+
+- 在 Subtitle-Downloader/user_config.toml 填入帳號、密碼，方便下次自動下載
+
 ## 使用方式
 
 - 線上執行 **_(Colab environment is in the US, if you want to use in other region please execute on local)_**
   1. 連結 Colab
   2. 環境設定，安裝必要程式 (執行第ㄧ個按鈕)
-  3. 依照不同平台填入各項資料  (執行其他按鈕)
+  3. 依照不同平台填入各項必要資料 (執行其他按鈕)
   4. 下載的字幕檔案會在左邊側邊欄，可以直接存入Google雲端硬碟或下載到本機
 
     <a href="https://colab.research.google.com/drive/13tv-eT5mx6EWBL_du9Bd2gMQFxT83NCp?usp=sharing" target="_blank"><img src="https://colab.research.google.com/assets/colab-badge.svg" title="Open this file in Google Colab" alt="Colab"/></a>
@@ -32,9 +60,10 @@ pip install -r requriements
 
 - 本機執行
 
-  1. 可根據要下載的平台修改config.py設定檔（填入串流平台帳號、密碼等方便下次直接執行） Subtitle-Downloader/user_config.toml
+  1. 可根據要下載的平台修改user_config.toml設定檔（填入串流平台帳號、密碼等方便下次直接執行） Subtitle-Downloader/user_config.toml
   2. 根據欲下載不同串流平台的字幕放入對應cookies.txt到Subtitle-Downloader/cookies
   3. 在終端機執行python指令或是使用Subtitle-Downloader.bat下載字幕
+
   ```
   python subtitle_downloader.py URL [OPTIONS]
   ```
@@ -156,6 +185,13 @@ WeTV
 
 1. Install https://chrome.google.com/webstore/detail/get-cookiestxt-locally/cclelndahbckbenkjhflpdbgdldlbecc
 2. Login Friday Video, and use this plugin download video.friday.tw_cookies.txt (Don't modify anything even the file name)
+3. Put cookie.txt into Subtitle-Downloader/cookies
+4. Make sure the movies or series which you're going to download is playable in your region.
+
+## MyVideo
+
+1. Install https://chrome.google.com/webstore/detail/get-cookiestxt-locally/cclelndahbckbenkjhflpdbgdldlbecc
+2. Login Friday Video, and use this plugin download www.myvideo.net.tw_cookies.txt (Don't modify anything even the file name)
 3. Put cookie.txt into Subtitle-Downloader/cookies
 4. Make sure the movies or series which you're going to download is playable in your region.
 
