@@ -75,7 +75,8 @@ class Service(object):
         proxy = args.proxy or next(iter(self.GEOFENCE), None)
         if proxy:
             if len("".join(i for i in proxy if not i.isdigit())) == 2:  # e.g. ie, ie12, us1356
-                proxy = get_proxy(region=proxy, ip_info=self.ip_info)
+                proxy = get_proxy(region=proxy, ip_info=self.ip_info,
+                                  geofence=self.GEOFENCE, platform=self.platform)
 
             self.logger.debug('proxy: %s', proxy)
             if proxy:

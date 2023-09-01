@@ -15,7 +15,7 @@ import pysubs2
 from chardet import detect
 from utils.helper import get_locale
 
-SUBTITLE_FORMAT = ['.srt', '.ass', '.ssa', '.vtt', '.xml', '.json']
+SUBTITLE_FORMAT = ['.srt', '.ass', '.ssa', '.vtt', '.xml']
 
 
 def get_encoding_type(source):
@@ -179,7 +179,7 @@ def merge_subtitle_fragments(folder_path="", file_name="", lang="", display=Fals
         subtitles = []
         for segment in sorted(os.listdir(folder_path)):
             file_path = os.path.join(folder_path, segment)
-            if Path(file_path).suffix in ('.vtt', '.srt'):
+            if is_subtitle(file_path):
                 subs = pysubs2.load(file_path)
                 if shift_time:
                     offset = next(

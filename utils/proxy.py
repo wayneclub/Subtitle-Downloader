@@ -18,32 +18,35 @@ def get_ip_info(session: Optional[requests.Session] = None) -> dict:
     return (session or requests.Session()).get("https://ipinfo.io/json").json()
 
 
-def get_proxy(region: str, ip_info: dict) -> Optional[str]:
+def get_proxy(region: str, ip_info: dict, geofence: list, platform: str) -> Optional[str]:
     """Get proxy"""
 
     if not region:
-        logger.error("Region cannot be empty")
+        logger.error('Region cannot be empty!')
         sys.exit(1)
     region = region.lower()
 
     logger.info('Obtaining a proxy to "%s"', region)
 
-    if ip_info["country"].lower() == "".join(i for i in region if not i.isdigit()):
+    if ip_info['country'].lower() == ''.join(i for i in region if not i.isdigit()):
         return None  # no proxy necessary
 
     if config.proxies.get(region):
         proxy = config.proxies[region]
-        logger.info(f" + {proxy} (via config.proxies)")
-    elif config.nordvpn.get("username") and config.nordvpn.get("password"):
+        logger.info(' + %s (via config.proxies)', proxy)
+    elif config.nordvpn.get('username') and config.nordvpn.get('password'):
         proxy = get_nordvpn_proxy(region)
-        logger.info(f" + {proxy} (via nordvpn)")
+        logger.info(' + %s (via nordvpn)', proxy)
     else:
-        logger.error(" - Unable to obtain a proxy")
+        logger.error(' - Unable to obtain a proxy')
+        if geofence:
+            logger.error(
+                '%s is restricted in %s, please use the proxy to bypass restrictions.', platform, ', '.join(geofence).upper())
         sys.exit(1)
 
-    if "://" not in proxy:
+    if '://' not in proxy:
         # assume a https proxy port
-        proxy = f"https://{proxy}"
+        proxy = f'https://{proxy}'
 
     return proxy
 

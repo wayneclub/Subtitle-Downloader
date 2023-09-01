@@ -12,6 +12,7 @@ import os
 import re
 import shutil
 import time
+from cn2an import cn2an
 from configs.config import config, credentials, user_agent
 from utils.io import rename_filename
 from utils.subtitle import convert_subtitle
@@ -24,6 +25,8 @@ class NowE(Service):
 
     Authorization: Cookies
     """
+
+    GEOFENCE = ['hk']
 
     def __init__(self, args):
         super().__init__(args)
@@ -99,8 +102,17 @@ class NowE(Service):
                          platform=self.platform, lang=self.locale)
 
     def series_metadata(self, data):
-        title = data['episode'][0]['brandName']
-        season_index = int(data['episode'][0]['seasonNum'])
+        title = data['brandName']
+        season_index = int(data['seasonNum'])
+        if season_index == 0:
+            season_search = re.search(
+                r'(.+?)第(.+?)季', data['brandName'])
+            if season_search:
+                title = season_search.group(1).strip()
+                season_index = int(cn2an(season_search.group(2)))
+            else:
+                title = data['brandName'].strip()
+                season_index = 1
 
         self.logger.info("\n%s Season %s", title, season_index)
         title = rename_filename(

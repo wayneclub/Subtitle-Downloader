@@ -25,6 +25,8 @@ class FridayVideo(Service):
     Authorization: Cookies
     """
 
+    GEOFENCE = ['tw']
+
     def __init__(self, args):
         super().__init__(args)
         self._ = get_locale(__name__, self.locale)

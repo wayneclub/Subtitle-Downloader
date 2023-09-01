@@ -231,7 +231,7 @@ python subtitle_downloader.py URL -p http://127.0.0.1:7890
 
 ## NOTICE
 
-- Few streaming services have Geo-blocking, make sure you are in same region or use proxy to overcome.
+- Few streaming services have Geo-blocking, make sure you are in the same region or use a proxy to bypass restrictions.
 - Disney+ doesn't support VPN.
 
 ## FAQ
