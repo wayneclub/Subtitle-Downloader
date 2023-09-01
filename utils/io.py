@@ -69,8 +69,7 @@ def download_file(url, output_path, headers={}):
             total=total,
             unit='B',
             unit_scale=True,
-            unit_divisor=1024,
-            colour='#41980a',
+            unit_divisor=1024
         ) as bar:
             for data in res.iter_content(chunk_size=1024):
                 size = file.write(data)

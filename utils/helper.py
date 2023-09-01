@@ -109,7 +109,7 @@ def check_url_exist(url, headers={}):
 
     if validators.url(url):
         try:
-            response = requests.options(
+            response = requests.head(
                 url, headers={'user-agent': user_agent}, timeout=10)
             if response.ok:
                 return True
