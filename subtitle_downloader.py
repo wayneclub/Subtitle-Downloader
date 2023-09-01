@@ -42,14 +42,6 @@ def main() -> None:
                         '--output',
                         dest='output',
                         help=_("output directory"))
-    parser.add_argument('-email',
-                        '--email',
-                        dest='email',
-                        help=_("account for streaming service"))
-    parser.add_argument('-password',
-                        '--password',
-                        dest='password',
-                        help=_("password for streaming service"))
     parser.add_argument('-slang',
                         '--subtitle-language',
                         dest='subtitle_language',

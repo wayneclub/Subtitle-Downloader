@@ -34,6 +34,7 @@ ISO_6391 = {
     'mya': 'my',
     'tha': 'th',
     'ind': 'id',
+    'id-id': 'id',
     'vie': 'vi',
     'ara': 'ar',
     'spa': 'es',

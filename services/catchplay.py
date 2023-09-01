@@ -34,7 +34,8 @@ class CatchPlay(Service):
         res = self.session.get(url=self.config['api']['auth'], timeout=5)
         if res.ok:
             if '</html>' in res.text:
-                self.logger.error("\nOut of services!")
+                self.logger.error(
+                    self._("\nOut of services! Please use proxy to bypass."))
                 sys.exit(1)
             data = res.json()
             self.logger.debug("User: %s", data)
@@ -76,7 +77,7 @@ class CatchPlay(Service):
         english_title = data['apolloState'][main_id]['title']['eng']
         season_num = data['apolloState'][main_id]['totalChildren']
 
-        self.logger.info("\n%s (%s) total: %s season(s)",
+        self.logger.info(self._("\n%s (%s) total: %s season(s)"),
                          title, english_title, season_num)
 
         for season in data['apolloState'][main_id]['children']:
@@ -94,17 +95,17 @@ class CatchPlay(Service):
                 episode_list = data['apolloState'][season_id]['children']
                 episode_num = len(episode_list)
                 if self.last_episode:
-                    self.logger.info("\nSeason %s total: %s episode(s)\tdownload season %s last episode\n---------------------------------------------------------------",
+                    self.logger.info(self._("\nSeason %s total: %s episode(s)\tdownload season %s last episode\n---------------------------------------------------------------"),
                                      season_index,
                                      episode_num,
                                      season_index)
                     episode_list = [episode_list[-1]]
                 elif self.download_episode:
                     self.logger.info(
-                        "\nSeason %s total: %s episode(s)\tdownload episode: %s\n---------------------------------------------------------------", season_index, episode_num, self.download_episode)
+                        self._("\nSeason %s total: %s episode(s)\tdownload episode: %s\n---------------------------------------------------------------"), season_index, episode_num, self.download_episode)
                 else:
                     self.logger.info(
-                        "\nSeason %s total: %s episode(s)\tdownload all episodes\n---------------------------------------------------------------", season_index, episode_num)
+                        self._("\nSeason %s total: %s episode(s)\tdownload all episodes\n---------------------------------------------------------------"), season_index, episode_num)
 
                 for episode_index, episode in enumerate(episode_list, start=1):
                     if not self.download_episode or episode_index in self.download_episode:
@@ -150,10 +151,10 @@ class CatchPlay(Service):
             error_msg = res.json()['message']
             if 'No subscribe record' in error_msg:
                 self.logger.error(
-                    "\nPlease check your subscription plan, and make sure you are able to watch it online!")
+                    self._("\nPlease check your subscription plan, and make sure you are able to watch it online!"))
             elif 'Insufficient permission to access' in error_msg:
                 self.logger.error(
-                    "\nPlease renew the cookies!")
+                    self._("\nPlease renew the cookies!"))
                 os.remove(
                     Path(config.directories['cookies']) / credentials[self.platform]['cookies'])
             else:

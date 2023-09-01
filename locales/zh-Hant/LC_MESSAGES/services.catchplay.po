@@ -26,8 +26,8 @@ msgstr "\n下載：%s\n---------------------------------------------------------
 #, python-format
 msgid ""
 "\n"
-"%s total: %s season(s)"
-msgstr "\n%s 共有：%s 季"
+"%s (%s) total: %s season(s)"
+msgstr "\n%s (%s) 共有：%s 季"
 
 #: services/catchplay.py:149
 #, python-format
@@ -47,3 +47,21 @@ msgid ""
 "\n"
 "Sorry, there's no embedded subtitles in this video!"
 msgstr "\n抱歉，此劇只有硬字幕，可去其他串流平台查看"
+
+#: services/catchplay.py:262
+msgid ""
+"\n"
+"Out of services! Please use proxy to bypass."
+msgstr "\n抱歉，未在此區提供服務！請使用代理繞過"
+
+#: services/catchplay.py:262
+msgid ""
+"\n"
+"Please check your subscription plan, and make sure you are able to watch it online!"
+msgstr "\n抱歉，請檢查您的訂閱，確保您能夠線上觀看！"
+
+#: services/catchplay.py:262
+msgid ""
+"\n"
+"Please renew the cookies!"
+msgstr "\n請更新Cookies！"

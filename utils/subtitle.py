@@ -10,7 +10,7 @@ import logging
 import os
 import shutil
 from pathlib import Path
-import time
+import sys
 import pysubs2
 from chardet import detect
 from utils.helper import get_locale
@@ -49,14 +49,14 @@ def convert_utf8(srcfile):
         logger.error("Encode Error")
 
 
-def is_subtitle(file_path, format=''):
+def is_subtitle(file_path, file_format=''):
     """
     Check subtitle is in valid format
     """
 
     extenison = Path(file_path).suffix.lower()
     if os.path.isfile(file_path) and Path(file_path).stat().st_size > 0 and extenison in SUBTITLE_FORMAT:
-        if format and format != extenison:
+        if file_format and file_format != extenison:
             return False
         return True
 
@@ -91,7 +91,7 @@ def convert_subtitle(folder_path="", platform="", lang=""):
                     os.remove(subtitle)
                     folder = os.listdir(folder_path)
             if platform:
-                archive_subtitle(path=os.path.normpath(
+                archive_subtitle(folder_path=os.path.normpath(
                     folder_path), platform=platform, lang=lang)
 
         elif is_subtitle(folder_path, '.vtt'):
@@ -107,24 +107,32 @@ def convert_subtitle(folder_path="", platform="", lang=""):
             logger.info(os.path.basename(subtitle_name))
 
 
-def archive_subtitle(path, platform="", lang=""):
+def archive_subtitle(folder_path, platform="", lang=""):
     """
     Archive subtitles
     """
+    contain_subtitle = False
+    for path, dirs, files in os.walk(folder_path):
+        if any('.srt' in s for s in files):
+            contain_subtitle = True
+            break
+
+    if not contain_subtitle:
+        sys.exit(0)
 
     _ = get_locale(__name__, lang)
     logger.info(
         _("\nArchive subtitles:\n---------------------------------------------------------------"))
 
     if platform:
-        zipname = os.path.basename(f'{path}.WEB-DL.{platform}')
+        zipname = os.path.basename(f'{folder_path}.WEB-DL.{platform}')
     else:
-        zipname = os.path.basename(f'{path}.WEB-DL')
+        zipname = os.path.basename(f'{folder_path}.WEB-DL')
 
-    path = os.path.normpath(path)
+    folder_path = os.path.normpath(folder_path)
     logger.info("%s.zip", zipname)
 
-    shutil.make_archive(Path(path).parent / zipname, 'zip', path)
+    shutil.make_archive(Path(folder_path).parent / zipname, 'zip', folder_path)
 
 
 def ms_to_timestamp(ms: int) -> str:
@@ -158,6 +166,9 @@ def convert_list_to_subtitle(subs):
 
 
 def merge_same_subtitle(subs):
+    """
+    Merge same subtitles
+    """
     for i, sub in enumerate(subs):
         if i > 0 and sub.text == subs[i-1].text and sub.start - subs[i-1].end <= 20:
             subs[i-1].end = sub.end
@@ -232,6 +243,9 @@ def format_zh_subtitle(subs):
 
 
 def clean_subs(subs):
+    """
+    Clean redundant subtitles
+    """
     for sub in subs:
         text = sub.text
         text = re.sub(r"&rlm;", "", text)
@@ -245,7 +259,6 @@ def format_subtitle(subs):
     """
     Format subtitle
     """
-
     delete_list = []
     for i, sub in enumerate(subs):
         sub.text = re.sub(r'\u200b', '', sub.text)

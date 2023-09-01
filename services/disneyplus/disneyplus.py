@@ -30,12 +30,7 @@ class DisneyPlus(Service):
         super().__init__(args)
         self._ = get_locale(__name__, self.locale)
 
-        self.email = args.email if args.email else credentials[self.platform]['email']
-        self.password = args.password if args.password else credentials[
-            self.platform]['password']
-
         self.audio_language = args.audio_language
-
         self.profile = dict()
         self.access_token = ''
 
@@ -348,8 +343,8 @@ class DisneyPlus(Service):
                     folder_path, file_name))
 
     def main(self):
-        user = Login(email=self.email,
-                     password=self.password,
+        user = Login(email=credentials[self.platform]['email'],
+                     password=credentials[self.platform]['password'],
                      ip_info=self.ip_info,
                      locale=self.locale,
                      config=self.config,

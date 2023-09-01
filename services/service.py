@@ -5,12 +5,6 @@
 This module is default service
 """
 from __future__ import annotations
-from utils.ripprocess import ripprocess
-from utils.proxy import get_ip_info, get_proxy
-from utils.helper import EpisodesNumbersHandler
-from configs.config import config, credentials, filenames, user_agent
-from tmdbv3api import TMDb, TV, Movie
-import opencc
 import html
 import os
 import ssl
@@ -18,8 +12,16 @@ import sys
 from http.cookiejar import MozillaCookieJar
 from typing import Optional
 from pathlib import Path
-import requests
 import urllib3
+import requests
+import opencc
+from pwinput import pwinput
+from tmdbv3api import TMDb, TV, Movie
+from configs.config import config, credentials, filenames, user_agent
+from utils.ripprocess import ripprocess
+from utils.proxy import get_ip_info, get_proxy
+from utils.helper import EpisodesNumbersHandler
+
 urllib3.disable_warnings()
 
 
@@ -110,13 +112,12 @@ class Service(object):
                     service_config.get('required'))
             else:
                 self.logger.error(
-                    '\nMissing define %s\'s cookies in %s', self.platform, filenames.root_config)
+                    '\nNot set %s\'s cookies in %s', self.platform, filenames.root_config)
                 sys.exit(1)
         elif service_config.get('credentials') == 'email':
             if not credentials[self.platform].get('email') and not credentials[self.platform].get('password'):
-                self.logger.error(
-                    '\nMissing define %s\'s email and password in %s', self.platform, filenames.root_config)
-                sys.exit(1)
+                credentials[self.platform]['email'] = input("Email: ").strip()
+                credentials[self.platform]['password'] = pwinput().strip()
 
         return service_config
 

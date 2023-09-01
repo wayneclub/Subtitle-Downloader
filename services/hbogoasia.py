@@ -36,9 +36,6 @@ class HBOGOAsia(Service):
         super().__init__(args)
         self._ = get_locale(__name__, self.locale)
 
-        self.username = args.email if args.email else credentials[self.platform]['username']
-        self.password = args.password if args.password else credentials[self.platform]['password']
-
         self.device_id = str(uuid.uuid4())
         self.origin = ""
         self.territory = ""
@@ -64,21 +61,14 @@ class HBOGOAsia(Service):
 
     def login(self):
 
-        if self.username and self.password:
-            username = self.username
-            password = self.password
-        else:
-            username = input(self._("HBOGO Asia username: "))
-            password = getpass(self._("HBOGO Asia password: "))
-
         headers = {
             'origin': self.origin,
             'referer': self.origin
         }
 
         payload = {
-            'contactPassword': password.strip(),
-            'contactUserName': username.strip(),
+            'contactPassword': credentials[self.platform]['password'].strip(),
+            'contactUserName': credentials[self.platform]['email'].strip(),
             'deviceDetails': {
                 'deviceName': platform.system(),
                 'deviceType': "COMP",

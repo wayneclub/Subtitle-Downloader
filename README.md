@@ -82,10 +82,6 @@ pip install -r requriements
 
   -o, --output                  output directory
 
-  -email, --email               account for Disney Plus and HBOGO Asia
-
-  -password, --password         password for Disney Plus and HBOGO Asia
-
   -slang, --subtitle-language   languages of subtitles; use commas to separate multiple languages
                                 default: Traditional Chinese
                                 all: download all available languages

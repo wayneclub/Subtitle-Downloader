@@ -152,12 +152,12 @@ class FridayVideo(Service):
 
             if season_num > 1:
                 self.logger.info(
-                    "\n%s (%s) total: %s season(s)", title, original_title, season_num)
+                    self._("\n%s (%s) total: %s season(s)"), title, original_title, season_num)
             else:
                 self.logger.info("\n%s (%s)", title, original_title)
 
             if self.last_episode:
-                self.logger.info("\nSeason %s total: %s episode(s)\tdownload season %s last episode\n---------------------------------------------------------------",
+                self.logger.info(self._("\nSeason %s total: %s episode(s)\tdownload season %s last episode\n---------------------------------------------------------------"),
                                  season_list[-1],
                                  season_list.count(season_list[-1]),
                                  season_list[-1])
@@ -167,15 +167,15 @@ class FridayVideo(Service):
                     episode_count = []
                     for season in self.download_season:
                         episode_count.append(season_list.count(season))
-                    self.logger.info("\nSeason %s total: %s episode(s)\tdownload all episodes\n---------------------------------------------------------------",
+                    self.logger.info(self._("\nSeason %s total: %s episode(s)\tdownload all episodes\n---------------------------------------------------------------"),
                                      self.download_season,
                                      episode_count)
                 else:
                     if season_num > 1:
-                        self.logger.info("\nTotal: %s episode(s)\tdownload all episodes\n---------------------------------------------------------------",
+                        self.logger.info(self._("\nTotal: %s episode(s)\tdownload all episodes\n---------------------------------------------------------------"),
                                          episode_num)
                     else:
-                        self.logger.info("\nSeason %s total: %s episode(s)\tdownload all episodes\n---------------------------------------------------------------",
+                        self.logger.info(self._("\nSeason %s total: %s episode(s)\tdownload all episodes\n---------------------------------------------------------------"),
                                          season_num,
                                          episode_num)
 

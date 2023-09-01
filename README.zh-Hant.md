@@ -82,10 +82,6 @@ pip install -r requriements
 
   -o, --output                  下載路徑
 
-  -email, --email               串流平台帳號
-
-  -password, --password         串流平台密碼
-
   -slang, --subtitle-language   字幕語言，用','分隔
                                 預設: 繁體中文
                                 all: 下載所有語言
