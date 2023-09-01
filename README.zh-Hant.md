@@ -56,7 +56,7 @@ pip install -r requriements
   3. 依照不同平台填入各項必要資料 (執行其他按鈕)
   4. 下載的字幕檔案會在左邊側邊欄，可以直接存入Google雲端硬碟或下載到本機
 
-    <a href="https://colab.research.google.com/drive/13tv-eT5mx6EWBL_du9Bd2gMQFxT83NCp?usp=sharing" target="_blank"><img src="https://colab.research.google.com/assets/colab-badge.svg" title="Open this file in Google Colab" alt="Colab"/></a>
+    <a href="https://colab.research.google.com/drive/1ZaGad1httJDw6rut1xmH140UCTlwlBnR?usp=sharing" target="_blank"><img src="https://colab.research.google.com/assets/colab-badge.svg" title="Open this file in Google Colab" alt="Colab"/></a>
 
 
 - 本機執行
@@ -277,8 +277,8 @@ python subtitle_downloader.py URL -p http://127.0.0.1:7890
 
 ## 注意
 
+- 部分串流平台有地域限制，可使用代理繞過
 - Disney+ 不支援使用 VPN
-
 
 ## 常見問題
 

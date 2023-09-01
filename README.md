@@ -51,10 +51,11 @@ pip install -r requriements
 ## USAGE
 
 - Online **_(Colab environment is in the US, if you want to use in other region please execute on local)_**
-  1. Connect Colab
-  2. Install the requirements (Click 1st play button)
-  3. Depend the download platform and modify the text field  (Cick the play button next to it when modified complete)
-  4. Download the subtitles from the left side menu
+  1. Save a copy in Drive
+  2. Connect Colab
+  3. Install the requirements (Click 1st play button)
+  4. Depend the download platform and modify the text field  (Cick the play button next to it when modified complete)
+  5. Download the subtitles from the left side menu
 
   <a href="https://colab.research.google.com/drive/1Qu7MHUt4QXym9cNOORCKTezIBYBNNg3V?usp=sharing" target="_blank"><img src="https://colab.research.google.com/assets/colab-badge.svg" title="Open this file in Google Colab" alt="Colab"/></a>
 
@@ -230,7 +231,8 @@ python subtitle_downloader.py URL -p http://127.0.0.1:7890
 
 ## NOTICE
 
-- Disney+ doesn't support VPN
+- Few streaming services have Geo-blocking, make sure you are in same region or use proxy to overcome.
+- Disney+ doesn't support VPN.
 
 ## FAQ
 

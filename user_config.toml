@@ -42,10 +42,10 @@ cookies = 'www.iq.com_cookies.txt'
 cookies = 'www.myvideo.net.tw_cookies.txt'
 
 [credentials.NowE]
-cookies = 'nowe.com_cookies.txt'
+cookies = 'www.nowe.com_cookies.txt'
 
 [credentials.NowPlayer]
-cookies = 'now.com_cookies.txt'
+cookies = 'nowplayer.now.com_cookies.txt'
 
 [credentials.WeTV]
 cookies = 'wetv.vip_cookies.txt'
