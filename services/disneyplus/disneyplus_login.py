@@ -23,8 +23,8 @@ class Login(object):
         self.logger = logging.getLogger(__name__)
         self._ = get_locale(__name__, locale)
 
-        self.email = email
-        self.password = password
+        self.email = email.strip()
+        self.password = password.strip()
         self.config = config
 
         location = ip_info['loc'].split(',')
@@ -95,14 +95,6 @@ class Login(object):
                 sys.exit(0)
 
     def login(self, access_token):
-
-        if self.email and self.password:
-            email = self.email.strip()
-            password = self.password.strip()
-        else:
-            email = input(self._("Disney+ email: "))
-            password = getpass(self._("Disney+ password: "))
-
         headers = {
             'accept': 'application/json; charset=utf-8',
             'authorization': f'Bearer {access_token}',
