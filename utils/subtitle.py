@@ -15,6 +15,8 @@ import pysubs2
 from chardet import detect
 from utils.helper import get_locale
 
+SUBTITLE_FORMAT = ['.srt', '.ass', '.ssa', '.vtt', '.xml', '.json']
+
 
 def get_encoding_type(source):
     """
@@ -32,7 +34,7 @@ def convert_utf8(srcfile):
 
     from_codec = get_encoding_type(srcfile)
     try:
-        if from_codec.lower() != 'utf-8':
+        if from_codec and from_codec.lower() != 'utf-8':
             if from_codec == 'BIG5' or from_codec == 'GBK' or from_codec == 'GB2312' or from_codec == 'Windows-1252' or from_codec == 'ISO-8859-1':
                 from_codec = 'CP950'
 
@@ -47,6 +49,18 @@ def convert_utf8(srcfile):
         logger.error("Encode Error")
 
 
+def is_subtitle(file_path, format=''):
+    """
+    Check subtitle is in valid format
+    """
+
+    extenison = Path(file_path).suffix.lower()
+    if os.path.isfile(file_path) and Path(file_path).stat().st_size > 0 and extenison in SUBTITLE_FORMAT:
+        if format and format != extenison:
+            return False
+        return True
+
+
 def convert_subtitle(folder_path="", platform="", lang=""):
     """
     Convert subtitle to .srt
@@ -58,16 +72,15 @@ def convert_subtitle(folder_path="", platform="", lang=""):
             display = True
             folder = os.listdir(folder_path)
             for file in sorted(folder):
-                extenison = Path(file).suffix
-                if os.path.isfile(os.path.join(folder_path, file)) and extenison == '.vtt':
+                extenison = Path(file).suffix.lower()
+                if is_subtitle(os.path.join(folder_path, file), '.vtt'):
                     if display:
                         logger.info(
                             _("\nConvert %s to .srt:\n---------------------------------------------------------------"), extenison)
                         display = False
 
                     subtitle = os.path.join(folder_path, file)
-                    subtitle_name = subtitle.replace(
-                        Path(subtitle).suffix, '.srt')
+                    subtitle_name = subtitle.replace(extenison, '.srt')
                     convert_utf8(subtitle)
                     subs = pysubs2.load(subtitle)
                     if '.zh-Hant' in subtitle_name:
@@ -80,7 +93,8 @@ def convert_subtitle(folder_path="", platform="", lang=""):
             if platform:
                 archive_subtitle(path=os.path.normpath(
                     folder_path), platform=platform, lang=lang)
-        elif os.path.isfile(folder_path) and Path(folder_path).suffix == '.vtt':
+
+        elif is_subtitle(folder_path, '.vtt'):
             subtitle_name = folder_path.replace(
                 Path(folder_path).suffix, '.srt')
             convert_utf8(folder_path)

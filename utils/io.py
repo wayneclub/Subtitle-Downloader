@@ -12,6 +12,7 @@ import gettext
 import multiprocessing
 from operator import itemgetter
 import os
+import time
 from typing import Optional, Union
 from pathlib import Path
 import html
@@ -73,6 +74,7 @@ def download_file(url, output_path, headers={}):
             unit='B',
             unit_scale=True,
             unit_divisor=1024,
+            colour='#41980a',
         ) as bar:
             for data in res.iter_content(chunk_size=1024):
                 size = file.write(data)
