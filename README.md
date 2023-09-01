@@ -228,8 +228,12 @@ python subtitle_downloader.py URL -s 1 -e 1,3,5
 python subtitle_downloader.py URL -p http://127.0.0.1:7890
 ```
 
+## NOTICE
+
+- Disney+ doesn't support VPN
+
 ## FAQ
 
 - Any issue during downloading subtitles, upload the screenshot and log file (Please provide title, platform and region).
-- Make sure the video contains embedded subtitles and it is playable in your region.
+- Make sure the video contains embedded subtitles (subtitles able to turn on-off) and it is playable in your region.
 

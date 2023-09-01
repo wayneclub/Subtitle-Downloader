@@ -275,26 +275,12 @@ python subtitle_downloader.py URL -s 1 -e 1,3,5
 python subtitle_downloader.py URL -p http://127.0.0.1:7890
 ```
 
+## 注意
 
-## FAQ
+- Disney+ 不支援使用 VPN
+
+
+## 常見問題
 
 - 下載字幕過程中若出現任何問題，請上傳截圖和日誌文件（請提供下載的連結、平台和是否使用vpn跨區下載）。
-- 回報問題前，請先確保影片有外掛字幕並且可以在您所在的地區正常播放。
-
-
-> 目前只支持從
->
-> 1. KKTV 下載電影、影集、綜藝、動漫字幕
-> 2. LineTV 下載影集、綜藝字幕
-> 3. FriDay 影音 下載電影、影集、綜藝、動漫字幕
-> 4. 愛奇藝（iq.com） 下載電影、劇集
-> 5. Disney+ 下載電影、影集
-> 6. HBOGO Asia 下載電影、影集
-> 7. Viu 下載電影、影集
-> 8. CatchPlay 下載電影、影集字幕
-> 9. WeTV 下載電影、影集字幕
-> 10. NOW E 下載電影、影集字幕
-> 11. Now Player 下載電影、影集字幕
-> 請確認網站網址無誤
-
-![alt text](https://github.com/wayneclub/Subtitle-Downloader/blob/main/guide.png?raw=true)
+- 回報問題前，請先確保影片有外掛字幕（字幕可關閉）並且可以在您所在的地區正常播放。
