@@ -41,7 +41,7 @@ pip install -r requriements
 
 ### 取得Cookies
 
-1. Chrome安裝擴充元件 https://chrome.google.com/webstore/detail/get-cookiestxt-locally/cclelndahbckbenkjhflpdbgdldlbecc
+1. Chrome安裝[下載cookies](https://chrome.google.com/webstore/detail/get-cookiestxt-locally/cclelndahbckbenkjhflpdbgdldlbecc)的擴充元件
 2. 登入串流平台，並利用擴充元件下載 cookies.txt (請勿更改cookies.txt的檔名及其內容)
 3. 將 cookie.txt 放入 Subtitle-Downloader/cookies
 
@@ -59,7 +59,6 @@ pip install -r requriements
 
     <a href="https://colab.research.google.com/drive/1ZaGad1httJDw6rut1xmH140UCTlwlBnR?usp=sharing" target="_blank"><img src="https://colab.research.google.com/assets/colab-badge.svg" title="Open this file in Google Colab" alt="Colab"/></a>
 
-
 - 本機執行
 
   1. 可根據要下載的平台修改user_config.toml設定檔（設定字幕預設語言、串流平台帳號/密碼等，方便下次直接執行） Subtitle-Downloader/user_config.toml
@@ -72,7 +71,7 @@ pip install -r requriements
 
 ## 參數
 
-```
+```text
   -h, --help                    參數說明
 
   -s --season                   下載 第[0-9]季
@@ -191,67 +190,67 @@ WeTV
 
 ## Now E, Now Player
 
-- 從瀏覽器複製 User-Agent (https://www.whatsmyua.info/)，並貼在 Subtitle-Downloader/user_config.toml (User-Agent). User-Agent必須與登入Now E、Now Player相同。
-
+- 從瀏覽器複製 User-Agent [https://www.whatsmyua.info/](https://www.whatsmyua.info/)，並貼在 Subtitle-Downloader/user_config.toml (User-Agent). User-Agent必須與登入Now E、Now Player相同。
 
 ## 更多範例
 
 - Download all seasons and all episodes
 
-```
+```bash
 python subtitle_downloader.py URL
 ```
 
 - Download season 1 episode 1
 
-```
+```bash
 python subtitle_downloader.py URL -s 1 -e 1
 ```
 
 - Download season 1 episode 1's subtitle with all langugages
 
-```
+```bash
 python subtitle_downloader.py URL -s 1 -e 1 -slang all
 ```
 
 - Download all episodes subtitles with all langugages: en, zh-Hant
 
-```
+```bash
 python subtitle_downloader.py https://www.disneyplus.com/series/loki/6pARMvILBGzF -slang en,zh-Hant
 ```
 
 - Download latest episode
 
-```
+```bash
 python subtitle_downloader.py URL -l
 ```
 
 - Download season 1 episode 1-10
 
-```
+```bash
 python subtitle_downloader.py URL -s 1 -e 1-10
 ```
 
 - Download season 1 episode 1,3,5
 
-```
+```bash
 python subtitle_downloader.py URL -s 1 -e 1,3,5
 ```
 
 - Download season 1 episodes with NordVPN (region=tw)
 
-```
+```bash
 python subtitle_downloader.py URL -s 1 -p tw
 ```
 
 - Download season 1 episodes with proxy (Clash)
 
-```
+```bash
 python subtitle_downloader.py URL -s 1 -p http:127.0.0.1:7890
 ```
 
 - Download season 1 episodes with .ass format subtitle
-```
+
+```bash
 python subtitle_downloader.py URL -s 1 -sf .ass
 ```
 
