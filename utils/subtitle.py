@@ -213,7 +213,7 @@ def merge_same_subtitle(subs):
     return subs
 
 
-def merge_subtitle_fragments(folder_path="", file_name="", subtitle_format="", locale="", display=False, shift_time=None):
+def merge_subtitle_fragments(folder_path="", filename="", subtitle_format="", locale="", display=False, shift_time=None):
     """
     Merge subtitle fragments
     """
@@ -242,7 +242,7 @@ def merge_subtitle_fragments(folder_path="", file_name="", subtitle_format="", l
         subs = convert_list_to_subtitle(subtitles)
         subs = merge_same_subtitle(subs)
         file_path = os.path.join(
-            Path(folder_path).parent.absolute(), file_name)
+            Path(folder_path).parent.absolute(), filename)
         subs.sort()
         if '.zh-Hant' in file_path or '.cmn-Hant' in file_path:
             subs = format_zh_subtitle(subs)

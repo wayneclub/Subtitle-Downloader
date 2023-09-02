@@ -5,7 +5,6 @@
 This module is for default setting.
 """
 from __future__ import annotations
-from os.path import dirname
 from pathlib import Path
 from typing import Any
 import rtoml
@@ -14,33 +13,12 @@ app_name = "Subtitle-Downloader"
 __version__ = "2.0.0"
 
 
-dir_path = dirname(dirname(__file__)).replace("\\", "/")
-
-
-class Platform:
-    """
-    Define all streaming service name
-    """
-
-    APPLETVPLUS = 'AppleTVPlus'
-    CATCHPLAY = 'CatchPlay'
-    DISNEYPLUS = 'DisneyPlus'
-    FRIDAYVIDEO = 'FridayVideo'
-    HBOGOASIA = 'HBOGOAsia'
-    IQIYI = 'iQIYI'
-    ITUNES = 'iTunes'
-    KKTV = 'KKTV'
-    LINETV = 'LineTV'
-    MYVIDEO = 'MyVideo'
-    NOWE = 'NowE'
-    NOWPLAYER = 'NowPlayer'
-    VIU = 'Viu'
-    WETV = 'WeTV'
-
-
 class Config:
+    """
+    Config module
+    """
+
     def __init__(self, **kwargs: Any):
-        # self.default_language: str = kwargs.get("default-language") or ""
         self.subtitles: dict = kwargs.get("subtitles") or {}
         self.credentials: dict = kwargs.get("credentials") or {}
         self.directories: dict = kwargs.get("directories") or {}
@@ -50,6 +28,7 @@ class Config:
 
     @classmethod
     def from_toml(cls, path: Path) -> Config:
+        """Load toml"""
         if not path.exists():
             raise FileNotFoundError(f"Config file path ({path}) was not found")
         if not path.is_file():
@@ -59,6 +38,10 @@ class Config:
 
 
 class Directories:
+    """
+    Directories module
+    """
+
     def __init__(self) -> None:
         self.package_root = Path(__file__).resolve().parent.parent
         self.configuration = self.package_root / 'configs'
@@ -68,18 +51,14 @@ class Directories:
 
 
 class Filenames:
+    """
+    Filenames module
+    """
+
     def __init__(self) -> None:
         self.log = directories.logs / "{app_name}_{log_time}.log"
         self.config = directories.configuration / "{service}.toml"
         self.root_config: Path = directories.package_root / "user_config.toml"
-
-
-def mergeDictsOverwriteEmpty(d1, d2):
-    res = d2.copy()
-    for k, v in d1.items():
-        if k not in d2 or d2[k] == '':
-            res[k] = v
-    return res
 
 
 directories = Directories()

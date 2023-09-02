@@ -59,15 +59,15 @@ class CatchPlay(Service):
         if os.path.exists(folder_path):
             shutil.rmtree(folder_path)
 
-        file_name = f'{title}.WEB-DL.{self.platform}.vtt'
+        filename = f'{title}.WEB-DL.{self.platform}.vtt'
 
         self.logger.info(
-            self._("\nDownload: %s\n---------------------------------------------------------------"), file_name)
+            self._("\nDownload: %s\n---------------------------------------------------------------"), filename)
 
         vcms_access_token = self.get_vcms_access_token(program_id)
         if vcms_access_token:
             self.get_subtitle(
-                vcms_access_token['play_video_id'], vcms_access_token['play_token'], folder_path, file_name)
+                vcms_access_token['play_video_id'], vcms_access_token['play_token'], folder_path, filename)
 
             convert_subtitle(folder_path=folder_path,
                              platform=self.platform, subtitle_format=self.subtitle_format, locale=self.locale)
@@ -111,15 +111,15 @@ class CatchPlay(Service):
 
                 for episode_index, episode in enumerate(episode_list, start=1):
                     if not self.download_episode or episode_index in self.download_episode:
-                        file_name = f'{name}E{str(episode_index).zfill(2)}.WEB-DL.{self.platform}.vtt'
+                        filename = f'{name}E{str(episode_index).zfill(2)}.WEB-DL.{self.platform}.vtt'
                         episode_id = episode['__ref'].replace('Program:', '')
                         vcms_access_token = self.get_vcms_access_token(
                             episode_id)
                         if vcms_access_token:
                             self.logger.info(
-                                self._("\nDownload: %s\n---------------------------------------------------------------"), file_name)
+                                self._("\nDownload: %s\n---------------------------------------------------------------"), filename)
                             self.get_subtitle(
-                                vcms_access_token['play_video_id'], vcms_access_token['play_token'], folder_path, file_name)
+                                vcms_access_token['play_video_id'], vcms_access_token['play_token'], folder_path, filename)
                         else:
                             break
 
@@ -165,7 +165,7 @@ class CatchPlay(Service):
 
             return None
 
-    def get_subtitle(self, play_video_id, play_token, folder_path, file_name):
+    def get_subtitle(self, play_video_id, play_token, folder_path, filename):
         headers = {
             'asiaplay-os-type': 'chrome',
             'asiaplay-device-model': 'mac os',
@@ -179,7 +179,7 @@ class CatchPlay(Service):
 
         media_info_url = self.config['api']['media_info'].format(
             video_id=play_video_id)
-        res = self.session.get(url=media_info_url, headers=headers)
+        res = self.session.get(url=media_info_url, headers=headers, timeout=5)
 
         if res.ok:
             data = res.json()
@@ -191,14 +191,14 @@ class CatchPlay(Service):
                     sub_lang = get_language_code(sub['language'])
                     lang_folder_path = folder_path
                     lang_paths.add(lang_folder_path)
-                    subtitle_file_name = file_name.replace(
+                    subtitle_filename = filename.replace(
                         '.vtt', f'.{sub_lang}.vtt')
                     subtitle_link = sub['src']
                     self.logger.debug(subtitle_link)
                     os.makedirs(lang_folder_path,
                                 exist_ok=True)
                     subtitle = dict()
-                    subtitle['name'] = subtitle_file_name
+                    subtitle['name'] = subtitle_filename
                     subtitle['path'] = lang_folder_path
                     subtitle['url'] = subtitle_link
                     subtitles.append(subtitle)
@@ -209,7 +209,7 @@ class CatchPlay(Service):
                 self.logger.debug('mpd_url: %s', mpd_url)
                 os.makedirs(folder_path, exist_ok=True)
                 self.ripprocess.download_subtitles_from_mpd(
-                    url=mpd_url, title=file_name.replace('.vtt', ''), folder_path=folder_path, log_level=self.logger.level)
+                    url=mpd_url, title=filename.replace('.vtt', ''), folder_path=folder_path, log_level=self.logger.level)
         else:
             self.logger.error(res.text)
 

@@ -94,16 +94,16 @@ def download_files(files, headers=None):
                 extension = Path(file['name']).suffix
                 sequence = str(lang_paths.count(file['path'])).zfill(3)
                 if file['segment'] == 'comment':
-                    file_name = os.path.join(file['path'], file['name'].replace(
+                    filename = os.path.join(file['path'], file['name'].replace(
                         extension, f'-seg_{sequence}_comment{extension}'))
                 else:
-                    file_name = os.path.join(file['path'], file['name'].replace(
+                    filename = os.path.join(file['path'], file['name'].replace(
                         extension, f'-seg_{sequence}{extension}'))
                 lang_paths.append(file['path'])
             else:
-                file_name = os.path.join(file['path'], file['name'])
+                filename = os.path.join(file['path'], file['name'])
             pool.apply_async(download_file, args=(
-                file['url'], file_name, headers))
+                file['url'], filename, headers))
     pool.close()
     pool.join()
 

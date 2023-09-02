@@ -11,7 +11,8 @@ from datetime import datetime
 import os
 import sys
 import validators
-from configs.config import Platform, config, app_name, __version__, filenames
+from configs.config import config, app_name, __version__, filenames
+from constants import Platform
 from services import service_map
 from utils.helper import get_locale
 from utils.io import load_toml

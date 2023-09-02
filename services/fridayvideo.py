@@ -8,9 +8,9 @@ This module is to download subtitle from Friday Video
 import os
 from pathlib import Path
 import re
-import shutil
 import sys
 import time
+from orjson import JSONDecodeError
 from configs.config import config, credentials, user_agent
 from utils.io import rename_filename, download_files
 from utils.helper import get_locale, get_language_code
@@ -32,6 +32,7 @@ class FridayVideo(Service):
     def __init__(self, args):
         super().__init__(args)
         self._ = get_locale(__name__, self.locale)
+        self.monitor_url = ''
 
     def get_content_type(self, content_type):
         program = {
@@ -62,12 +63,12 @@ class FridayVideo(Service):
             'subtitle': False
         }
 
-        file_name = f"{title}.WEB-DL.{self.platform}.zh-Hant.vtt"
+        filename = f"{title}.WEB-DL.{self.platform}.zh-Hant.vtt"
 
         languages = set()
         subtitles = []
         subs, lang_paths = self.get_subtitle(
-            media_info=media_info, folder_path=folder_path, file_name=file_name)
+            media_info=media_info, folder_path=folder_path, filename=filename)
         subtitles += subs
         languages = set.union(languages, lang_paths)
 
@@ -75,7 +76,7 @@ class FridayVideo(Service):
             self.logger.info(
                 self._(
                     "\nDownload: %s\n---------------------------------------------------------------"),
-                file_name)
+                filename)
 
         self.download_subtitle(
             subtitles=subtitles, languages=languages, folder_path=folder_path)
@@ -122,11 +123,11 @@ class FridayVideo(Service):
                     season_index = 0
                     episode_index = 1
 
-            file_name = f"{title}.S{str(season_index).zfill(2)}E{str(episode_index).zfill(2)}.WEB-DL.{self.platform}.zh-Hant.vtt"
+            filename = f"{title}.S{str(season_index).zfill(2)}E{str(episode_index).zfill(2)}.WEB-DL.{self.platform}.zh-Hant.vtt"
 
             episode['season_index'] = season_index
             episode['episode_index'] = episode_index
-            episode['file_name'] = file_name
+            episode['filename'] = filename
             episode_list.append(episode)
 
         self.logger.debug("episode_list: %s", episode_list)
@@ -142,7 +143,7 @@ class FridayVideo(Service):
             content_id=data['contentId'], content_type=data['contentType'])
         self.logger.debug(episode_list_url)
 
-        res = self.session.get(url=episode_list_url)
+        res = self.session.get(url=episode_list_url, timeout=5)
 
         if res.ok:
             data = res.json()['data']
@@ -187,9 +188,9 @@ class FridayVideo(Service):
             for episode in episode_list:
                 if not self.download_season or episode['season_index'] in self.download_season:
                     if not self.download_episode or episode['episode_index'] in self.download_episode:
-                        file_name = episode['file_name']
+                        filename = episode['filename']
                         folder_path = os.path.join(
-                            self.download_path, rename_filename(file_name.split('E')[0]))
+                            self.download_path, rename_filename(filename.split('E')[0]))
                         media_info = {
                             'streaming_id': episode['streamingId'],
                             'streaming_type': episode['streamingType'],
@@ -199,7 +200,7 @@ class FridayVideo(Service):
                         }
 
                         subs, lang_paths = self.get_subtitle(
-                            media_info=media_info, folder_path=folder_path, file_name=file_name)
+                            media_info=media_info, folder_path=folder_path, filename=filename)
                         subtitles += subs
                         languages = set.union(languages, lang_paths)
 
@@ -210,7 +211,7 @@ class FridayVideo(Service):
             self.logger.error(res.text)
             sys.exit(1)
 
-    def get_media_info(self, media_info, file_name):
+    def get_media_info(self, media_info, filename):
 
         client_id = self.cookies['uid']
         login_access_token = self.cookies['login_accessToken']
@@ -241,7 +242,7 @@ class FridayVideo(Service):
                     return data
                 else:
                     self.logger.error("%s\nError: %s\n", os.path.basename(
-                        file_name), data['message'])
+                        filename), data['message'])
         else:
             self.logger.error(res.text)
             sys.exit(1)
@@ -263,8 +264,8 @@ class FridayVideo(Service):
             self.logger.error(res.text)
             sys.exit(1)
 
-    def get_subtitle(self, media_info, folder_path, file_name):
-        data = self.get_media_info(media_info, file_name)
+    def get_subtitle(self, media_info, folder_path, filename):
+        data = self.get_media_info(media_info, filename)
 
         lang_paths = set()
         subtitles = []
@@ -286,7 +287,7 @@ class FridayVideo(Service):
                             exist_ok=True)
 
                 subtitles.append({
-                    'name': file_name,
+                    'name': filename,
                     'path': folder_path,
                     'url': sub['url'].replace('http:', 'https:')
                 })
@@ -337,7 +338,7 @@ class FridayVideo(Service):
                     self.movie_metadata(data)
                 else:
                     self.series_metadata(data)
-            except:
+            except JSONDecodeError:
                 if '/pkmslogout' in res.text:
                     self.logger.info(
                         "\nCookies is expired!\nPlease log out (https://video.friday.tw/logout), login, and re-download cookies!")

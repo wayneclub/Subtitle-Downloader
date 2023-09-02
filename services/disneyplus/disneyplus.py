@@ -12,7 +12,7 @@ import sys
 from urllib.parse import urljoin
 import m3u8
 from configs.config import credentials, user_agent
-from utils.helper import get_locale
+from utils.helper import get_all_languages, get_locale
 from utils.io import rename_filename, download_files, download_audio
 from utils.subtitle import convert_subtitle, merge_subtitle_fragments
 from services.disneyplus.disneyplus_login import Login
@@ -34,30 +34,12 @@ class DisneyPlus(Service):
         self.profile = dict()
         self.access_token = ''
 
-    def get_all_languages(self, available_languages):
-        """Get all subtitles language"""
-
-        if 'all' in self.subtitle_language:
-            self.subtitle_language = available_languages
-
-        intersect = set(self.subtitle_language).intersection(
-            set(available_languages))
-
-        if not intersect:
-            self.logger.error(
-                self._("\nUnsupport %s subtitle, available languages: %s"), ", ".join(self.subtitle_language), ", ".join(available_languages))
-            sys.exit(0)
-
-        if len(intersect) != len(self.subtitle_language):
-            self.logger.error(
-                self._("\nUnsupport %s subtitle, available languages: %s"), ", ".join(set(self.subtitle_language).symmetric_difference(intersect)), ", ".join(available_languages))
-
     def movie_subtitle(self):
         movie_url = self.config['api']['DmcVideo'].format(
             region=self.profile['region'],
             language=self.profile['language'],
             family_id=os.path.basename(self.url))
-        res = self.session.get(url=movie_url)
+        res = self.session.get(url=movie_url, timeout=5)
         if res.ok:
             data = res.json()['data']['DmcVideoBundle']['video']
             title = data['text']['title']['full']['program']['default']['content'].strip(
@@ -77,7 +59,7 @@ class DisneyPlus(Service):
             media_id = data['mediaMetadata']['mediaId']
             m3u8_url = self.get_m3u8_url(media_id)
 
-            file_name = f'{title}.{release_year}.WEB-DL.{self.platform}.vtt'
+            filename = f'{title}.{release_year}.WEB-DL.{self.platform}.vtt'
             subtitle_list, audio_list = self.parse_m3u(m3u8_url)
 
             if not subtitle_list:
@@ -86,11 +68,11 @@ class DisneyPlus(Service):
                 sys.exit(1)
 
             self.logger.info(
-                self._("\nDownload: %s\n---------------------------------------------------------------"), file_name)
+                self._("\nDownload: %s\n---------------------------------------------------------------"), filename)
             self.get_subtitle(subtitle_list, program_type,
-                              folder_path, file_name)
+                              folder_path, filename)
             if self.audio_language:
-                self.get_audio(audio_list, folder_path, file_name)
+                self.get_audio(audio_list, folder_path, filename)
 
             convert_subtitle(folder_path=folder_path,
                              platform=self.platform, subtitle_format=self.subtitle_format, locale=self.locale)
@@ -103,7 +85,7 @@ class DisneyPlus(Service):
             language=self.profile['language'],
             series_id=os.path.basename(self.url))
         self.logger.debug(series_url)
-        res = self.session.get(url=series_url)
+        res = self.session.get(url=series_url, timeout=5)
         if res.ok:
             data = res.json()['data']['DmcSeriesBundle']
             if not data['series']:
@@ -151,7 +133,7 @@ class DisneyPlus(Service):
                             m3u8_url = self.get_m3u8_url(media_id)
                             self.logger.debug(m3u8_url)
 
-                            file_name = f'{name}E{str(episode_index).zfill(2)}.WEB-DL.{self.platform}.vtt'
+                            filename = f'{name}E{str(episode_index).zfill(2)}.WEB-DL.{self.platform}.vtt'
                             subtitle_list, audio_list = self.parse_m3u(
                                 m3u8_url)
 
@@ -161,12 +143,12 @@ class DisneyPlus(Service):
                                 sys.exit(1)
 
                             self.logger.info(
-                                self._("\nDownload: %s\n---------------------------------------------------------------"), file_name)
+                                self._("\nDownload: %s\n---------------------------------------------------------------"), filename)
                             self.get_subtitle(subtitle_list, program_type,
-                                              folder_path, file_name)
+                                              folder_path, filename)
                             if self.audio_language:
                                 self.get_audio(
-                                    audio_list, folder_path, file_name)
+                                    audio_list, folder_path, filename)
 
                     convert_subtitle(folder_path=folder_path,
                                      platform=self.platform, subtitle_format=self.subtitle_format, locale=self.locale)
@@ -182,7 +164,7 @@ class DisneyPlus(Service):
                 language=self.profile['language'],
                 season_id=season_id, page=page)
             self.logger.debug(episode_page_url)
-            res = self.session.get(url=episode_page_url)
+            res = self.session.get(url=episode_page_url, timeout=5)
 
             if res.ok:
                 data = res.json()
@@ -277,7 +259,8 @@ class DisneyPlus(Service):
                 self.logger.debug(audio['url'])
                 audio_url_list.append(audio)
 
-        self.get_all_languages(languages)
+        get_all_languages(available_languages=languages,
+                          subtitle_language=self.subtitle_language, locale_=self.locale)
 
         subtitle_list = []
         for sub in sub_url_list:
@@ -298,14 +281,14 @@ class DisneyPlus(Service):
         subtitles = []
 
         for sub in subtitle_list:
-            file_name = sub_name.replace('.vtt', f".{sub['lang']}.vtt")
+            filename = sub_name.replace('.vtt', f".{sub['lang']}.vtt")
 
             if program_type == 'movie' or len(self.subtitle_language) == 1:
                 lang_folder_path = os.path.join(
-                    folder_path, f"tmp_{file_name.replace('.vtt', '.srt')}")
+                    folder_path, f"tmp_{filename.replace('.vtt', '.srt')}")
             else:
                 lang_folder_path = os.path.join(
-                    os.path.join(folder_path, sub['lang']), f"tmp_{file_name.replace('.vtt', '.srt')}")
+                    os.path.join(folder_path, sub['lang']), f"tmp_{filename.replace('.vtt', '.srt')}")
 
             os.makedirs(lang_folder_path, exist_ok=True)
 
@@ -313,7 +296,7 @@ class DisneyPlus(Service):
 
             for url in sub['urls']:
                 subtitle = dict()
-                subtitle['name'] = file_name
+                subtitle['name'] = filename
                 subtitle['path'] = lang_folder_path
                 subtitle['url'] = url
                 subtitle['segment'] = True
@@ -329,18 +312,18 @@ class DisneyPlus(Service):
             for lang_path in sorted(languages):
                 if 'tmp' in lang_path:
                     merge_subtitle_fragments(
-                        folder_path=lang_path, file_name=os.path.basename(lang_path.replace('tmp_', '')), subtitle_format=self.subtitle_format, locale=self.locale, display=display)
+                        folder_path=lang_path, filename=os.path.basename(lang_path.replace('tmp_', '')), subtitle_format=self.subtitle_format, locale=self.locale, display=display)
                     display = False
 
     def get_audio(self, audio_list, folder_path, audio_name):
         for audio in audio_list:
             if audio['lang'] in ['cmn-TW', 'yue']:
-                file_name = audio_name.replace(
+                filename = audio_name.replace(
                     '.vtt', f".{audio['lang']}{audio['extension']}")
                 self.logger.info(
-                    self._("\nDownload: %s\n---------------------------------------------------------------"), file_name)
+                    self._("\nDownload: %s\n---------------------------------------------------------------"), filename)
                 download_audio(audio['url'], os.path.join(
-                    folder_path, file_name))
+                    folder_path, filename))
 
     def main(self):
         user = Login(email=credentials[self.platform]['email'],

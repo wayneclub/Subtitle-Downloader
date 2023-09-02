@@ -71,9 +71,9 @@ class WeTV(Service):
         if os.path.exists(folder_path):
             shutil.rmtree(folder_path)
 
-        file_name = f'{title}.WEB-DL.{self.platform}.vtt'
+        filename = f'{title}.WEB-DL.{self.platform}.vtt'
         self.logger.info(
-            self._("\nDownload: %s\n---------------------------------------------------------------"), file_name)
+            self._("\nDownload: %s\n---------------------------------------------------------------"), filename)
 
         movie_data = self.get_dash_url(
             cid=data['videoInfo']['coverList'][0], vid=data['videoInfo']['vid'], url=self.url)
@@ -83,7 +83,7 @@ class WeTV(Service):
 
         if movie_data:
             subs, lang_paths = self.get_subtitle(
-                movie_data, folder_path, file_name)
+                movie_data, folder_path, filename)
             subtitles += subs
             languages = set.union(
                 languages, lang_paths)
@@ -153,16 +153,16 @@ class WeTV(Service):
                             series_id=series_id, episode_id=episode_id)
                         self.logger.debug(episode_url)
 
-                        file_name = f'{name}E{str(episode_index).zfill(2)}.WEB-DL.{self.platform}.vtt'
+                        filename = f'{name}E{str(episode_index).zfill(2)}.WEB-DL.{self.platform}.vtt'
                         self.logger.info(
-                            self._("Finding %s ..."), file_name)
+                            self._("Finding %s ..."), filename)
 
                         episode_data = self.get_dash_url(
                             cid=series_id, vid=episode_id, url=self.url)
 
                         if episode_data:
                             subs, lang_paths = self.get_subtitle(
-                                episode_data, folder_path, file_name)
+                                episode_data, folder_path, filename)
                             subtitles += subs
                             languages = set.union(
                                 languages, lang_paths)
@@ -243,7 +243,7 @@ class WeTV(Service):
             self.logger.error(res.text)
             sys.exit(1)
 
-    def get_subtitle(self, data, folder_path, file_name):
+    def get_subtitle(self, data, folder_path, filename):
 
         lang_paths = set()
         subtitles = []
@@ -260,14 +260,14 @@ class WeTV(Service):
                 subtitle_link = sub['url']
                 if '.m3u8' in subtitle_link:
                     subtitle_link = self.parse_m3u(subtitle_link)
-                subtitle_file_name = file_name.replace(
+                subtitle_filename = filename.replace(
                     '.vtt', f'.{sub_lang}.vtt')
 
                 os.makedirs(lang_folder_path,
                             exist_ok=True)
 
                 subtitle = dict()
-                subtitle['name'] = subtitle_file_name
+                subtitle['name'] = subtitle_filename
                 subtitle['path'] = lang_folder_path
                 subtitle['url'] = subtitle_link
                 subtitles.append(subtitle)

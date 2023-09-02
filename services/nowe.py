@@ -105,10 +105,10 @@ class NowE(Service):
         if os.path.exists(folder_path):
             shutil.rmtree(folder_path)
 
-        file_name = f'{title}.WEB-DL.{self.platform}'
+        filename = f'{title}.WEB-DL.{self.platform}'
 
         self.download_subtitle(content_id=content_id,
-                               title=file_name, folder_path=folder_path)
+                               title=filename, folder_path=folder_path)
 
         convert_subtitle(folder_path=folder_path,
                          platform=self.platform, subtitle_format=self.subtitle_format, locale=self.locale)
@@ -155,12 +155,12 @@ class NowE(Service):
             if not self.download_season or season_index in self.download_season:
                 if not self.download_episode or episode_index in self.download_episode:
                     content_id = episode['episodeId']
-                    file_name = f'{name}E{str(episode_index).zfill(2)}.WEB-DL.{self.platform}'
+                    filename = f'{name}E{str(episode_index).zfill(2)}.WEB-DL.{self.platform}'
 
-                    self.logger.info("\n%s", file_name)
+                    self.logger.info("\n%s", filename)
 
                     self.download_subtitle(content_id=content_id,
-                                           title=file_name, folder_path=folder_path)
+                                           title=filename, folder_path=folder_path)
 
         convert_subtitle(folder_path=folder_path,
                          platform=self.platform, subtitle_format=self.subtitle_format, locale=self.locale)

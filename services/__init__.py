@@ -1,5 +1,11 @@
+#!/usr/bin/python3
+# coding: utf-8
 
-from configs.config import Platform
+"""
+This module is for service initiation mapping
+"""
+
+from constants import Platform
 from services.kktv import KKTV
 from services.linetv import LineTV
 from services.fridayvideo import FridayVideo
@@ -8,6 +14,7 @@ from services.iqiyi.iqiyi import IQIYI
 from services.myvideo import MyVideo
 from services.nowplayer import NowPlayer
 from services.wetv.wetv import WeTV
+from services.viki import Viki
 from services.viu import Viu
 from services.nowe import NowE
 from services.disneyplus.disneyplus import DisneyPlus
@@ -75,6 +82,11 @@ service_map = [
         'name': Platform.NOWPLAYER,
         'class': NowPlayer,
         'keyword': 'nowplayer.now.com'
+    },
+    {
+        'name': Platform.VIKI,
+        'class': Viki,
+        'keyword': 'viki.com'
     },
     {
         'name': Platform.VIU,

@@ -83,7 +83,7 @@ class LineTV(Service):
                                     drama_id=drama_id, episode_name=episode_index)
                                 self.logger.debug(subtitle_link)
 
-                                file_name = f'{title}.S{str(season_index).zfill(2)}E{str(episode_index).zfill(2)}.WEB-DL.{self.platform}.zh-Hant.vtt'
+                                filename = f'{name}E{str(episode_index).zfill(2)}.WEB-DL.{self.platform}.zh-Hant.vtt'
 
                                 if not check_url_exist(subtitle_link):
                                     if check_url_exist(subtitle_link.replace('tv-aws-media-convert-input-tokyo', 'aws-elastic-transcoder-input-tokyo')):
@@ -97,11 +97,11 @@ class LineTV(Service):
                                                 free_date = strftime(
                                                     '%Y-%m-%d', localtime(int(episode['free_date'])/1000))
                                                 self.logger.info(
-                                                    self._("%s\t...free user will be available on %s"), file_name, free_date)
+                                                    self._("%s\t...free user will be available on %s"), filename, free_date)
 
                                 os.makedirs(folder_path, exist_ok=True)
                                 subtitle = dict()
-                                subtitle['name'] = file_name
+                                subtitle['name'] = filename
                                 subtitle['path'] = folder_path
                                 subtitle['url'] = subtitle_link
                                 subtitles.append(subtitle)

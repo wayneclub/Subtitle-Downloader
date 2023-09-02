@@ -4,7 +4,7 @@
 
 **禁止營利使用，只限個人研究和語言學習，字幕版權皆屬原串流平台所有**
 
-Subtitle-Downloader 支持從各大串流平台下載字幕，例如：Disney Plus、HBOGO Asia、KKTV、LineTV、friDay影音、MyVideo、CatchPlay、iq.com（愛奇藝）、Viu（不需要VPN即可下載香港、新加坡地區的字幕）、WeTV、NowE、Now Player、AppleTV Plus、iTunes等等。
+Subtitle-Downloader 支持從各大串流平台下載字幕，例如：Disney Plus、HBOGO Asia、KKTV、LineTV、friDay影音、MyVideo、CatchPlay、iq.com（愛奇藝）、Viki、Viu（不需要VPN即可下載香港、新加坡地區的字幕）、WeTV、NowE、Now Player、AppleTV Plus、iTunes等等。
 
 ## 說明
 
@@ -36,6 +36,7 @@ pip install -r requriements
 | MyVideo | Cookies |
 | NowE | Cookies |
 | Now Player | Cookies |
+| Viki | Cookies |
 | Viu |  |
 | WeTV | Cookies |
 
@@ -280,6 +281,7 @@ python subtitle_downloader.py URL -s 1 -sf .ass
 
 - 部分串流平台有地域限制，可使用代理繞過
 - Disney+ 不支援使用 VPN
+- Viki 有API限制，別太頻繁呼叫（只下載完成度100%的字幕）
 
 ## 常見問題
 

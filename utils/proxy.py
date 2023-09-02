@@ -15,7 +15,8 @@ from configs.config import config
 
 def get_ip_info(session: Optional[requests.Session] = None) -> dict:
     """Use ipinfo.io to get IP location information."""
-    return (session or requests.Session()).get("https://ipinfo.io/json").json()
+
+    return (session or requests.Session()).get('https://ipinfo.io/json', timeout=5).json()
 
 
 def get_proxy(region: str, ip_info: dict, geofence: list, platform: str) -> Optional[str]:

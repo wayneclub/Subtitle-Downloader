@@ -17,7 +17,7 @@ import m3u8
 import orjson
 from configs.config import user_agent
 from utils.io import rename_filename, download_files
-from utils.helper import get_language_code, get_locale
+from utils.helper import get_all_languages, get_language_code, get_locale
 from utils.subtitle import convert_subtitle, merge_subtitle_fragments
 from services.service import Service
 
@@ -36,24 +36,6 @@ class AppleTVPlus(Service):
         self.title_id = os.path.basename(self.url.split('?')[0])
         self.content_type = 'movies' if '/movie/' in self.url else 'shows'
 
-    def get_all_languages(self, available_languages):
-        """Get all subtitles language"""
-
-        if 'all' in self.subtitle_language:
-            self.subtitle_language = available_languages
-
-        intersect = set(self.subtitle_language).intersection(
-            set(available_languages))
-
-        if not intersect:
-            self.logger.error(
-                self._("\nUnsupport %s subtitle, available languages: %s"), ", ".join(self.subtitle_language), ", ".join(available_languages))
-            sys.exit(0)
-
-        if len(intersect) != len(self.subtitle_language):
-            self.logger.error(
-                self._("\nUnsupport %s subtitle, available languages: %s"), ", ".join(set(self.subtitle_language).symmetric_difference(intersect)), ", ".join(available_languages))
-
     def movie_subtitle(self, data):
         title = data['content']['title']
         release_year = datetime.utcfromtimestamp(
@@ -66,7 +48,7 @@ class AppleTVPlus(Service):
         if os.path.exists(folder_path):
             shutil.rmtree(folder_path)
 
-        file_name = f'{title}.WEB-DL.{self.platform}.vtt'
+        filename = f'{title}.WEB-DL.{self.platform}.vtt'
         playable_id = data['smartPlayables'][-1]['playableId']
 
         m3u8_url = ''
@@ -91,9 +73,9 @@ class AppleTVPlus(Service):
             sys.exit(0)
 
         self.logger.info(
-            self._("\nDownload: %s\n---------------------------------------------------------------"), file_name)
+            self._("\nDownload: %s\n---------------------------------------------------------------"), filename)
         self.get_subtitle(
-            subtitle_list, folder_path, file_name)
+            subtitle_list, folder_path, filename)
 
         convert_subtitle(folder_path=folder_path,
                          platform=self.platform, subtitle_format=self.subtitle_format, locale=self.locale)
@@ -109,7 +91,7 @@ class AppleTVPlus(Service):
 
         params = self.config['device'] | {'selectedSeasonEpisodesOnly': False}
         res = self.session.get(self.config['api']['shows'].format(
-            id=self.title_id), params=params, timeout=1)
+            id=self.title_id), params=params, timeout=5)
         if res.ok:
             total = res.json()['data']['totalEpisodeCount']
         else:
@@ -125,7 +107,7 @@ class AppleTVPlus(Service):
             params = self.config['device'] | {'nextToken': next_token}
 
             res = self.session.get(self.config['api']['shows'].format(
-                id=self.title_id), params=params, timeout=1)
+                id=self.title_id), params=params, timeout=5)
             if res.ok:
                 episode_list += res.json()['data']['episodes']
             else:
@@ -175,7 +157,7 @@ class AppleTVPlus(Service):
 
                     episode_index = episode['episodeNumber']
                     if not self.download_episode or episode_index in self.download_episode:
-                        file_name = f'{name}E{str(episode_index).zfill(2)}.WEB-DL.{self.platform}.vtt'
+                        filename = f'{name}E{str(episode_index).zfill(2)}.WEB-DL.{self.platform}.vtt'
 
                         res = self.session.get(self.config['api']['episode'].format(
                             id=episode['id']), params=self.config['device'], timeout=5)
@@ -197,9 +179,9 @@ class AppleTVPlus(Service):
                             sys.exit(1)
 
                         self.logger.info(
-                            self._("\nDownload: %s\n---------------------------------------------------------------"), file_name)
+                            self._("\nDownload: %s\n---------------------------------------------------------------"), filename)
                         self.get_subtitle(
-                            subtitle_list, folder_path, file_name)
+                            subtitle_list, folder_path, filename)
 
             convert_subtitle(folder_path=folder_path,
                              platform=self.platform, subtitle_format=self.subtitle_format, locale=self.locale)
@@ -225,7 +207,8 @@ class AppleTVPlus(Service):
                 languages.add(sub_lang)
                 sub_url_list.append(sub)
 
-        self.get_all_languages(sorted(languages))
+        get_all_languages(available_languages=languages,
+                          subtitle_language=self.subtitle_language, locale_=self.locale)
 
         subtitle_list = []
         for sub in sub_url_list:
@@ -246,24 +229,24 @@ class AppleTVPlus(Service):
         subtitles = []
 
         for sub in subtitle_list:
-            file_name = sub_name.replace('.vtt', f".{sub['lang']}.vtt")
+            filename = sub_name.replace('.vtt', f".{sub['lang']}.vtt")
 
             if self.content_type == 'movies' or len(self.subtitle_language) == 1:
                 lang_folder_path = os.path.join(
-                    folder_path, f"tmp_{file_name.replace('.vtt', '.srt')}")
+                    folder_path, f"tmp_{filename.replace('.vtt', '.srt')}")
             else:
                 lang_folder_path = os.path.join(
-                    os.path.join(folder_path, sub['lang']), f"tmp_{file_name.replace('.vtt', '.srt')}")
+                    os.path.join(folder_path, sub['lang']), f"tmp_{filename.replace('.vtt', '.srt')}")
 
             os.makedirs(lang_folder_path, exist_ok=True)
 
             languages.add(lang_folder_path)
 
-            self.logger.debug(file_name, len(sub['urls']))
+            self.logger.debug(filename, len(sub['urls']))
 
             for url in sub['urls']:
                 subtitle = dict()
-                subtitle['name'] = file_name
+                subtitle['name'] = filename
                 subtitle['path'] = lang_folder_path
                 subtitle['url'] = url
                 subtitle['segment'] = True
@@ -294,7 +277,7 @@ class AppleTVPlus(Service):
         """Get configurations"""
 
         res = self.session.get(
-            self.config['api']['configurations'], params=self.config['device'], timeout=1)
+            self.config['api']['configurations'], params=self.config['device'], timeout=5)
         if res.ok:
             configurations = res.json(
             )['data']['applicationProps']['requiredParamsMap']['Default']
@@ -312,7 +295,7 @@ class AppleTVPlus(Service):
             for lang_path in sorted(languages):
                 if 'tmp' in lang_path:
                     merge_subtitle_fragments(
-                        folder_path=lang_path, file_name=os.path.basename(lang_path.replace('tmp_', '')), subtitle_format=self.subtitle_format, locale=self.locale, display=display)
+                        folder_path=lang_path, filename=os.path.basename(lang_path.replace('tmp_', '')), subtitle_format=self.subtitle_format, locale=self.locale, display=display)
                     display = False
 
     def main(self):
@@ -330,7 +313,7 @@ class AppleTVPlus(Service):
             self.config['device'] = configurations
 
         res = self.session.get(self.config['api']['title'].format(
-            content_type=self.content_type, id=self.title_id), params=self.config['device'], timeout=1)
+            content_type=self.content_type, id=self.title_id), params=self.config['device'], timeout=5)
         if res.ok:
             data = res.json()['data']
             if self.content_type == 'movies':

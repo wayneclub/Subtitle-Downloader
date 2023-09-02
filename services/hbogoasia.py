@@ -45,7 +45,7 @@ class HBOGOAsia(Service):
     def get_territory(self):
         geo_url = self.config['api']['geo'].format(
             bundle_id=urlparse(self.url).netloc)
-        res = self.session.get(url=geo_url)
+        res = self.session.get(url=geo_url, timeout=5)
         if res.ok:
             data = res.json()
             if 'territory' in data:
@@ -129,7 +129,7 @@ class HBOGOAsia(Service):
                 self._("\nUnsupport %s subtitle, available languages: %s"), ", ".join(set(self.subtitle_language).symmetric_difference(intersect)), ", ".join(available_languages))
 
     def movie_subtitle(self, movie_url, content_id):
-        res = self.session.get(url=movie_url)
+        res = self.session.get(url=movie_url, timeout=5)
 
         if res.ok:
             movie = res.json()
@@ -146,13 +146,13 @@ class HBOGOAsia(Service):
             if os.path.exists(folder_path):
                 shutil.rmtree(folder_path)
 
-            file_name = f'{title}.WEB-DL.{self.platform}.vtt'
+            filename = f'{title}.WEB-DL.{self.platform}.vtt'
 
             self.logger.info(
-                self._("\nDownload: %s\n---------------------------------------------------------------"), file_name)
+                self._("\nDownload: %s\n---------------------------------------------------------------"), filename)
 
             subtitles = self.get_subtitle(
-                content_id, movie, folder_path, file_name)[0]
+                content_id, movie, folder_path, filename)[0]
 
             self.download_subtitle(
                 subtitles=subtitles, folder_path=folder_path)
@@ -160,7 +160,7 @@ class HBOGOAsia(Service):
             self.logger.error(res.text)
 
     def series_subtitle(self, series_url):
-        res = self.session.get(url=series_url)
+        res = self.session.get(url=series_url, timeout=5)
         if res.ok:
             season_list = res.json()['results']
 
@@ -191,7 +191,7 @@ class HBOGOAsia(Service):
                     if os.path.exists(folder_path):
                         shutil.rmtree(folder_path)
 
-                    episode_res = self.session.get(url=season_url)
+                    episode_res = self.session.get(url=season_url, timeout=5)
                     if episode_res.ok:
                         episode_list = episode_res.json()
                         episode_num = episode_list['total']
@@ -206,12 +206,12 @@ class HBOGOAsia(Service):
                             if not self.download_episode or episode_index in self.download_episode:
                                 content_id = episode['contentId']
 
-                                file_name = f'{name}E{str(episode_index).zfill(2)}.WEB-DL.{self.platform}.vtt'
+                                filename = f'{name}E{str(episode_index).zfill(2)}.WEB-DL.{self.platform}.vtt'
 
                                 self.logger.info(
-                                    self._("Finding %s ..."), file_name)
+                                    self._("Finding %s ..."), filename)
                                 subs, lang_paths = self.get_subtitle(
-                                    content_id, episode, folder_path, file_name)
+                                    content_id, episode, folder_path, filename)
                                 subtitles += subs
                                 languages = set.union(languages, lang_paths)
 
@@ -220,11 +220,11 @@ class HBOGOAsia(Service):
         else:
             self.logger.error(res.text)
 
-    def get_subtitle(self, content_id, data, folder_path, file_name):
+    def get_subtitle(self, content_id, data, folder_path, filename):
         playback_url = self.config['api']['playback'].format(territory=self.territory, content_id=content_id,
                                                              session_token=self.session_token, channel_partner_id=self.channel_partner_id)
         self.logger.debug(playback_url)
-        res = self.session.get(url=playback_url)
+        res = self.session.get(url=playback_url, timeout=5)
 
         if res.ok:
             mpd_url = res.json()['playbackURL']
@@ -253,7 +253,7 @@ class HBOGOAsia(Service):
                         lang_code = Path(
                             subtitle_file).stem.replace(content_id, '')
 
-                        subtitle_file_name = file_name.replace(
+                        subtitle_filename = filename.replace(
                             '.vtt', f'.{sub_lang}.vtt')
 
                         subtitle_link = mpd_url.replace(
@@ -263,7 +263,7 @@ class HBOGOAsia(Service):
                         os.makedirs(lang_folder_path,
                                     exist_ok=True)
                         subtitle = dict()
-                        subtitle['name'] = subtitle_file_name
+                        subtitle['name'] = subtitle_filename
                         subtitle['path'] = lang_folder_path
                         subtitle['url'] = subtitle_link
                         subtitles.append(subtitle)

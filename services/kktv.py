@@ -7,7 +7,6 @@ This module is to download subtitle from KKTV
 from __future__ import annotations
 import os
 import re
-import shutil
 import sys
 import orjson
 from utils.io import rename_filename, download_files
@@ -39,7 +38,7 @@ class KKTV(Service):
 
         folder_path = os.path.join(self.download_path, title)
         episode_id = data['series'][0]['episodes'][0]['id']
-        file_name = f'{title}.WEB-DL.{self.platform}.zh-Hant.vtt'
+        filename = f'{title}.WEB-DL.{self.platform}.zh-Hant.vtt'
 
         self.logger.warning(
             self._("\nSorry, there's no embedded subtitles in this video!"))
@@ -105,7 +104,7 @@ class KKTV(Service):
                                 episode['id'].replace(episode['seriesId'], ''))
 
                         if not self.download_episode or episode_index in self.download_episode:
-                            file_name = f"{name}E{str(episode_index).zfill(fill_num)}.WEB-DL.{self.platform}.zh-Hant.vtt"
+                            filename = f"{name}E{str(episode_index).zfill(fill_num)}.WEB-DL.{self.platform}.zh-Hant.vtt"
 
                             if not episode['subtitles']:
                                 self.logger.error(
@@ -135,9 +134,9 @@ class KKTV(Service):
                                         ko_subtitle_link = subtitle_link.replace(
                                             'zh-Hant.vtt', 'ko.vtt')
 
-                                        ja_file_name = file_name.replace(
+                                        ja_filename = filename.replace(
                                             'zh-Hant.vtt', 'ja.vtt')
-                                        ko_file_name = file_name.replace(
+                                        ko_filename = filename.replace(
                                             'zh-Hant.vtt', 'ko.vtt')
 
                                         ja_folder_path = os.path.join(
@@ -152,7 +151,7 @@ class KKTV(Service):
                                             languages.add(folder_path)
 
                                             subtitle = dict()
-                                            subtitle['name'] = file_name
+                                            subtitle['name'] = filename
                                             subtitle['path'] = folder_path
                                             subtitle['url'] = subtitle_link
                                             subtitles.append(subtitle)
@@ -162,7 +161,7 @@ class KKTV(Service):
                                                 ja_folder_path, exist_ok=True)
                                             languages.add(ja_folder_path)
                                             subtitle = dict()
-                                            subtitle['name'] = ja_file_name
+                                            subtitle['name'] = ja_filename
                                             subtitle['path'] = ja_folder_path
                                             subtitle['url'] = ja_subtitle_link
                                             subtitles.append(subtitle)
@@ -172,7 +171,7 @@ class KKTV(Service):
                                                 ko_folder_path, exist_ok=True)
                                             languages.add(ko_folder_path)
                                             subtitle = dict()
-                                            subtitle['name'] = ko_file_name
+                                            subtitle['name'] = ko_filename
                                             subtitle['path'] = ko_folder_path
                                             subtitle['url'] = ko_subtitle_link
                                             subtitles.append(subtitle)

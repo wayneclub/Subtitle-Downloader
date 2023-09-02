@@ -18,3 +18,4 @@ Subtitle-Downloader:
 	msgfmt -o locales/zh-Hant/LC_MESSAGES/services.appletvplus.mo locales/zh-Hant/LC_MESSAGES/services.appletvplus
 	msgfmt -o locales/zh-Hant/LC_MESSAGES/services.nowe.mo locales/zh-Hant/LC_MESSAGES/services.nowe
 	msgfmt -o locales/zh-Hant/LC_MESSAGES/services.nowplayer.mo locales/zh-Hant/LC_MESSAGES/services.nowplayer
+	msgfmt -o locales/zh-Hant/LC_MESSAGES/services.viki.mo locales/zh-Hant/LC_MESSAGES/services.viki

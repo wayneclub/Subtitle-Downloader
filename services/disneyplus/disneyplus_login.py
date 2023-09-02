@@ -32,7 +32,7 @@ class Login(object):
         self.session = session
 
     def client_info(self):
-        res = self.session.get(self.config['api']['login_page'])
+        res = self.session.get(self.config['api']['login_page'], timeout=5)
         match = re.search('window.server_path = ({.*});', res.text)
         data = json.loads(match.group(1))
         client_id = data['sdk']['clientId']
@@ -190,7 +190,7 @@ class Login(object):
         }
 
         res = self.session.get(
-            url=self.config['api']['current_account'], headers=headers)
+            url=self.config['api']['current_account'], headers=headers, timeout=5)
 
         if res.ok:
             self.logger.debug(res.json())
@@ -217,7 +217,7 @@ class Login(object):
 
         session_url = self.config['api']['session']
 
-        res = self.session.get(url=session_url, headers=headers)
+        res = self.session.get(url=session_url, headers=headers, timeout=5)
         if res.ok:
             return res.json()['location']['country_code']
         else:

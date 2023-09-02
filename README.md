@@ -4,7 +4,7 @@
 
 **NON-COMMERCIAL USE ONLY**
 
-Subtitle-Downloader supports downloading subtitles from multiple streaming services, such as Disney Plus, HBOGO Asia, KKTV, LineTV, friDay Video, MyVideo, CatchPlay, iq.com, Viu (support HK and SG without vpn), WeTV, NowE, Now Player, AppleTV Plus, iTunes and etc.
+Subtitle-Downloader supports downloading subtitles from multiple streaming services, such as Disney Plus, HBOGO Asia, KKTV, LineTV, friDay Video, MyVideo, CatchPlay, iq.com, Viki, Viu (support HK and SG without vpn), WeTV, NowE, Now Player, AppleTV Plus, iTunes and etc.
 
 ## DESCRIPTION
 
@@ -36,6 +36,7 @@ pip install -r requriements
 | MyVideo | Cookies |
 | NowE | Cookies |
 | Now Player | Cookies |
+| Viki | Cookies |
 | Viu |  |
 | WeTV | Cookies |
 
@@ -281,6 +282,7 @@ python subtitle_downloader.py URL -s 1 -sf .ass
 
 - Few streaming services have Geo-blocking, make sure you are in the same region or use a proxy to bypass restrictions.
 - Disney+ doesn't support VPN.
+- Viki has API protection, don't call API too often. (Only catch 100% completed subtitles)
 
 ## FAQ
 

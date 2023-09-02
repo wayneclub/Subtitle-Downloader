@@ -104,6 +104,30 @@ def get_language_code(lang=''):
         return lang
 
 
+def get_all_languages(available_languages, subtitle_language, locale_):
+    """Get all subtitles language"""
+
+    _ = get_locale(__name__, locale_)
+
+    if available_languages:
+        available_languages = sorted(available_languages)
+
+    if 'all' in subtitle_language:
+        subtitle_language = available_languages
+
+    intersect = set(subtitle_language).intersection(
+        set(available_languages))
+
+    if not intersect:
+        logger.error(
+            _("\nUnsupport %s subtitle, available languages: %s"), ", ".join(subtitle_language), ", ".join(available_languages))
+        sys.exit(0)
+
+    if len(intersect) != len(subtitle_language):
+        logger.error(
+            _("\nUnsupport %s subtitle, available languages: %s"), ", ".join(set(subtitle_language).symmetric_difference(intersect)), ", ".join(available_languages))
+
+
 def check_url_exist(url, headers=None):
     """Validate url exist"""
 

@@ -142,13 +142,13 @@ class RipProcess(object):
 
             subtitle_language = next((
                 language[1] for language in LANGUAGE_LIST if subtitle_language in language), subtitle_language)
-            file_name = f"{title}.{subtitle_language}.vtt"
+            filename = f"{title}.{subtitle_language}.vtt"
             if os.path.exists(os.path.join(segments_path, 'init.mp4')):
                 if os.path.isdir(segments_path):
                     self.extract_sub(segments_path, self.logger.level)
 
                     os.rename(f"{segments_path}.vtt",
-                              os.path.join(folder_path, file_name))
+                              os.path.join(folder_path, filename))
             else:
                 with open(os.path.join(segments_path, 'raw.json'), 'rb') as file:
                     content = file.read().decode('utf-8')
@@ -164,7 +164,7 @@ class RipProcess(object):
                             'offset': offset
                         })
                 merge_subtitle_fragments(
-                    folder_path=segments_path, file_name=file_name, shift_time=shift_time)
+                    folder_path=segments_path, filename=filename, shift_time=shift_time)
 
         for path in glob.glob(os.path.join(folder_path, "dash*")):
             if os.path.isdir(path):

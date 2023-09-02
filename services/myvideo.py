@@ -38,15 +38,15 @@ class MyVideo(Service):
         title = rename_filename(f'{title}.{release_year}')
         folder_path = os.path.join(self.download_path, title)
 
-        file_name = f"{title}.WEB-DL.{self.platform}.zh-Hant.vtt"
+        filename = f"{title}.WEB-DL.{self.platform}.zh-Hant.vtt"
         movie_id = os.path.basename(data['url'])
         media_info = self.get_media_info(
-            content_id=movie_id, file_name=file_name)
+            content_id=movie_id, filename=filename)
 
         languages = set()
         subtitles = []
         subs, lang_paths = self.get_subtitle(
-            media_info=media_info, folder_path=folder_path, file_name=file_name)
+            media_info=media_info, folder_path=folder_path, filename=filename)
         subtitles += subs
         languages = set.union(languages, lang_paths)
 
@@ -54,7 +54,7 @@ class MyVideo(Service):
             self.logger.info(
                 self._(
                     "\nDownload: %s\n---------------------------------------------------------------"),
-                file_name)
+                filename)
 
         self.download_subtitle(
             subtitles=subtitles, languages=languages, folder_path=folder_path)
@@ -70,7 +70,7 @@ class MyVideo(Service):
             season_index = season['index']
             if not self.download_season or season_index in self.download_season:
                 episode_list = []
-                res = self.session.get(season['url'])
+                res = self.session.get(season['url'], timeout=5)
                 if res.ok:
                     soup = BeautifulSoup(res.text, 'html.parser')
                     for episode in soup.find_all('span', class_='episodeIntro'):
@@ -104,11 +104,11 @@ class MyVideo(Service):
                 for episode in episode_list:
                     episode_index = episode['index']
                     if not self.download_episode or episode_index in self.download_episode:
-                        file_name = f"{name}E{str(episode_index).zfill(2)}.WEB-DL.{self.platform}.zh-Hant.vtt"
+                        filename = f"{name}E{str(episode_index).zfill(2)}.WEB-DL.{self.platform}.zh-Hant.vtt"
                         media_info = self.get_media_info(
-                            content_id=episode['id'], file_name=file_name)
+                            content_id=episode['id'], filename=filename)
                         subs, lang_paths = self.get_subtitle(
-                            media_info=media_info, folder_path=folder_path, file_name=file_name)
+                            media_info=media_info, folder_path=folder_path, filename=filename)
 
                         if not subs:
                             break
@@ -132,7 +132,7 @@ class MyVideo(Service):
             self.logger.error(res.text)
             sys.exit(1)
 
-    def get_media_info(self, content_id, file_name):
+    def get_media_info(self, content_id, filename):
 
         media_info_url = self.config['api']['media_info'].format(
             content_id=content_id)
@@ -148,7 +148,7 @@ class MyVideo(Service):
                 return data
             elif data.get('error'):
                 self.logger.error("%s\nError: %s\n", os.path.basename(
-                    file_name), orjson.loads(data['error'])['errorMessage'])
+                    filename), orjson.loads(data['error'])['errorMessage'])
             else:
                 self.logger.error(res.text)
                 sys.exit(1)
@@ -156,7 +156,7 @@ class MyVideo(Service):
             self.logger.error(res.text)
             sys.exit(1)
 
-    def get_subtitle(self, media_info, folder_path, file_name):
+    def get_subtitle(self, media_info, folder_path, filename):
 
         lang_paths = set()
         subtitles = []
@@ -175,7 +175,7 @@ class MyVideo(Service):
                                 exist_ok=True)
 
                     subtitles.append({
-                        'name': file_name,
+                        'name': filename,
                         'path': folder_path,
                         'url': sub['subtitleUrl']
                     })
@@ -198,7 +198,7 @@ class MyVideo(Service):
     def main(self):
         """Download subtitle from MyVideo"""
 
-        res = self.session.get(self.url)
+        res = self.session.get(self.url, timeout=5)
         if res.ok:
             soup = BeautifulSoup(res.text, 'html.parser')
             data = ''

@@ -96,10 +96,10 @@ class IQIYI(Service):
         if os.path.exists(folder_path):
             shutil.rmtree(folder_path)
 
-        file_name = f'{title}.WEB-DL.{self.platform}.vtt'
+        filename = f'{title}.WEB-DL.{self.platform}.vtt'
 
         self.logger.info(self._(
-            "\nDownload: %s\n---------------------------------------------------------------"), file_name)
+            "\nDownload: %s\n---------------------------------------------------------------"), filename)
 
         play_url = f"https:{data['playUrl']}"
         vid = self.get_vid(play_url)
@@ -108,7 +108,7 @@ class IQIYI(Service):
             vid=vid, tvid=tvid)
         self.logger.debug("dash url: %s", dash_url)
 
-        res = self.session.get(url=dash_url)
+        res = self.session.get(url=dash_url, timeout=5)
         if res.ok:
             movie_data = res.json()['data']
             languages = set()
@@ -119,7 +119,7 @@ class IQIYI(Service):
                 self.get_all_languages(movie_data)
 
                 subs, lang_paths = self.get_subtitle(
-                    movie_data, folder_path, file_name)
+                    movie_data, folder_path, filename)
                 subtitles += subs
                 languages = set.union(languages, lang_paths)
 
@@ -166,7 +166,7 @@ class IQIYI(Service):
             episode_list_url = self.config['api']['episode_list'].format(
                 album_id=album_id, mode_code=mode_code, lang_code=lang_code, end_order=current_eps, start_order=start_order)
             self.logger.debug("episode_list_url: %s", episode_list_url)
-            res = self.session.get(url=episode_list_url)
+            res = self.session.get(url=episode_list_url, timeout=5)
 
             if res.ok:
                 episode_list_data = res.json()
@@ -210,9 +210,9 @@ class IQIYI(Service):
                 episode_index = int(episode['order'])
                 if not self.download_season or season_index in self.download_season:
                     if not self.download_episode or episode_index in self.download_episode:
-                        file_name = f'{name}E{str(episode_index).zfill(2)}.WEB-DL.{self.platform}.vtt'
+                        filename = f'{name}E{str(episode_index).zfill(2)}.WEB-DL.{self.platform}.vtt'
                         self.logger.info(
-                            self._("Finding %s ..."), file_name)
+                            self._("Finding %s ..."), filename)
 
                         tvid = episode['qipuId']
                         play_url = f"https://www.iq.com/play/{episode['playLocSuffix']}"
@@ -234,7 +234,7 @@ class IQIYI(Service):
                                     episode_data)
 
                                 subs, lang_paths = self.get_subtitle(
-                                    episode_data, folder_path, file_name)
+                                    episode_data, folder_path, filename)
                                 subtitles += subs
                                 languages = set.union(
                                     languages, lang_paths)
@@ -299,7 +299,7 @@ class IQIYI(Service):
         self.logger.debug("vf: %s", vf)
         return f"https://cache-video.iq.com{url}&vf={vf}"
 
-    def get_subtitle(self, data, folder_path, file_name):
+    def get_subtitle(self, data, folder_path, filename):
 
         lang_paths = set()
         subtitles = []
@@ -315,11 +315,11 @@ class IQIYI(Service):
 
                 if 'webvtt' in sub:
                     subtitle_link = sub['webvtt']
-                    subtitle_file_name = file_name.replace(
+                    subtitle_filename = filename.replace(
                         '.vtt', f'.{sub_lang}.vtt')
                 else:
                     subtitle_link = sub['xml']
-                    subtitle_file_name = file_name.replace(
+                    subtitle_filename = filename.replace(
                         '.vtt', f'.{sub_lang}.xml')
 
                 subtitle_link = self.config['api']['meta'] + \
@@ -329,7 +329,7 @@ class IQIYI(Service):
                             exist_ok=True)
 
                 subtitle = dict()
-                subtitle['name'] = subtitle_file_name
+                subtitle['name'] = subtitle_filename
                 subtitle['path'] = lang_folder_path
                 subtitle['url'] = subtitle_link
                 subtitles.append(subtitle)

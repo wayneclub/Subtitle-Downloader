@@ -5,6 +5,29 @@
 This module is for constants
 """
 
+
+class Platform:
+    """
+    Define all streaming services name
+    """
+
+    APPLETVPLUS = 'AppleTVPlus'
+    CATCHPLAY = 'CatchPlay'
+    DISNEYPLUS = 'DisneyPlus'
+    FRIDAYVIDEO = 'FridayVideo'
+    HBOGOASIA = 'HBOGOAsia'
+    IQIYI = 'iQIYI'
+    ITUNES = 'iTunes'
+    KKTV = 'KKTV'
+    LINETV = 'LineTV'
+    MYVIDEO = 'MyVideo'
+    NOWE = 'NowE'
+    NOWPLAYER = 'NowPlayer'
+    VIKI = 'Viki'
+    VIU = 'Viu'
+    WETV = 'WeTV'
+
+
 SUBTITLE_FORMAT = ['.srt', '.ass', '.ssa', '.vtt', '.xml']
 
 ISO_6391 = {

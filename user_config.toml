@@ -50,6 +50,9 @@ cookies = 'www.nowe.com_cookies.txt'
 [credentials.NowPlayer]
 cookies = 'nowplayer.now.com_cookies.txt'
 
+[credentials.Viki]
+cookies = 'www.viki.com_cookies.txt'
+
 [credentials.WeTV]
 cookies = 'wetv.vip_cookies.txt'
 

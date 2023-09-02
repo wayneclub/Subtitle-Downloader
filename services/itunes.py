@@ -30,7 +30,8 @@ class iTunes(Service):
         self._ = get_locale(__name__, self.locale)
 
     def get_configurations(self):
-        res = self.session.get(url=self.config['api']['configurations'])
+        res = self.session.get(
+            url=self.config['api']['configurations'], timeout=5)
         if res.ok:
             return res.json()['data']['applicationProps']['requiredParamsMap']
         else:
@@ -72,20 +73,20 @@ class iTunes(Service):
         subtitles = []
 
         for sub in subtitle_list:
-            file_name = sub_name.replace('.vtt', f".{sub['lang']}.vtt")
+            filename = sub_name.replace('.vtt', f".{sub['lang']}.vtt")
 
             lang_folder_path = os.path.join(
-                folder_path, f"tmp_{file_name.replace('.vtt', '.srt')}")
+                folder_path, f"tmp_{filename.replace('.vtt', '.srt')}")
 
             os.makedirs(lang_folder_path, exist_ok=True)
 
             languages.add(lang_folder_path)
 
-            self.logger.debug(file_name, len(sub['urls']))
+            self.logger.debug(filename, len(sub['urls']))
 
             for url in sub['urls']:
                 subtitle = dict()
-                subtitle['name'] = file_name
+                subtitle['name'] = filename
                 subtitle['path'] = lang_folder_path
                 subtitle['url'] = url
                 subtitle['segment'] = True
@@ -102,7 +103,7 @@ class iTunes(Service):
             for lang_path in sorted(languages):
                 if 'tmp' in lang_path:
                     merge_subtitle_fragments(
-                        folder_path=lang_path, file_name=os.path.basename(lang_path.replace('tmp_', '')), subtitle_format=self.subtitle_format, locale=self.locale, display=display)
+                        folder_path=lang_path, filename=os.path.basename(lang_path.replace('tmp_', '')), subtitle_format=self.subtitle_format, locale=self.locale, display=display)
                     display = False
             convert_subtitle(folder_path=folder_path,
                              platform=self.platform, subtitle_format=self.subtitle_format, locale=self.locale)
@@ -141,13 +142,13 @@ class iTunes(Service):
                 if os.path.exists(folder_path):
                     shutil.rmtree(folder_path)
 
-                file_name = f'{title}.WEB-DL.{self.platform}.vtt'
+                filename = f'{title}.WEB-DL.{self.platform}.vtt'
 
                 offer_id = movie['data']['relationships']['offers']['data'][0]['id']
                 m3u8_url = next(offer['attributes']['assets'][0]['hlsUrl']
                                 for offer in movie['included'] if offer['type'] == 'offer' and offer['id'] == offer_id)
                 self.logger.debug("m3u8_url: %s", m3u8_url)
                 subtitle_list = self.parse_m3u(m3u8_url)
-                self.get_subtitle(subtitle_list, folder_path, file_name)
+                self.get_subtitle(subtitle_list, folder_path, filename)
             else:
                 self.logger.error("\nNo subtitles found!")

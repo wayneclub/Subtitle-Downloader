@@ -38,7 +38,7 @@ class NowPlayer(Service):
             self.cookies, cookiejar=None, overwrite=True))
 
         res = self.session.get(
-            self.config['api']['movie'].format(product_id=content_id))
+            self.config['api']['movie'].format(product_id=content_id), timeout=5)
 
         if res.ok:
             data = res.json()[0]
@@ -51,7 +51,7 @@ class NowPlayer(Service):
             self.session.cookies.update(cookiejar_from_dict(
                 chinese_cookies, cookiejar=None, overwrite=True))
             chinese_title = self.session.get(
-                self.config['api']['movie'].format(product_id=content_id)).json()[0]['episodeTitle']
+                self.config['api']['movie'].format(product_id=content_id), timeout=5).json()[0]['episodeTitle']
 
             release_year = ''
             movie_info = self.get_title_info(
@@ -71,10 +71,10 @@ class NowPlayer(Service):
             if os.path.exists(folder_path):
                 shutil.rmtree(folder_path)
 
-            file_name = f'{title}.WEB-DL.{self.platform}'
+            filename = f'{title}.WEB-DL.{self.platform}'
 
             self.download_subtitle(
-                content_id=data['episodeId'], title=file_name, folder_path=folder_path)
+                content_id=data['episodeId'], title=filename, folder_path=folder_path)
 
             convert_subtitle(folder_path=folder_path,
                              platform=self.platform, subtitle_format=self.subtitle_format, locale=self.locale)
@@ -89,7 +89,7 @@ class NowPlayer(Service):
             self.cookies, cookiejar=None, overwrite=True))
 
         res = self.session.get(
-            self.config['api']["series"].format(series_id=content_id))
+            self.config['api']["series"].format(series_id=content_id), timeout=5)
 
         if res.ok:
             data = res.json()[0]
@@ -98,12 +98,10 @@ class NowPlayer(Service):
             if season_index == 0:
                 season_index = 1
 
-            season_name = str(season_index).zfill(2)
-
             self.logger.info("\n%s Season %s", title, season_index)
 
-            folder_path = os.path.join(
-                self.download_path, f'{rename_filename(title)}.S{season_name}')
+            name = rename_filename(f'{title}.S{str(season_index).zfill(2)}')
+            folder_path = os.path.join(self.download_path, name)
 
             episode_list = data['episode']
 
@@ -125,12 +123,12 @@ class NowPlayer(Service):
                 if not self.download_season or season_index in self.download_season:
                     if not self.download_episode or episode_index in self.download_episode:
                         content_id = episode['episodeId']
-                        file_name = f'{title} S{season_name}E{str(episode_index).zfill(2)}'
+                        filename = f'{name}E{str(episode_index).zfill(2)}'
 
-                        self.logger.info("\n%s", file_name)
+                        self.logger.info("\n%s", filename)
 
                         self.download_subtitle(content_id=content_id,
-                                               title=file_name, folder_path=folder_path)
+                                               title=filename, folder_path=folder_path)
 
             convert_subtitle(folder_path=folder_path,
                              platform=self.platform, subtitle_format=self.subtitle_format, locale=self.locale)
