@@ -57,7 +57,7 @@ cookies = 'wetv.vip_cookies.txt'
 # This is a dictionary of proxies you wish to use on services that require a specific country IP.
 # The dictionary key needs to be an alpha 2 country code (2-letter code, e.g. `us`, `gb`, `jp`, `de`).
 # The value needs to be the proxy string which should be recognizable by python-requests and curl.
-# e.g.: Clash http:127.0.0.1:7890
+# e.g.: Clash 'http:127.0.0.1:7890'
 # e.g.: https://username:password123@subdomain.hostname.ext:89
 # If you don't want any, just have this section blank or remove the [proxies] entirely
 # us = 'http://127.0.0.1:7890' #clash

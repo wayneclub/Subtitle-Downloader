@@ -63,32 +63,32 @@ pip install -r requriements
 
   1. 可根據要下載的平台修改`user_config.toml`設定檔（設定字幕預設語言、串流平台帳號/密碼等，方便下次直接執行） `Subtitle-Downloader/user_config.toml`
 
-  ```toml
-    [subtitles]
-    default-language = 'en'
-    default-format = '.srt'
+    ```toml
+      [subtitles]
+      default-language = 'en'
+      default-format = '.srt'
 
-    [headers]
-    User-Agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36'
+      [headers]
+      User-Agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36'
 
-    [credentials.DisneyPlus]
-    email = ''
-    password = ''
+      [credentials.DisneyPlus]
+      email = ''
+      password = ''
 
-    [proxies]
-    http:127.0.0.1:7890 # Clash
+      [proxies]
+      'http:127.0.0.1:7890' # Clash
 
-    [nordvpn]
-    username = ''
-    password = ''
-    ```
+      [nordvpn]
+      username = ''
+      password = ''
+      ```
 
   2. 根據欲下載不同串流平台的字幕放入對應cookies.txt到`Subtitle-Downloader/cookies`
   3. 在終端機執行python指令或是使用`Subtitle-Downloader.bat`下載字幕
 
-  ```bash
-  python subtitle_downloader.py 電影、影集的網址 [OPTIONS]
-  ```
+    ```bash
+    python subtitle_downloader.py 電影、影集的網址 [OPTIONS]
+    ```
 
 ## 參數
 

@@ -77,7 +77,7 @@ pip install -r requriements
     password = ''
 
     [proxies]
-    http:127.0.0.1:7890 # Clash
+    'http:127.0.0.1:7890' # Clash
 
     [nordvpn]
     username = ''
@@ -87,9 +87,9 @@ pip install -r requriements
   2. Follow each platform requirements and put cookies.txt into Subtitle-Downloader/cookies
   3. Execute the program with command line or Subtitle-Downloader.bat (Paste title url)
 
-  ```bash
-  python subtitle_downloader.py URL [OPTIONS]
-  ```
+    ```bash
+    python subtitle_downloader.py URL [OPTIONS]
+    ```
 
 ## OPTIONS
 
