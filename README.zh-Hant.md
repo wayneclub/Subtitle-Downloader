@@ -72,7 +72,7 @@ pip install -r requriements
 ## 參數
 
 ```
-  -h, --help                    顯示參數說明
+  -h, --help                    參數說明
 
   -s --season                   下載 第[0-9]季
 
@@ -88,10 +88,17 @@ pip install -r requriements
 
   -alang, --audio-language      音軌語言，用','分隔
 
+  -sf, --subtitle-format        字幕格式：.srt 或 .ass
+
   -region, --region             串流平台地區
+
   -locale, --locale             界面語言
 
   -p, --proxy                   代理
+
+  -d, --debug                   除錯日誌
+
+  -v, --version                 程式版本
 ```
 
 ## 字幕語言

@@ -89,7 +89,7 @@ def main() -> None:
         '--version',
         action='version',
         version=f'{app_name} {__version__}',
-        help=_("show program's version number and exit")
+        help=_("app's version")
     )
 
     args = parser.parse_args()

@@ -38,13 +38,9 @@ msgstr "下載 最新一集"
 msgid "output directory"
 msgstr "下載路徑"
 
-#: subtitle_downloader.py:42
-msgid "account for streaming service"
-msgstr "串流平台帳號"
-
 #: subtitle_downloader.py:46
-msgid "password for streaming service"
-msgstr "串流平台密碼"
+msgid "subtitles format: .srt or .ass"
+msgstr "字幕格式：.srt 或 .ass"
 
 #: subtitle_downloader.py:50
 msgid ""
@@ -70,15 +66,15 @@ msgstr "代理"
 
 #: subtitle_Downloader.py:74
 msgid "enable debug logging"
-msgstr "偵錯日誌"
+msgstr "除錯日誌"
 
 #: subtitle_Downloader.py:74
-msgid "show program's version number and exit"
-msgstr "顯示程式版本"
+msgid "app's version"
+msgstr "程式版本"
 
 #: subtitle_Downloader.py:74
 msgid "show this help message and exit"
-msgstr "顯示參數說明"
+msgstr "參數說明"
 
 #: subtitle_Downloader.py:74
 msgid ""

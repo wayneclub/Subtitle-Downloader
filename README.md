@@ -88,10 +88,18 @@ pip install -r requriements
 
   -alang, --audio-language      languages of audio-tracks; use commas to separate multiple languages
 
+  -sf, --subtitle-format        subtitles format: .srt or .ass
+
+  -region, --region             streaming service's region
+
+  -locale, --locale             interface language
+
   -p, --proxy                   proxy
+
+  -d, --debug                   enable debug logging
+
+  -v, --version                 app's version
 ```
-
-
 
 ## Subtitle Languages
 
