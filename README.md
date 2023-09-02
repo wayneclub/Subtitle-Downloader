@@ -51,45 +51,46 @@ pip install -r requriements
 
 ## USAGE
 
-- Online **_(Colab environment is in the US, if you want to use in other region please execute on local)_**
-  1. Save a copy in Drive
-  2. Connect Colab
-  3. Install the requirements (Click 1st play button)
-  4. Depend the download platform and modify the text field  (Cick the play button next to it when modified complete)
-  5. Download the subtitles from the left side menu
+### Online **_(Colab environment is in the US, if you want to use in other region please execute on local)_**
 
-  <a href="https://colab.research.google.com/drive/1Qu7MHUt4QXym9cNOORCKTezIBYBNNg3V?usp=sharing" target="_blank"><img src="https://colab.research.google.com/assets/colab-badge.svg" title="Open this file in Google Colab" alt="Colab"/></a>
+1. Save a copy in Drive
+2. Connect Colab
+3. Install the requirements (Click 1st play button)
+4. Depend the download platform and modify the text field  (Cick the play button next to it when modified complete)
+5. Download the subtitles from the left side menu
 
-- Local
+<a href="https://colab.research.google.com/drive/1Qu7MHUt4QXym9cNOORCKTezIBYBNNg3V?usp=sharing" target="_blank"><img src="https://colab.research.google.com/assets/colab-badge.svg" title="Open this file in Google Colab" alt="Colab"/></a>
 
-  1. Depend on download platform and modify `Subtitle-Downloader/user_config.toml`
+### Local
 
-    ```toml
-    [subtitles]
-    default-language = 'en'
-    default-format = '.srt'
+1. Depend on download platform and modify `Subtitle-Downloader/user_config.toml`
 
-    [headers]
-    User-Agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36'
+  ```toml
+  [subtitles]
+  default-language = 'en'
+  default-format = '.srt'
 
-    [credentials.DisneyPlus]
-    email = ''
-    password = ''
+  [headers]
+  User-Agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36'
 
-    [proxies]
-    us = 'http:127.0.0.1:7890' # Clash
+  [credentials.DisneyPlus]
+  email = ''
+  password = ''
 
-    [nordvpn]
-    username = ''
-    password = ''
-    ```
+  [proxies]
+  us = 'http:127.0.0.1:7890' # Clash
 
-  2. Follow each platform requirements and put cookies.txt into Subtitle-Downloader/cookies
-  3. Execute the program with command line or Subtitle-Downloader.bat (Paste title url)
+  [nordvpn]
+  username = ''
+  password = ''
+  ```
 
-    ```bash
-    python subtitle_downloader.py URL [OPTIONS]
-    ```
+2. Follow each platform requirements and put cookies.txt into Subtitle-Downloader/cookies
+3. Execute the program with command line or Subtitle-Downloader.bat (Paste title url)
+
+  ```bash
+  python subtitle_downloader.py URL [OPTIONS]
+  ```
 
 ## OPTIONS
 
