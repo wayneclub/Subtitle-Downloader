@@ -77,7 +77,7 @@ pip install -r requriements
     password = ''
 
     [proxies]
-    'http:127.0.0.1:7890' # Clash
+    us = 'http:127.0.0.1:7890' # Clash
 
     [nordvpn]
     username = ''
