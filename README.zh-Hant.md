@@ -8,7 +8,7 @@ Subtitle-Downloader 支持從各大串流平台下載字幕，例如：Disney Pl
 
 ## 說明
 
-Subtitle-Downloader 是一個方便您從各大串流平台上下載字幕的程式。需要安裝 [Python](https://www.python.org/downloads/)3.8以上的版本和 [NodeJS](https://nodejs.org/en/download)，可以在 Linux、Windows 或 macOS 上執行。
+Subtitle-Downloader 是一個方便您從各大串流平台上下載字幕的程式。需要安裝 [Python 3.8](https://www.python.org/downloads/)以上的版本和 [NodeJS](https://nodejs.org/en/download)，可以在 Linux、Windows 或 macOS 上執行。
 
 ## 安裝方式
 
@@ -18,7 +18,7 @@ Subtitle-Downloader 是一個方便您從各大串流平台上下載字幕的程
 pip install -r requriements
 ```
 
-- Windows：執行install_requirements.bat
+- Windows：執行`install_requirements.bat`
 
 ## 必要驗證資訊
 
@@ -43,11 +43,11 @@ pip install -r requriements
 
 1. Chrome安裝[下載cookies](https://chrome.google.com/webstore/detail/get-cookiestxt-locally/cclelndahbckbenkjhflpdbgdldlbecc)的擴充元件
 2. 登入串流平台，並利用擴充元件下載 cookies.txt (請勿更改cookies.txt的檔名及其內容)
-3. 將 cookie.txt 放入 Subtitle-Downloader/cookies
+3. 將 cookie.txt 放入 `Subtitle-Downloader/cookies`
 
 ### 帳號、密碼
 
-- 在 Subtitle-Downloader/user_config.toml 填入帳號、密碼，方便下次自動下載
+- 在 `Subtitle-Downloader/user_config.toml` 填入帳號、密碼，方便下次自動下載
 
 ## 使用方式
 
@@ -61,9 +61,9 @@ pip install -r requriements
 
 - 本機執行
 
-  1. 可根據要下載的平台修改user_config.toml設定檔（設定字幕預設語言、串流平台帳號/密碼等，方便下次直接執行） Subtitle-Downloader/user_config.toml
-  2. 根據欲下載不同串流平台的字幕放入對應cookies.txt到Subtitle-Downloader/cookies
-  3. 在終端機執行python指令或是使用Subtitle-Downloader.bat下載字幕
+  1. 可根據要下載的平台修改`user_config.toml`設定檔（設定字幕預設語言、串流平台帳號/密碼等，方便下次直接執行） `Subtitle-Downloader/user_config.toml`
+  2. 根據欲下載不同串流平台的字幕放入對應cookies.txt到`Subtitle-Downloader/cookies`
+  3. 在終端機執行python指令或是使用`Subtitle-Downloader.bat`下載字幕
 
   ```bash
   python subtitle_downloader.py 電影、影集的網址 [OPTIONS]
@@ -190,7 +190,7 @@ WeTV
 
 ## Now E, Now Player
 
-- 從瀏覽器複製 User-Agent [https://www.whatsmyua.info/](https://www.whatsmyua.info/)，並貼在 Subtitle-Downloader/user_config.toml (User-Agent). User-Agent必須與登入Now E、Now Player相同。
+- 從瀏覽器複製 User-Agent [https://www.whatsmyua.info/](https://www.whatsmyua.info/)，並貼在 `Subtitle-Downloader/user_config.toml`(User-Agent). User-Agent必須與登入Now E、Now Player相同。
 
 ## 更多範例
 

@@ -18,7 +18,7 @@ Subtitle-Downloader is a command-line program to download subtitles from the mos
 pip install -r requriements
 ```
 
-- Windows: Execute install_requirements.bat
+- Windows: Execute `install_requirements.bat`
 
 ## Service Requirements
 
@@ -43,11 +43,11 @@ pip install -r requriements
 
 1. Install Chrome plugin: [get-cookiestxt-locally](https://chrome.google.com/webstore/detail/get-cookiestxt-locally/cclelndahbckbenkjhflpdbgdldlbecc)
 2. Login to the streaming service, and use the plugin to download cookies.txt (Don't modify anything even the file name)
-3. Put cookie.txt into Subtitle-Downloader/cookies
+3. Put cookie.txt into `Subtitle-Downloader/cookies`
 
 ### Email & Password
 
-- Fill your email and password in Subtitle-Downloader/user_config.toml
+- Fill your email and password in `Subtitle-Downloader/user_config.toml`
 
 ## USAGE
 
@@ -191,7 +191,7 @@ WeTV
 
 ## Now E, Now Player
 
-- Copy user-agent from login browser [https://www.whatsmyua.info/](https://www.whatsmyua.info/) and paste it in Subtitle-Downloader/user_config.toml (User-Agent). The user-agent must be same as login browser user-agent.
+- Copy user-agent from login browser [https://www.whatsmyua.info/](https://www.whatsmyua.info/) and paste it in `Subtitle-Downloader/user_config.toml (User-Agent)`. The user-agent must be same as login browser user-agent.
 
 ## More Examples
 
