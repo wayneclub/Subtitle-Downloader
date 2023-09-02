@@ -85,8 +85,8 @@ pip install -r requriements
   password = ''
   ```
 
-2. Follow each platform requirements and put cookies.txt into Subtitle-Downloader/cookies
-3. Execute the program with command line or Subtitle-Downloader.bat (Paste title url)
+2. Follow each platform requirements and put cookies.txt into `Subtitle-Downloader/cookies`
+3. Execute the program with command line or `Subtitle-Downloader.bat` (Paste title url)
 
   ```bash
   python subtitle_downloader.py URL [OPTIONS]
