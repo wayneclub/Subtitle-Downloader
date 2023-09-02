@@ -19,7 +19,7 @@ from pwinput import pwinput
 from tmdbv3api import TMDb, TV, Movie
 from configs.config import config, credentials, filenames, user_agent
 from constants import SUBTITLE_FORMAT
-from utils.ripprocess import ripprocess
+from utils.ripprocess import RipProcess
 from utils.proxy import get_ip_info, get_proxy
 from utils.helper import EpisodesNumbersHandler
 
@@ -98,7 +98,7 @@ class Service(object):
         else:
             self.region = self.ip_info['country']
 
-        self.ripprocess = ripprocess()
+        self.ripprocess = RipProcess()
 
         self.subtitle_language = self.get_language_list(args.subtitle_language)
         self.subtitle_format = self.get_subtitle_format(args.subtitle_format)
@@ -174,8 +174,8 @@ class Service(object):
             movie = Movie()
             results = movie.search(title.strip())
         else:
-            tv = TV()
-            results = tv.search(title.strip())
+            tv_series = TV()
+            results = tv_series.search(title.strip())
 
         if results.get('results'):
             title_info = results.get('results')[0]
@@ -184,7 +184,7 @@ class Service(object):
                 if is_movie:
                     results = movie.search(alias.strip())
                 else:
-                    results = tv.search(alias.strip())
+                    results = tv_series.search(alias.strip())
                     if results.get('results'):
                         title_info = results.get('results')[0]
         if title_info:

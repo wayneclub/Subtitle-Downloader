@@ -22,8 +22,12 @@ from tools.XstreamDL_CLI.downloader import Downloader
 from tools.pyshaka.main import parse
 
 
-class xstreamArgs(object):
-    def __init__(self, save_dir, url_patch, headers, proxy, debug):
+class XstreamArgs(object):
+    """
+    XstreamDL_CLI args
+    """
+
+    def __init__(self, save_dir, url_patch, headers, proxy, log_level):
         self.speed_up = False
         self.speed_up_left = 10
         self.live = False
@@ -63,27 +67,38 @@ class xstreamArgs(object):
         self.parse_only = False
         self.show_init = False
         self.index_to_name = False
-        self.log_level = 'DEBUG' if debug else 'INFO'
-        self.redl_code = []
-        self.hide_load_metadata = True
+        self.log_level = 'INFO'
+        self.redl_code = []  # type: list
+        self.hide_load_metadata = True  # type: bool
+        self.no_metadata_file = None  # type: bool
+        self.gen_init_only = False  # type: bool
+        self.skip_gen_init = None  # type: bool
+        self.URI = None  # type: list
 
 
-class pyshakaArgs(object):
-    def __init__(self, segments_path, debug):
+class PyshakaArgs(object):
+    """
+    Pyshaka args
+    """
+
+    def __init__(self, segments_path, log_level):
         self.type = 'wvtt'
         self.init_path = os.path.join(segments_path, 'init.mp4')
         self.segments_path = segments_path
-        self.debug = debug
+        self.debug = True if log_level == logging.DEBUG else False
         self.segment_time = 0
 
 
-class ripprocess(object):
+class RipProcess(object):
+    """
+    Rip process
+    """
+
     def __init__(self):
         self.logger = logging.getLogger(__name__)
 
-    def download_subtitles_from_mpd(self, url, title, folder_path, url_patch=False, headers="", proxy="", debug=False, timescale=""):
-        self.logger.info("\nDownloading subtitles...")
-
+    def download_subtitles_from_mpd(self, url, title, folder_path, url_patch=False, headers="", proxy="", log_level=logging.INFO, timescale=""):
+        """Download  subtitles from mpd url"""
         os.makedirs(folder_path, exist_ok=True)
 
         if not headers:
@@ -96,8 +111,8 @@ class ripprocess(object):
         else:
             url_patch = ""
 
-        args = xstreamArgs(save_dir=folder_path, url_patch=url_patch,
-                           headers=headers, proxy=proxy, debug=debug)
+        args = XstreamArgs(save_dir=folder_path, url_patch=url_patch,
+                           headers=headers, proxy=proxy, log_level=log_level)
 
         args.disable_auto_concat = True
         args.enable_auto_delete = False
@@ -108,7 +123,7 @@ class ripprocess(object):
         sub_tracks = set()
         for index, stream in enumerate(streams):
             self.logger.debug(
-                index, f"{stream.get_name()}{stream.get_init_msg(False)}")
+                '%s %s', index, f"{stream.get_name()}{stream.get_init_msg(False)}")
             if 'subtitle' in f"{stream.get_name()}{stream.get_init_msg(False)}":
                 sub_tracks.add(index)
 
@@ -130,7 +145,7 @@ class ripprocess(object):
             file_name = f"{title}.{subtitle_language}.vtt"
             if os.path.exists(os.path.join(segments_path, 'init.mp4')):
                 if os.path.isdir(segments_path):
-                    self.extract_sub(segments_path, debug)
+                    self.extract_sub(segments_path, self.logger.level)
 
                     os.rename(f"{segments_path}.vtt",
                               os.path.join(folder_path, file_name))
@@ -157,11 +172,15 @@ class ripprocess(object):
             else:
                 os.remove(path)
 
-    def extract_sub(self, segments_path, debug):
-        args = pyshakaArgs(segments_path, debug)
+    def extract_sub(self, segments_path, log_level):
+        """Call pyshaka"""
+
+        args = PyshakaArgs(segments_path, log_level)
         parse(args)
 
     def get_time_scale(self, mpd_url, headers):
+        """Get time scale"""
+
         res = requests.get(url=mpd_url, headers=headers, timeout=5)
         if res.ok:
             timescale = re.search(r'(?<=timescale=\")\d*(?=\")', res.text)

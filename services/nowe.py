@@ -206,7 +206,7 @@ class NowE(Service):
             })
 
             self.ripprocess.download_subtitles_from_mpd(
-                url=mpd_url, title=title, folder_path=folder_path, timescale=timescale)
+                url=mpd_url, title=title, folder_path=folder_path, log_level=self.logger.level, timescale=timescale)
 
         else:
             self.logger.error(res.text)

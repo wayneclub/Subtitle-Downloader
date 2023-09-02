@@ -8,7 +8,7 @@ from typing import List, Set, Dict
 from asyncio import new_event_loop
 from asyncio import AbstractEventLoop, Future, Task
 from aiohttp import client_exceptions
-from aiohttp import ClientSession, ClientTimeout, TCPConnector
+from aiohttp import ClientResponse, ClientSession, ClientTimeout, TCPConnector
 from aiohttp_socks import ProxyConnector
 from concurrent.futures._base import TimeoutError, CancelledError
 from tools.XstreamDL_CLI.cmdargs import CmdArgs
@@ -276,6 +276,9 @@ class Downloader:
         elif self.args.all_audios:
             selected = [index for index, stream in enumerate(
                 streams) if stream.stream_type == 'audio']
+        elif self.args.all_subtitles:
+            selected = [index for index, stream in enumerate(
+                streams) if stream.stream_type == 'subtitle']
         elif self.args.resolution != '':
             selected = auto_choose_resolution(self.args, streams)
         else:
@@ -313,10 +316,14 @@ class Downloader:
                 if len(stream.segments) <= 5:
                     stream.show_segments()
                 continue
-            if stream.get_stream_model() == 'mss':
+            if stream.get_stream_model() == 'mss' and self.args.skip_gen_init is False:
                 # 这里的init实际上是不正确的 这里生成是为了满足下载文件检查等逻辑
                 stream.fix_header(is_fake=True)
-            logger.info(f'{stream.get_name()} {t_msg.download_start}.')
+            if self.args.skip_gen_init:
+                # 跳过init
+                if stream.segments[0].name.startswith('init'):
+                    _ = stream.segments.pop(0)
+            logger.debug(f'{stream.get_name()} {t_msg.download_start}.')
             speed_up_flag = self.args.speed_up
             while max_failed > 0:
                 loop = new_event_loop()
@@ -342,7 +349,7 @@ class Downloader:
                     continue
                 break
             # track_id 最佳获取方案是从实际分段中提取 通过ism元数据无法直接计算出来
-            if stream.get_stream_model() == 'mss':
+            if stream.get_stream_model() == 'mss' and self.args.skip_gen_init is False:
                 stream.fix_header(is_fake=False)
             self.try_concat(stream)
             # 只需要检查一个流的时间达到最大值就停止录制
@@ -459,21 +466,25 @@ class Downloader:
         self.init_progress(stream, count, completed, speed_up_flag)
         ts = time.time()
         client = ClientSession(connector=get_connector(self.args), timeout=ClientTimeout(
-            total=None, sock_connect=60, sock_read=60))  # type: ClientSession
-        for segment in _left:
+            total=None, sock_connect=15, sock_read=15))  # type: ClientSession
+        for count, segment in enumerate(_left):
             if segment.max_retry_404 <= 0:
                 self.xprogress.decrease_total_count()
                 continue
             task = loop.create_task(self.download(client, stream, segment))
             task.add_done_callback(_done_callback)
             tasks.add(task)
-        logger.info(f'{len(tasks)} tasks start')
+            if self.args.gen_init_only and count == 0:
+                break
+        if len(tasks) == 0:
+            return results
+        logger.debug(f'{len(tasks)} tasks start')
         # 阻塞并等待运行完成
         finished, unfinished = await asyncio.wait(tasks)
         # 关闭ClientSession
         await client.close()
         self.xprogress.to_stop(is_error=is_error)
-        logger.info(f'tasks end, time used {time.time() - ts:.2f}s')
+        logger.debug(f'tasks end, time used {time.time() - ts:.2f}s')
         return results
 
     async def download(self, client: ClientSession, stream: Stream, segment: Segment):

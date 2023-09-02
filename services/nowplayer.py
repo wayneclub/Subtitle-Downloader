@@ -178,7 +178,7 @@ class NowPlayer(Service):
             timescale = self.ripprocess.get_time_scale(mpd_url, headers)
 
             self.ripprocess.download_subtitles_from_mpd(
-                url=mpd_url, title=title, folder_path=folder_path, headers=headers, proxy=self.proxy, debug=False, timescale=timescale)
+                url=mpd_url, title=title, folder_path=folder_path, headers=headers, proxy=self.proxy, log_level=self.logger.level, timescale=timescale)
 
         else:
             sys.exit()

@@ -65,32 +65,32 @@ pip install -r requriements
 
 1. Depend on download platform and modify `Subtitle-Downloader/user_config.toml`
 
-  ```toml
-  [subtitles]
-  default-language = 'en'
-  default-format = '.srt'
+    ```toml
+    [subtitles]
+    default-language = 'en'
+    default-format = '.srt'
 
-  [headers]
-  User-Agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36'
+    [headers]
+    User-Agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36'
 
-  [credentials.DisneyPlus]
-  email = ''
-  password = ''
+    [credentials.DisneyPlus]
+    email = ''
+    password = ''
 
-  [proxies]
-  us = 'http:127.0.0.1:7890' # Clash
+    [proxies]
+    us = 'http:127.0.0.1:7890' # Clash
 
-  [nordvpn]
-  username = ''
-  password = ''
-  ```
+    [nordvpn]
+    username = ''
+    password = ''
+    ```
 
 2. Follow each platform requirements and put cookies.txt into `Subtitle-Downloader/cookies`
 3. Execute the program with command line or `Subtitle-Downloader.bat` (Paste title url)
 
-  ```bash
-  python subtitle_downloader.py URL [OPTIONS]
-  ```
+    ```bash
+    python subtitle_downloader.py URL [OPTIONS]
+    ```
 
 ## OPTIONS
 

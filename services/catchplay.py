@@ -22,6 +22,8 @@ class CatchPlay(Service):
     Service code for CatchPlay streaming service (https://www.catchplay.com).
 
     Authorization: Cookies
+
+    GEOFENCE: id, sg, tw
     """
 
     def __init__(self, args):
@@ -207,7 +209,7 @@ class CatchPlay(Service):
                 self.logger.debug('mpd_url: %s', mpd_url)
                 os.makedirs(folder_path, exist_ok=True)
                 self.ripprocess.download_subtitles_from_mpd(
-                    url=mpd_url, title=file_name.replace('.vtt', ''), folder_path=folder_path)
+                    url=mpd_url, title=file_name.replace('.vtt', ''), folder_path=folder_path, log_level=self.logger.level)
         else:
             self.logger.error(res.text)
 

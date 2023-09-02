@@ -8,6 +8,7 @@ class MetaItem:
     def match_duration(self, _duration: str) -> float:
         '''
         test samples
+        - PT0S
         - PT50M0S
         - PT1H54.600S
         - PT23M59.972S

@@ -3,7 +3,7 @@ import locale
 
 class Texts:
     def __init__(self):
-        if locale.getdefaultlocale() and locale.getdefaultlocale()[0] == 'zh_CN':
+        if locale.getdefaultlocale()[0] == 'zh_CN':
             self.setup_zh_CN()
         else:
             self.setup_en_US()

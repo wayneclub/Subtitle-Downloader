@@ -22,7 +22,8 @@ class S(MPDItem):
         if self.r is None:
             self.r = 0
         self.to_int()
-        self.r += 1
+        if self.r != -1:
+            self.r += 1
 
     def to_int(self):
         self.t = int(self.t)

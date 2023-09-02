@@ -46,7 +46,7 @@ def rename_filename(filename):
         .replace(".-.", ".")
     )
     filename = re.sub(" +", ".", filename)
-    for i in range(5):
+    for _ in range(5):
         filename = re.sub(r"(\.\.)", ".", filename)
     filename = re.sub(r'[/\\:|<>"?*\0-\x1f]|^(AUX|COM[1-9]|CON|LPT[1-9]|NUL|PRN)(?![^.])|^\s|[\s.]$',
                       "", filename[:255], flags=re.IGNORECASE)
@@ -54,8 +54,8 @@ def rename_filename(filename):
     return filename
 
 
-def download_file(url, output_path, headers={}):
-    """Download file from url"""
+def download_file(url, output_path, headers=None):
+    """Download file from url and show progress"""
 
     if check_url_exist(url):
 
@@ -70,16 +70,16 @@ def download_file(url, output_path, headers={}):
             unit='B',
             unit_scale=True,
             unit_divisor=1024
-        ) as bar:
+        ) as progress_bar:
             for data in res.iter_content(chunk_size=1024):
                 size = file.write(data)
-                bar.update(size)
+                progress_bar.update(size)
 
     else:
         logger.warning(_("\nFile not found!"))
 
 
-def download_files(files, headers={}):
+def download_files(files, headers=None):
     """Multi-processing download files"""
 
     cpus = multiprocessing.cpu_count()

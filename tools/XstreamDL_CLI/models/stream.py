@@ -89,6 +89,7 @@ class Stream:
         offset = len(self.segments)
         _segments = []
         for segment in segments:
+            # 这里会过滤掉init分段
             if segment.index == -1:
                 continue
             if compare_with_url:
@@ -202,9 +203,8 @@ class Stream:
             return url
         elif url.startswith('/'):
             return f'{self.home_url}{url}'
-        elif url.startswith('../'):
-            fixed_base_url = '/'.join(self.base_url.split("/")[:-1])
-            return f'{fixed_base_url}{url[2:]}'
+        elif url == '':
+            return f'{self.base_url}'
         else:
             return f'{self.base_url}/{url}'
 

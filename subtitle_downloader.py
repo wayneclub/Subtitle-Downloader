@@ -6,6 +6,7 @@ This module is to download subtitle from stream services.
 """
 import argparse
 import logging
+from logging import INFO, DEBUG
 from datetime import datetime
 import os
 import sys
@@ -126,6 +127,10 @@ def main() -> None:
 
     if service:
         log = logging.getLogger(service['class'].__module__)
+        if args.debug:
+            log.setLevel(DEBUG)
+        else:
+            log.setLevel(INFO)
 
         service_config = load_toml(
             str(filenames.config).format(service=service['name']))

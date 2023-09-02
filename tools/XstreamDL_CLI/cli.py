@@ -138,6 +138,8 @@ def main():
                         help='choose all video stream to download')
     parser.add_argument('--all-audios', action='store_true',
                         help='choose all audio stream to download')
+    parser.add_argument('--all-subtitles', action='store_true',
+                        help='choose all subtitle stream to download')
     parser.add_argument('--service', default='',
                         help='set serviceLocation for BaseURL choose')
     parser.add_argument('--save-dir', default='Downloads',
@@ -181,29 +183,39 @@ def main():
                         help='some dash live have the same name for different stream, use this option to avoid')
     parser.add_argument('--log-level', default='INFO', choices=[
                         'DEBUG', 'INFO', 'WARNING', 'ERROR'], help='set log level, default is INFO')
-    parser.add_argument('--redl-code', default='',
+    parser.add_argument('--redl-code', default='502',
                         help='re-download set of response status codes , e.g. 408,500,502,503,504')
     parser.add_argument('--hide-load-metadata', action='store_true',
                         help='hide `Load #EXT-X-MEDIA metadata` balabala')
+    parser.add_argument('--no-metadata-file', action='store_true',
+                        help='do not save metadata file(.m3u8/.mpd/.ism/...)')
+    parser.add_argument('--gen-init-only', action='store_true',
+                        help='generate init segment only')
+    parser.add_argument('--skip-gen-init', action='store_true',
+                        help='skip generate init segment for mss')
     parser.add_argument('URI', nargs='*', help='URL/FILE/FOLDER string')
     args = parser.parse_args()
     if args.help:
         print_version()
         parser.print_help()
-        sys.exit(0)
+        sys.exit()
     if args.version:
         print_version()
-        sys.exit(0)
+        sys.exit()
     if len(args.URI) == 0:
         try:
             uri = input(
                 'Paste your URL/FILE/FOLDER string at the end of commands, plz.\nCtrl C to exit or input here:')
         except KeyboardInterrupt:
-            sys.exit(0)
+            sys.exit()
         if uri.strip() != '':
             args.URI.append(uri.strip())
     if len(args.URI) == 0:
         sys.exit('No URL/FILE/FOLDER input')
+    for handler in logger.handlers:
+        if isinstance(handler, logging.FileHandler) and args.log_level != 'DEBUG':
+            logger.handlers.remove(handler)
+            break
     for handler in logger.handlers:
         # 注意 这里不能拿 StreamHandler 做判断
         # 因为 FileHandler 父类是 StreamHandler

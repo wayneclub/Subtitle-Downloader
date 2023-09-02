@@ -9,12 +9,16 @@ requests
 tqdm
 selenium
 chromedriver-autoinstaller
-aiohttp
-aiohttp_socks
-pycryptodome
 cn2an
 tmdbv3api
 opencc
 rtoml
 validators
 pwinput
+
+# XstreamDL_CLI
+
+aiohttp
+aiohttp_socks
+pycryptodome
+python-dateutil

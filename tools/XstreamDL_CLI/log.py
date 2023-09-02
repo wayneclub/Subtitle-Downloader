@@ -56,9 +56,10 @@ def setup_logger(name: str, level: str = 'INFO') -> logging.Logger:
     logger = logging.getLogger(f'{name}')
     GLOBAL_LOGGERS[name] = logger
     # 开始设置
-    formatter = logging.Formatter(
-        '%(asctime)s.%(msecs)03d %(relativepath)s:%(lineno)d %(levelname)s: %(message)s', datefmt='%H:%M:%S')
+    # formatter = logging.Formatter(
+    #     '%(asctime)s.%(msecs)03d %(relativepath)s:%(lineno)d %(levelname)s: %(message)s', datefmt='%H:%M:%S')
     # formatter = logging.Formatter('%(asctime)s %(process)d %(relativepath)s:%(lineno)d %(levelname)s: %(message)s')
+    formatter = logging.Formatter('%(message)s')
     log_time = datetime.datetime.now().strftime("%Y-%m-%d_%H%M%S")
     # 没有打包的时候 __file__ 就是当前文件路径
     # 打包之后通过 sys.executable 获取程序路径
@@ -78,13 +79,26 @@ def setup_logger(name: str, level: str = 'INFO') -> logging.Logger:
 
     ch.setFormatter(formatter)
     # logger.setLevel(logging.DEBUG)
+
+    # if level.lower() == 'info':
+    #     ch.setFormatter(logging.Formatter('%(message)s'))
+    # else:
+    #     ch.setFormatter(formatter)
+
     logger.addHandler(ch)
     log_file_path = log_folder_path / f'{name}-{log_time}.log'
     fh = logging.FileHandler(
         log_file_path.resolve().as_posix(), encoding='utf-8', delay=True)
     fh.addFilter(PackagePathFilter())
-    fh.setLevel(logging.DEBUG)
+
+    # fh.setLevel(logging.DEBUG)
     fh.setFormatter(formatter)
+
+    # if level.lower() == 'info':
+    #     fh.setFormatter(logging.Formatter('%(message)s'))
+    # else:
+    #     fh.setFormatter(formatter)
+
     logger.addHandler(fh)
     return logger
 

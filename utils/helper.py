@@ -46,13 +46,13 @@ class EpisodesNumbersHandler(object):
         if "-" in number:
             start, end = number.split("-")
             if start.strip() == "" or end.strip() == "":
-                raise ValueError("wrong number: {}".format(number))
+                raise ValueError(f"wrong number: {number}")
             return self.number_range(int(start), int(end))
 
         if "~" in number:
             start, _ = number.split("~")
             if start.strip() == "":
-                raise ValueError("wrong number: {}".format(number))
+                raise ValueError(f"wrong number: {number}")
             return self.number_range(int(start), 999)
 
         return
@@ -104,13 +104,16 @@ def get_language_code(lang=''):
         return lang
 
 
-def check_url_exist(url, headers={}):
+def check_url_exist(url, headers=None):
     """Validate url exist"""
 
     if validators.url(url):
+
+        if not headers:
+            headers = {'user-agent': user_agent}
         try:
             response = requests.head(
-                url, headers={'user-agent': user_agent}, timeout=10)
+                url, headers=headers, timeout=10)
             if response.ok:
                 return True
             else:
@@ -126,7 +129,7 @@ def check_url_exist(url, headers={}):
 
 
 def driver_init(headless=True):
-    """Get html render by js"""
+    """Initial selenium"""
 
     kill_process()
     options = webdriver.ChromeOptions()
@@ -158,6 +161,8 @@ def driver_init(headless=True):
 
 
 def get_network_url(driver, search_url, lang=""):
+    """Get url from network"""
+
     _ = get_locale(__name__, lang)
     url = ''
     delay = 0
@@ -177,6 +182,8 @@ def get_network_url(driver, search_url, lang=""):
 
 
 def kill_process():
+    """Kill process"""
+
     os.system('killall chromedriver > /dev/null 2>&1')
 
 

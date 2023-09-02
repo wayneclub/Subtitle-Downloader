@@ -23,6 +23,8 @@ class FridayVideo(Service):
     Service code for Friday Video streaming service (https://video.friday.tw).
 
     Authorization: Cookies
+
+    GEOFENCE: tw
     """
 
     GEOFENCE = ['tw']

@@ -5,7 +5,7 @@ from pathlib import Path
 from tools.XstreamDL_CLI.cmdargs import CmdArgs
 from tools.XstreamDL_CLI.util.texts import t_msg
 
-ONCE_MAX_FILES = 200
+ONCE_MAX_FILES = 500
 
 
 class Concat:

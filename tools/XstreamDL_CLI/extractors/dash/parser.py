@@ -1,5 +1,6 @@
 import re
 import math
+from datetime import datetime, timezone
 from typing import List, Dict, Union
 from .mpd import MPD
 from .handler import xml_handler
@@ -212,7 +213,8 @@ class DASHParser(BaseParser):
             base_url = self.fix_dash_base_url(
                 uri_item.base_url, representation)
             current_uri_item = uri_item.new_base_url(base_url)
-            logger.debug(f'current_base_url {current_uri_item.base_url}')
+            if self.args.log_level == 'DEBUG':
+                logger.debug(f'current_base_url {current_uri_item.base_url}')
             stream = DASHStream(sindex, current_uri_item, self.args.save_dir)
             sindex += 1
             self.walk_contentprotection(adaptationset, stream)
@@ -239,20 +241,6 @@ class DASHParser(BaseParser):
             Roles = adaptationset.find('Role')  # type: List[Role]
             if stream.stream_type == '' and len(Roles) > 0:
                 stream.set_stream_type(Roles[0].value)
-            BaseURLs = representation.find('BaseURL')  # type: List[BaseURL]
-            if len(BaseURLs) == 1:
-                if len(Roles) == 1 and Roles[0].value in ['subtitle', 'caption']:
-                    base_url = BaseURLs[0].innertext.strip()
-                    if base_url.startswith('http') or base_url.startswith('/'):
-                        stream.set_subtitle_url(base_url)
-                    else:
-                        stream.set_subtitle_url('../' + base_url)
-                    streams.append(stream)
-                    continue
-                # if len(segmenttemplates) == 0 and len(representation.find('SegmentTimeline')) == 0:
-                #     stream.base2url(period.duration)
-                #     streams.append(stream)
-                #     continue
             segmentlists = representation.find(
                 'SegmentList')  # type: List[SegmentList]
             r_segmenttemplates = representation.find(
@@ -303,6 +291,9 @@ class DASHParser(BaseParser):
             stream.set_init_url(initializations[0].sourceURL)
         segmenturls = segmentlist.find('SegmentURL')  # type: List[SegmentURL]
         for segmenturl in segmenturls:
+            if segmenturl.media == '':
+                # 通常就是一个整段
+                continue
             stream.set_media_url(
                 segmenturl.media, name_from_url=self.args.name_from_url)
         if has_initialization:
@@ -342,8 +333,7 @@ class DASHParser(BaseParser):
             if len(segmenttemplates) > 1:
                 logger.error('please report this DASH content.')
             else:
-                logger.warning(
-                    'stream has no SegmentTemplate between Representation tag.')
+                # logger.warning('stream has no SegmentTemplate between Representation tag.')
                 if stream.base_url.startswith('http'):
                     stream.set_init_url(stream.base_url)
             return
@@ -392,6 +382,7 @@ class DASHParser(BaseParser):
         target_r = 0  # type: int
         ss = segmenttimeline.find('S')  # type: List[S]
         if len(ss) > 0 and self.is_live and ss[0].t > 0:
+            # 这个部分是修正 base_time
             # timeShiftBufferDepth => cdn max cache time for segments
             # newest available segment $Time$ should meet below condition
             # SegmentTimeline.S.t / timescale + (mpd.availabilityStartTime + Period.start) <= time.time()
@@ -401,19 +392,21 @@ class DASHParser(BaseParser):
             current_utctime = self.root.publishTime.timestamp() - self.args.live_utc_offset
             presentation_start = period.start - st.presentationTimeOffset / st.timescale + 30
             start_utctime = self.root.availabilityStartTime + presentation_start
-            logger.debug(
-                f'mpd.presentationTimeOffset {st.presentationTimeOffset} timescale {st.timescale}')
-            logger.debug(
-                f'mpd.availabilityStartTime {self.root.availabilityStartTime} Period.start {period.start}')
-            logger.debug(
-                f'start_utctime {start_utctime} current_utctime {current_utctime}')
+            if self.args.log_level == 'DEBUG':
+                logger.debug(
+                    f'mpd.presentationTimeOffset {st.presentationTimeOffset} timescale {st.timescale}')
+                logger.debug(
+                    f'mpd.availabilityStartTime {self.root.availabilityStartTime} Period.start {period.start}')
+                logger.debug(
+                    f'start_utctime {start_utctime} current_utctime {current_utctime}')
             tmp_t = ss[0].t
             for s in ss:
                 for number in range(s.r):
                     if (tmp_t + s.d) / st.timescale + start_utctime > current_utctime:
                         base_time = tmp_t
-                        logger.debug(
-                            f'set base_time {base_time} target_r {target_r}')
+                        if self.args.log_level == 'DEBUG':
+                            logger.debug(
+                                f'set base_time {base_time} target_r {target_r}')
                         break
                     if target_r > 0:
                         tmp_t += s.d
@@ -436,6 +429,7 @@ class DASHParser(BaseParser):
         time_offset = st.presentationTimeOffset if base_time == 0 else 0
         start_number = st.startNumber
         tmp_offset_r = 0
+        total_segments_duration = 0.0
         for index, s in enumerate(ss):
             if self.args.multi_s and index > 0 and s.t > 0:
                 base_time = s.t
@@ -443,10 +437,21 @@ class DASHParser(BaseParser):
                 interval = 0
             else:
                 interval = s.d / st.timescale
-            for number in range(s.r):
+            if s.r == -1:
+                _range = math.ceil(
+                    (period.duration or self.root.mediaPresentationDuration) / interval)
+            else:
+                _range = s.r
+            for number in range(_range):
                 tmp_offset_r += 1
                 if self.is_live and tmp_offset_r < target_r:
                     continue
+                # 经过测试 对于直播流 应当计算时长来确定应该下载的分段
+                # 因为无法通过比较两轮的url来排除已经下载的分段 通过url比较会导致重复下载
+                # 根据标准 这里与 minBufferTime 或者 minimumUpdatePeriod 比较都可以 浏览器是后者 保持一致
+                if self.is_live and total_segments_duration > self.root.minimumUpdatePeriod:
+                    break
+                total_segments_duration += interval
                 media_url = st.get_media_url()
                 if '$Bandwidth$' in media_url:
                     media_url = media_url.replace(
@@ -482,8 +487,25 @@ class DASHParser(BaseParser):
             interval = st.duration
         else:
             interval = float(int(st.duration) / int(st.timescale))
-        repeat = math.ceil(period.duration / interval)
-        for number in range(int(st.startNumber), repeat + int(st.startNumber)):
+        if self.is_live:
+            # 对于直播流来说应该有两个线程 一个刷新分段信息 一个负责下载 但是不想大改 就这样用吧
+            # 这样带来的问题是，下载速度要快且稳定 不然容易丢失分段
+            current_utctime = datetime.now(
+                timezone.utc).timestamp() - self.args.live_utc_offset + 30
+            presentation_start = period.start - st.presentationTimeOffset / st.timescale + 30
+            start_utctime = self.root.availabilityStartTime + presentation_start
+            number_start = math.ceil(
+                (self.root.publishTime.timestamp() - start_utctime) / interval)
+            max_repeat = math.ceil(self.root.minimumUpdatePeriod / interval)
+            repeat = 0
+            for i in range(max_repeat):
+                repeat += 1
+                if (number_start + repeat) * interval + start_utctime > current_utctime:
+                    break
+        else:
+            number_start = int(st.startNumber)
+            repeat = math.ceil(period.duration / interval)
+        for number in range(number_start, repeat + number_start):
             media_url = st.get_media_url()
             if '$Number$' in media_url:
                 media_url = media_url.replace('$Number$', str(number))
@@ -494,6 +516,10 @@ class DASHParser(BaseParser):
                 media_url = media_url.replace(old, new)
             if '$RepresentationID$' in media_url:
                 media_url = media_url.replace('$RepresentationID$', rid)
+            if self.is_live and '$Time$' in media_url:
+                fmt_time = number * st.duration
+                stream.set_segment_fmt_time(fmt_time)
+                media_url = media_url.replace('$Time$', str(fmt_time))
             stream.set_media_url(
                 media_url, name_from_url=self.args.name_from_url)
         stream.set_segments_duration(interval)

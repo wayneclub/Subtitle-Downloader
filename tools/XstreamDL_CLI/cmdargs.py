@@ -22,6 +22,7 @@ class CmdArgs:
         self.audio_only = None # type: bool
         self.all_videos = None # type: bool
         self.all_audios = None # type: bool
+        self.all_subtitles = None # type: bool
         self.service = None # type: str
         self.save_dir = None # type: Path
         self.ffmpeg = None # type: str
@@ -49,4 +50,7 @@ class CmdArgs:
         self.log_level = None # type: str
         self.redl_code = None # type: list
         self.hide_load_metadata = None # type: bool
+        self.no_metadata_file = None # type: bool
+        self.gen_init_only = None # type: bool
+        self.skip_gen_init = None # type: bool
         self.URI = None # type: list

@@ -84,6 +84,7 @@ class Daemon:
             return
         refresh_interval = self.args.live_refresh_interval
         last_time = time.time()
+        is_first_time = True
         while True:
             # 刷新间隔时间检查
             if time.time() - last_time < refresh_interval:
@@ -94,7 +95,11 @@ class Daemon:
             # 这里不应该是文件或者文件夹 当然第一轮可以是链接和文件
             next_streams = extractor.fetch_metadata(next_mpd_url)
             # 合并下载分段信息
-            self.streams_extend(streams, next_streams, skeys)
+            if is_first_time:
+                is_first_time = False
+                self.streams_extend({}, next_streams, skeys)
+            else:
+                self.streams_extend(streams, next_streams, skeys)
             # 下载分段
             downloader.download_streams(streams, selected=skeys)
             # 检查是不是主动退出了
