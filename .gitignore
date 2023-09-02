@@ -6,6 +6,7 @@ logs/
 *.pot
 *.srt
 *.vtt
+*.ass
 *.log
 cookies/*_cookies.txt
 *.zip
