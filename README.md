@@ -29,13 +29,13 @@ pip install -r requriements
 | Friday Video | Cookies |
 | HBOGO Asia | Email & Password |
 | iQIYI (iq.com) | Cookies |
-| iTunes | None |
-| KKTV | None |
-| LineTV | None |
+| iTunes |  |
+| KKTV |  |
+| LineTV |  |
 | MyVideo | Cookies |
 | NowE | Cookies |
 | Now Player | Cookies |
-| Viu | None |
+| Viu |  |
 | WeTV | Cookies |
 
 ### Get Cookies
