@@ -2,9 +2,7 @@ credentials = 'cookies'
 required = 'session__id'
 
 [api]
-# episodes = 'https://api.viki.io/v4/containers/{content_id}/episodes.json?token=&direction=desc&with_upcoming=true&sort=number&blocked=true&per_page=100&app=100000a'
-# episodes = 'https://api.viki.io/v4/containers/{content_id}/episodes.json?token=&direction=asc&with_upcoming=true&sort=number&blocked=true&page=1&per_page=100&watch_schedule=1&ws_end_time={time}&app=100000a'
-episodes = 'https://api.viki.io/v4/containers/{content_id}/episodes.json?token=&direction=asc&with_upcoming=true&sort=number&blocked=true&page=1&per_page=100&app=100000a'
+episodes = '{url}?token={token}&direction=asc&with_upcoming=true&sort=number&blocked=true&page=1&per_page=100&app=100000a'
 videos = 'https://www.viki.com/api/videos/{video_id}'
 
 [vmplayer]

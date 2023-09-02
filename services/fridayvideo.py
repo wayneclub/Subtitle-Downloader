@@ -229,8 +229,8 @@ class FridayVideo(Service):
         if res.ok:
             if 'redirectUri' in res.text:
                 self.logger.debug(res.text)
-                self.logger.info(
-                    "\nLogin access token (%s) is expired!\nPlease log out (https://video.friday.tw/logout), login, and re-download cookies", login_access_token)
+                self.logger.error(
+                    self._("\nLogin access token is expired!\nPlease clear browser cookies and re-download cookies!"))
                 os.remove(
                     Path(config.directories['cookies']) / credentials[self.platform]['cookies'])
                 sys.exit(1)

@@ -81,8 +81,14 @@ msgid ""
 "Sorry, there's no embedded subtitles in this video!"
 msgstr "\n抱歉，此劇只有硬字幕，可去其他串流平台查看"
 
-#: services/viki.py:237
+#: services/viki.py:95
 msgid ""
 "\n"
-"The film isn't released."
-msgstr "\n此部電影尚未上映"
+"Please check your subscription plan, and make sure you are able to watch it online!"
+msgstr "\n抱歉，請檢查您的訂閱，確保您能夠線上觀看！"
+
+#: services/viki.py:95
+msgid ""
+"\n"
+"Too Many Requests! Please clear browser cookies and re-download cookies!"
+msgstr "\n連線太頻繁，請清除瀏覽器cookies並重新下載！"

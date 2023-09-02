@@ -75,5 +75,5 @@ msgstr "\n抱歉，此劇只有硬字幕，可去其他串流平台查看"
 #: services/fridayvideo.py:237
 msgid ""
 "\n"
-"The film isn't released."
-msgstr "\n此部電影尚未上映"
+"\nLogin access token is expired!\nPlease clear browser cookies and re-download cookies!"
+msgstr "\n登入授權已逾期，請清除瀏覽器cookies並重新下載！"
