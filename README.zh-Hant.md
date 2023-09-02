@@ -229,9 +229,14 @@ python subtitle_downloader.py URL -s 1 -e 1-10
 python subtitle_downloader.py URL -s 1 -e 1,3,5
 ```
 
-- Download season 1 with proxy (clash)
+- Download season 1 episodes with proxy (region=tw)
 ```
-python subtitle_downloader.py URL -p http://127.0.0.1:7890
+python subtitle_downloader.py URL -s 1 -p tw
+```
+
+- Download season 1 episodes with .ass format subtitle
+```
+python subtitle_downloader.py URL -s 1 -sf .ass
 ```
 
 ## 注意
