@@ -13,7 +13,8 @@ Subtitle-Downloader 是一個方便您從各大串流平台上下載字幕的程
 ## 安裝方式
 
 - Linux、macOS:
-```
+
+```bash
 pip install -r requriements
 ```
 
@@ -65,7 +66,7 @@ pip install -r requriements
   2. 根據欲下載不同串流平台的字幕放入對應cookies.txt到Subtitle-Downloader/cookies
   3. 在終端機執行python指令或是使用Subtitle-Downloader.bat下載字幕
 
-  ```
+  ```bash
   python subtitle_downloader.py 電影、影集的網址 [OPTIONS]
   ```
 
@@ -194,44 +195,59 @@ WeTV
 
 
 ## 更多範例
+
 - Download all seasons and all episodes
+
 ```
 python subtitle_downloader.py URL
 ```
 
 - Download season 1 episode 1
+
 ```
 python subtitle_downloader.py URL -s 1 -e 1
 ```
 
 - Download season 1 episode 1's subtitle with all langugages
+
 ```
 python subtitle_downloader.py URL -s 1 -e 1 -slang all
 ```
 
 - Download all episodes subtitles with all langugages: en, zh-Hant
+
 ```
 python subtitle_downloader.py https://www.disneyplus.com/series/loki/6pARMvILBGzF -slang en,zh-Hant
 ```
 
 - Download latest episode
+
 ```
 python subtitle_downloader.py URL -l
 ```
 
 - Download season 1 episode 1-10
+
 ```
 python subtitle_downloader.py URL -s 1 -e 1-10
 ```
 
 - Download season 1 episode 1,3,5
+
 ```
 python subtitle_downloader.py URL -s 1 -e 1,3,5
 ```
 
-- Download season 1 episodes with proxy (region=tw)
+- Download season 1 episodes with NordVPN (region=tw)
+
 ```
 python subtitle_downloader.py URL -s 1 -p tw
+```
+
+- Download season 1 episodes with proxy (Clash)
+
+```
+python subtitle_downloader.py URL -s 1 -p http:127.0.0.1:7890
 ```
 
 - Download season 1 episodes with .ass format subtitle

@@ -13,7 +13,8 @@ Subtitle-Downloader is a command-line program to download subtitles from the mos
 ## INSTALLATION
 
 - Linux, macOS:
-```
+
+```bash
 pip install -r requriements
 ```
 
@@ -64,7 +65,8 @@ pip install -r requriements
   1. Depend on download platform and modify Subtitle-Downloader/user_config.toml
   2. Follow each platform requirements and put cookies.txt into Subtitle-Downloader/cookies
   3. Execute the program with command line or Subtitle-Downloader.bat (Paste title url)
-  ```
+
+  ```bash
   python subtitle_downloader.py URL [OPTIONS]
   ```
 
@@ -193,47 +195,63 @@ WeTV
 - Copy user-agent from login browser (https://www.whatsmyua.info/) and paste it in Subtitle-Downloader/user_config.toml (User-Agent). The user-agent must be same as login browser user-agent.
 
 ## More Examples
+
 - Download all seasons and all episodes
+
 ```
 python subtitle_downloader.py URL
 ```
 
 - Download season 1 episode 1
+
 ```
 python subtitle_downloader.py URL -s 1 -e 1
 ```
 
 - Download season 1 episode 1's subtitle with all langugages
+
 ```
 python subtitle_downloader.py URL -s 1 -e 1 -slang all
 ```
 
 - Download all episodes subtitles with all langugages: en, zh-Hant
+
 ```
 python subtitle_downloader.py https://www.disneyplus.com/series/loki/6pARMvILBGzF -slang en,zh-Hant
 ```
 
 - Download latest episode
+
 ```
 python subtitle_downloader.py URL -l
 ```
 
 - Download season 1 episode 1-10
+
 ```
 python subtitle_downloader.py URL -s 1 -e 1-10
 ```
 
 - Download season 1 episode 1,3,5
+
 ```
 python subtitle_downloader.py URL -s 1 -e 1,3,5
 ```
 
-- Download season 1 episodes with proxy (region=tw)
+- Download season 1 episodes with NordVPN (region=tw)
+
 ```
 python subtitle_downloader.py URL -s 1 -p tw
 ```
 
+- Download season 1 episodes with proxy (Clash)
+
+```
+python subtitle_downloader.py URL -s 1 -p http:127.0.0.1:7890
+```
+
 - Download season 1 episodes with .ass format subtitle
+
 ```
 python subtitle_downloader.py URL -s 1 -sf .ass
 ```
