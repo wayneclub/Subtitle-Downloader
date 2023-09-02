@@ -168,7 +168,7 @@ class Viu(Service):
                         episode_url = re.sub(r'(.+product_id=).+', '\\1',
                                              meta_url) + episode['product_id']
 
-                        file_name = f'{title}E{str(episode_index).zfill(2)}.WEB-DL.{self.platform}.vtt'
+                        file_name = f'{name}E{str(episode_index).zfill(2)}.WEB-DL.{self.platform}.vtt'
 
                         self.logger.info(self._("Finding %s ..."), file_name)
                         episode_res = self.session.get(url=episode_url)
@@ -241,7 +241,7 @@ class Viu(Service):
             self.logger.info(self._("\n%s Season %s"),
                              title, season_index)
 
-            title = rename_filename(
+            name = rename_filename(
                 f'{title}.S{str(season_index).zfill(2)}')
             folder_path = os.path.join(self.download_path, title)
 
@@ -259,7 +259,7 @@ class Viu(Service):
                 if not self.download_season or season_index in self.download_season:
                     if not self.download_episode or episode_index in self.download_episode:
 
-                        file_name = f'{title}E{str(episode_index).zfill(2)}.WEB-DL.{self.platform}.vtt'
+                        file_name = f'{name}E{str(episode_index).zfill(2)}.WEB-DL.{self.platform}.vtt'
 
                         self.logger.info(self._("Finding %s ..."), file_name)
 
@@ -270,7 +270,7 @@ class Viu(Service):
 
                         url_path = episode['urlpath']
 
-                        subs, lang_paths = self.get_subtitle_2(
+                        subs, lang_paths = self.get_comment(
                             subtitle_data, url_path, folder_path, file_name)
                         subtitles += subs
                         languages = set.union(languages, lang_paths)
@@ -315,7 +315,7 @@ class Viu(Service):
 
                 if 'second_subtitle_url' in sub and sub['second_subtitle_url']:
                     second_subtitle = dict()
-                    second_subtitle['segment'] = True
+                    second_subtitle['segment'] = 'comment'
                     second_subtitle['url'] = sub['second_subtitle_url'].replace(
                         '\\/', '/')
                     second_subtitle['name'] = subtitle_file_name
@@ -328,7 +328,7 @@ class Viu(Service):
 
         return subtitles, lang_paths
 
-    def get_subtitle_2(self, data, url_path, folder_path, file_name):
+    def get_comment(self, data, url_path, folder_path, file_name):
 
         lang_paths = set()
 
@@ -371,13 +371,13 @@ class Viu(Service):
             for lang_path in sorted(languages):
                 if 'tmp' in lang_path:
                     merge_subtitle_fragments(
-                        folder_path=lang_path, file_name=os.path.basename(lang_path.replace('tmp_', '')), lang=self.locale, display=display)
+                        folder_path=lang_path, file_name=os.path.basename(lang_path.replace('tmp_', '')), subtitle_format=self.subtitle_format, locale=self.locale, display=display)
                     display = False
                 convert_subtitle(
-                    folder_path=lang_path, lang=self.locale)
+                    folder_path=lang_path, subtitle_format=self.subtitle_format, locale=self.locale)
 
             convert_subtitle(folder_path=folder_path,
-                             platform=self.platform, lang=self.locale)
+                             platform=self.platform, subtitle_format=self.subtitle_format, locale=self.locale)
 
     def main(self):
         product_id = re.search(r'vod\/(\d+)\/', self.url)

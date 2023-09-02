@@ -111,7 +111,7 @@ class NowE(Service):
                                title=file_name, folder_path=folder_path)
 
         convert_subtitle(folder_path=folder_path,
-                         platform=self.platform, lang=self.locale)
+                         platform=self.platform, subtitle_format=self.subtitle_format, locale=self.locale)
 
     def series_metadata(self, data):
         title = data['brandName']
@@ -127,8 +127,7 @@ class NowE(Service):
                 season_index = 1
 
         self.logger.info(self._("\n%s Season %s"), title, season_index)
-        title = rename_filename(
-            f'{title}.S{str(season_index).zfill(2)}')
+        name = rename_filename(f'{title}.S{str(season_index).zfill(2)}')
         folder_path = os.path.join(self.download_path, title)
         if os.path.exists(folder_path):
             shutil.rmtree(folder_path)
@@ -156,7 +155,7 @@ class NowE(Service):
             if not self.download_season or season_index in self.download_season:
                 if not self.download_episode or episode_index in self.download_episode:
                     content_id = episode['episodeId']
-                    file_name = f'{title}E{str(episode_index).zfill(2)}.WEB-DL.{self.platform}'
+                    file_name = f'{name}E{str(episode_index).zfill(2)}.WEB-DL.{self.platform}'
 
                     self.logger.info("\n%s", file_name)
 
@@ -164,7 +163,7 @@ class NowE(Service):
                                            title=file_name, folder_path=folder_path)
 
         convert_subtitle(folder_path=folder_path,
-                         platform=self.platform, lang=self.locale)
+                         platform=self.platform, subtitle_format=self.subtitle_format, locale=self.locale)
 
     def download_subtitle(self, content_id, title, folder_path):
 

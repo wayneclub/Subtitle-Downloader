@@ -18,6 +18,7 @@ import opencc
 from pwinput import pwinput
 from tmdbv3api import TMDb, TV, Movie
 from configs.config import config, credentials, filenames, user_agent
+from constants import SUBTITLE_FORMAT
 from utils.ripprocess import ripprocess
 from utils.proxy import get_ip_info, get_proxy
 from utils.helper import EpisodesNumbersHandler
@@ -85,6 +86,7 @@ class Service(object):
                 if "://" not in proxy:
                     # assume a https proxy port
                     proxy = f"https://{proxy}"
+                self.proxy = proxy
                 self.session.proxies.update({"all": proxy})
                 self.logger.info(" + Set Proxy")
             else:
@@ -98,7 +100,8 @@ class Service(object):
 
         self.ripprocess = ripprocess()
 
-        self.subtitle_language = self.get_language_list(args)
+        self.subtitle_language = self.get_language_list(args.subtitle_language)
+        self.subtitle_format = self.get_subtitle_format(args.subtitle_format)
 
         tmdb = TMDb()
         tmdb.api_key = credentials['TMDB']['api_key']
@@ -146,17 +149,23 @@ class Service(object):
                 f"\nPlease put {os.path.basename(cookie_file)} in {Path(config.directories['cookies'])}")
             sys.exit(1)
 
-    def get_language_list(self, args):
+    def get_language_list(self, subtitle_language):
         """ Get language list """
 
-        subtitle_language = args.subtitle_language
         if not subtitle_language:
-            subtitle_language = config.default_language
+            subtitle_language = config.subtitles['default-language']
 
         return tuple([
             language for language in subtitle_language.split(',')])
 
-    def get_title_info(self, title="", title_aliases=[], is_movie=True):
+    def get_subtitle_format(self, subtitle_format):
+        """ Get subtitle default format """
+
+        if not subtitle_format or not subtitle_format in SUBTITLE_FORMAT:
+            subtitle_format = config.subtitles['default-format']
+        return subtitle_format
+
+    def get_title_info(self, title="", title_aliases=None, is_movie=True):
         """ Get title info from TMDB """
 
         title_info = {}

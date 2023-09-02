@@ -96,7 +96,7 @@ class AppleTVPlus(Service):
             subtitle_list, folder_path, file_name)
 
         convert_subtitle(folder_path=folder_path,
-                         platform=self.platform, lang=self.locale)
+                         platform=self.platform, subtitle_format=self.subtitle_format, locale=self.locale)
 
     def series_subtitle(self, data):
 
@@ -202,7 +202,7 @@ class AppleTVPlus(Service):
                             subtitle_list, folder_path, file_name)
 
             convert_subtitle(folder_path=folder_path,
-                             platform=self.platform, lang=self.locale)
+                             platform=self.platform, subtitle_format=self.subtitle_format, locale=self.locale)
 
     def parse_m3u(self, m3u8_url):
 
@@ -312,7 +312,7 @@ class AppleTVPlus(Service):
             for lang_path in sorted(languages):
                 if 'tmp' in lang_path:
                     merge_subtitle_fragments(
-                        folder_path=lang_path, file_name=os.path.basename(lang_path.replace('tmp_', '')), lang=self.locale, display=display)
+                        folder_path=lang_path, file_name=os.path.basename(lang_path.replace('tmp_', '')), subtitle_format=self.subtitle_format, locale=self.locale, display=display)
                     display = False
 
     def main(self):

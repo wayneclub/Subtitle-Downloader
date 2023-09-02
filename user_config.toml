@@ -1,7 +1,10 @@
 # This is an example Subtitle-Downloader's config file.
 
 # Subtitle default language: all/en/zh-Hant/zh-Hans/zh-HK
+# Subtitle default format: .srt/.ass
+[subtitles]
 default-language = 'zh-Hant'
+default-format = '.srt'
 
 # Default cookies dir: Subtitle-Downloader/cookies
 #         downloads dir: Subtitle-Downloader/downloads

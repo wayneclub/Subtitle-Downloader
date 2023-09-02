@@ -68,7 +68,7 @@ class CatchPlay(Service):
                 vcms_access_token['play_video_id'], vcms_access_token['play_token'], folder_path, file_name)
 
             convert_subtitle(folder_path=folder_path,
-                             platform=self.platform, lang=self.locale)
+                             platform=self.platform, subtitle_format=self.subtitle_format, locale=self.locale)
 
     def series_subtitle(self, data, program_id):
         main_program = 'getMainProgram({\"id\":\"' + program_id + '\"})'
@@ -122,7 +122,7 @@ class CatchPlay(Service):
                             break
 
                 convert_subtitle(folder_path=folder_path,
-                                 platform=self.platform, lang=self.locale)
+                                 platform=self.platform, subtitle_format=self.subtitle_format, locale=self.locale)
 
     def get_vcms_access_token(self, video_id):
         headers = {

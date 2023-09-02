@@ -93,8 +93,12 @@ def download_files(files, headers={}):
             if 'segment' in file and file['segment']:
                 extension = Path(file['name']).suffix
                 sequence = str(lang_paths.count(file['path'])).zfill(3)
-                file_name = os.path.join(file['path'], file['name'].replace(
-                    extension, f'-seg_{sequence}{extension}'))
+                if file['segment'] == 'comment':
+                    file_name = os.path.join(file['path'], file['name'].replace(
+                        extension, f'-seg_{sequence}_comment{extension}'))
+                else:
+                    file_name = os.path.join(file['path'], file['name'].replace(
+                        extension, f'-seg_{sequence}{extension}'))
                 lang_paths.append(file['path'])
             else:
                 file_name = os.path.join(file['path'], file['name'])

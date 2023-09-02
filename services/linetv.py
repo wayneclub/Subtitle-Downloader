@@ -113,7 +113,7 @@ class LineTV(Service):
         if subtitles:
             download_files(subtitles)
             convert_subtitle(folder_path=folder_path,
-                             platform=self.platform, lang=self.locale)
+                             platform=self.platform, subtitle_format=self.subtitle_format, locale=self.locale)
 
     def main(self):
         """Download subtitle from LineTV"""

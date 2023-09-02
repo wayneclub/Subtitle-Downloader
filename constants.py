@@ -1,3 +1,11 @@
+#!/usr/bin/python3
+# coding: utf-8
+
+"""
+This module is for constants
+"""
+
+SUBTITLE_FORMAT = ['.srt', '.ass', '.ssa', '.vtt', '.xml']
 
 ISO_6391 = {
     'cht': 'zh-Hant',

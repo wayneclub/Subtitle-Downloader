@@ -64,7 +64,7 @@ class NowPlayer(Service):
             else:
                 self.logger.info("\n%s", title)
 
-            default_language = data['language']
+            # default_language = data['language']
 
             title = rename_filename(f'{title}.{release_year}')
             folder_path = os.path.join(self.download_path, title)
@@ -73,11 +73,11 @@ class NowPlayer(Service):
 
             file_name = f'{title}.WEB-DL.{self.platform}'
 
-            self.download_subtitle(content_id=data['episodeId'],
-                                   title=file_name, folder_path=folder_path, default_language=default_language)
+            self.download_subtitle(
+                content_id=data['episodeId'], title=file_name, folder_path=folder_path)
 
             convert_subtitle(folder_path=folder_path,
-                             platform=self.platform, lang=self.locale)
+                             platform=self.platform, subtitle_format=self.subtitle_format, locale=self.locale)
 
         else:
             self.logger.error(res.text)
@@ -133,13 +133,13 @@ class NowPlayer(Service):
                                                title=file_name, folder_path=folder_path)
 
             convert_subtitle(folder_path=folder_path,
-                             platform=self.platform, lang=self.locale)
+                             platform=self.platform, subtitle_format=self.subtitle_format, locale=self.locale)
 
         else:
             self.logger.error(res.text)
             sys.exit(1)
 
-    def download_subtitle(self, content_id, title, folder_path, default_language=""):
+    def download_subtitle(self, content_id, title, folder_path):
         data = {
             'callerReferenceNo': self.generate_caller_reference_no(),
             'productId': content_id,
@@ -181,7 +181,7 @@ class NowPlayer(Service):
                 url=mpd_url, title=title, folder_path=folder_path, headers=headers, proxy=self.proxy, debug=False, timescale=timescale)
 
         else:
-            print()
+            sys.exit()
 
     def main(self):
         params = parse_qs(urlparse(self.url).query)

@@ -93,7 +93,7 @@ class DisneyPlus(Service):
                 self.get_audio(audio_list, folder_path, file_name)
 
             convert_subtitle(folder_path=folder_path,
-                             platform=self.platform, lang=self.locale)
+                             platform=self.platform, subtitle_format=self.subtitle_format, locale=self.locale)
         else:
             self.logger.error(res.text)
 
@@ -169,7 +169,7 @@ class DisneyPlus(Service):
                                     audio_list, folder_path, file_name)
 
                     convert_subtitle(folder_path=folder_path,
-                                     platform=self.platform, lang=self.locale)
+                                     platform=self.platform, subtitle_format=self.subtitle_format, locale=self.locale)
         else:
             self.logger.error(res.text)
 
@@ -329,7 +329,7 @@ class DisneyPlus(Service):
             for lang_path in sorted(languages):
                 if 'tmp' in lang_path:
                     merge_subtitle_fragments(
-                        folder_path=lang_path, file_name=os.path.basename(lang_path.replace('tmp_', '')), lang=self.locale, display=display)
+                        folder_path=lang_path, file_name=os.path.basename(lang_path.replace('tmp_', '')), subtitle_format=self.subtitle_format, locale=self.locale, display=display)
                     display = False
 
     def get_audio(self, audio_list, folder_path, audio_name):

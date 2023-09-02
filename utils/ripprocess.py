@@ -82,7 +82,7 @@ class ripprocess(object):
         self.logger = logging.getLogger(__name__)
 
     def download_subtitles_from_mpd(self, url, title, folder_path, url_patch=False, headers="", proxy="", debug=False, timescale=""):
-        # self.logger.info("\nDownloading subtitles...")
+        self.logger.info("\nDownloading subtitles...")
 
         os.makedirs(folder_path, exist_ok=True)
 

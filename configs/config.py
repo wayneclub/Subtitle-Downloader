@@ -40,7 +40,8 @@ class Platform:
 
 class Config:
     def __init__(self, **kwargs: Any):
-        self.default_language: str = kwargs.get("default-language") or ""
+        # self.default_language: str = kwargs.get("default-language") or ""
+        self.subtitles: dict = kwargs.get("subtitles") or {}
         self.credentials: dict = kwargs.get("credentials") or {}
         self.directories: dict = kwargs.get("directories") or {}
         self.headers: dict = kwargs.get("headers") or {}

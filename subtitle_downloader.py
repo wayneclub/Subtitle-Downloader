@@ -50,6 +50,10 @@ def main() -> None:
                         '--audio-language',
                         dest='audio_language',
                         help=_("languages of audio-tracks; use commas to separate multiple languages"))
+    parser.add_argument('-sf',
+                        '--subtitle-format',
+                        dest='subtitle_format',
+                        help=_("subtitles format: .srt or .ass"))
     parser.add_argument(
         '-region',
         '--region',
@@ -84,8 +88,7 @@ def main() -> None:
         '-v',
         '--version',
         action='version',
-        version='{app_name} {version}'.format(
-            app_name=app_name, version=__version__),
+        version=f'{app_name} {__version__}',
         help=_("show program's version number and exit")
     )
 

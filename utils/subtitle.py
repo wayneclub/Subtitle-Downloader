@@ -14,8 +14,7 @@ import sys
 import pysubs2
 from chardet import detect
 from utils.helper import get_locale
-
-SUBTITLE_FORMAT = ['.srt', '.ass', '.ssa', '.vtt', '.xml']
+from constants import SUBTITLE_FORMAT
 
 
 def get_encoding_type(source):
@@ -61,12 +60,15 @@ def is_subtitle(file_path, file_format=''):
         return True
 
 
-def convert_subtitle(folder_path="", platform="", lang=""):
+def convert_subtitle(folder_path="", platform="", subtitle_format="", locale=""):
     """
-    Convert subtitle to .srt
+    Convert subtitle to .srt or .ass
     """
+    _ = get_locale(__name__, locale)
 
-    _ = get_locale(__name__, lang)
+    if not subtitle_format:
+        subtitle_format = '.srt'
+
     if os.path.exists(folder_path):
         if os.path.isdir(folder_path):
             display = True
@@ -76,11 +78,12 @@ def convert_subtitle(folder_path="", platform="", lang=""):
                 if is_subtitle(os.path.join(folder_path, file), '.vtt'):
                     if display:
                         logger.info(
-                            _("\nConvert %s to .srt:\n---------------------------------------------------------------"), extenison)
+                            _("\nConvert %s to %s:\n---------------------------------------------------------------"), extenison, subtitle_format)
                         display = False
 
                     subtitle = os.path.join(folder_path, file)
-                    subtitle_name = subtitle.replace(extenison, '.srt')
+                    subtitle_name = subtitle.replace(
+                        extenison, subtitle_format)
                     convert_utf8(subtitle)
                     subs = pysubs2.load(subtitle)
                     if '.zh-Hant' in subtitle_name:
@@ -92,11 +95,11 @@ def convert_subtitle(folder_path="", platform="", lang=""):
                     folder = os.listdir(folder_path)
             if platform:
                 archive_subtitle(folder_path=os.path.normpath(
-                    folder_path), platform=platform, lang=lang)
+                    folder_path), platform=platform, locale=locale)
 
         elif is_subtitle(folder_path, '.vtt'):
             subtitle_name = folder_path.replace(
-                Path(folder_path).suffix, '.srt')
+                Path(folder_path).suffix, subtitle_format)
             convert_utf8(folder_path)
             subs = pysubs2.load(folder_path)
             if '.zh-Hant' in subtitle_name:
@@ -107,10 +110,12 @@ def convert_subtitle(folder_path="", platform="", lang=""):
             logger.info(os.path.basename(subtitle_name))
 
 
-def archive_subtitle(folder_path, platform="", lang=""):
+def archive_subtitle(folder_path, platform="", locale=""):
     """
     Archive subtitles
     """
+    _ = get_locale(__name__, locale)
+
     contain_subtitle = False
     for path, dirs, files in os.walk(folder_path):
         if any('.srt' in s for s in files):
@@ -120,7 +125,6 @@ def archive_subtitle(folder_path, platform="", lang=""):
     if not contain_subtitle:
         sys.exit(0)
 
-    _ = get_locale(__name__, lang)
     logger.info(
         _("\nArchive subtitles:\n---------------------------------------------------------------"))
 
@@ -178,11 +182,15 @@ def merge_same_subtitle(subs):
     return subs
 
 
-def merge_subtitle_fragments(folder_path="", file_name="", lang="", display=False, shift_time=[]):
+def merge_subtitle_fragments(folder_path="", file_name="", subtitle_format="", locale="", display=False, shift_time=None):
     """
     Merge subtitle fragments
     """
-    _ = get_locale(__name__, lang)
+    _ = get_locale(__name__, locale)
+
+    if not subtitle_format:
+        subtitle_format = '.srt'
+
     if os.path.exists(folder_path) and glob.glob(os.path.join(folder_path, '*.srt')) + glob.glob(os.path.join(folder_path, '*.vtt')):
         if display:
             logger.info(_(
@@ -197,6 +205,8 @@ def merge_subtitle_fragments(folder_path="", file_name="", lang="", display=Fals
                         (seg['offset'] for seg in shift_time if seg['name'] in file_path), '')
                     subs.shift(s=offset)
                 subs = clean_subs(subs)
+                if 'comment' in file_path:
+                    add_comment(subs)
                 subtitles += subs
         subs = convert_list_to_subtitle(subtitles)
         subs = merge_same_subtitle(subs)
@@ -206,10 +216,21 @@ def merge_subtitle_fragments(folder_path="", file_name="", lang="", display=Fals
         if '.zh-Hant' in file_path or '.cmn-Hant' in file_path:
             subs = format_zh_subtitle(subs)
         subs = format_subtitle(subs)
+        extenison = Path(file_path).suffix.lower()
+        file_path = file_path.replace(extenison, subtitle_format)
         subs.save(file_path)
-        logger.info(file_name)
+        logger.info(os.path.basename(file_path))
         if os.path.exists(folder_path):
             shutil.rmtree(folder_path)
+
+
+def add_comment(subs):
+    """
+    Add comment to subtitle
+    """
+    for sub in subs:
+        sub.text = '{\\an8}' + sub.text.strip()
+    return subs
 
 
 def format_zh_subtitle(subs):
@@ -227,12 +248,22 @@ def format_zh_subtitle(subs):
             text = text.replace('...', '…')
             text = text.replace(' （', '（')
             text = text.replace('） ', '）')
+            text = text.replace('） ', '）')
+            text = text.replace('） ', '）')
 
             if text.count('-') == 2:
                 text = text.replace('- ', '-')
 
             text = re.sub(r',([\u4E00-\u9FFF]+)', '，\\1', text)
             text = re.sub(r'([\u4E00-\u9FFF]+),', '\\1，', text)
+
+            text = re.sub(r'\u3000\u3000', ' -', text)
+
+            conversation = re.search(r'( )-[ \u4E00-\u9FFF「0-9]+', text)
+            if conversation:
+                text = text.replace(' -', '\n-')
+
+            text = re.sub(r'(^[「\u4E00-\u9FFF]+.*?)\n-', '-\\1\n-', text)
 
         text = text.replace('  ', ' ')
         text = text.replace('  ', ' ')
