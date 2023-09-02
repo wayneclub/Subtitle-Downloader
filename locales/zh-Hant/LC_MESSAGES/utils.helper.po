@@ -25,3 +25,10 @@ msgid ""
 "\n"
 "Timeout, please retry."
 msgstr "\n逾時，請再試一次"
+
+#: utils/helper.py:63 utils/helper.py:68
+#, python-format
+msgid ""
+"\n"
+"Unsupport %s subtitle, available languages: %s"
+msgstr "\n未提供%s的字幕，支援語言：%s"

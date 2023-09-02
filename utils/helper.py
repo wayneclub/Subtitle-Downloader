@@ -121,7 +121,6 @@ def get_all_languages(available_languages, subtitle_language, locale_):
     if not intersect:
         logger.error(
             _("\nUnsupport %s subtitle, available languages: %s"), ", ".join(subtitle_language), ", ".join(available_languages))
-        sys.exit(0)
 
     if len(intersect) != len(subtitle_language):
         logger.error(

@@ -77,6 +77,10 @@ class Viki(Service):
         episodes_url = self.config['api']['episodes'].format(
             content_id=content_id, time=int(time.time()))
 
+        self.session.headers.update({
+            'Referer': 'https://www.viki.com/',
+            'X-Viki-Device-ID': self.cookies['device_id']
+        })
         res = self.session.get(url=episodes_url, timeout=5)
 
         episodes = []
@@ -118,7 +122,7 @@ class Viki(Service):
             episode_index = int(episode['number'])
             if not self.download_season or season_index in self.download_season:
                 if not self.download_episode or episode_index in self.download_episode:
-                    filename = f'{title}.S{str(season_index).zfill(2)}E{str(episode_index).zfill(2)}.WEB-DL.{self.platform}.vtt'
+                    filename = f'{name}.E{str(episode_index).zfill(2)}.WEB-DL.{self.platform}.vtt'
                     media_info = self.get_media_info(
                         video_id=episode['id'], filename=filename)
                     subs, lang_paths = self.get_subtitle(
@@ -135,8 +139,7 @@ class Viki(Service):
         self.session.headers.update({
             'x-viki-app-ver': self.config['vmplayer']['version'],
             'x-client-user-agent': user_agent,
-            'x-viki-as-id': self.cookies['session__id'],
-            'x-viki-device-id': self.cookies['device_id']
+            'x-viki-as-id': self.cookies['session__id']
         })
         media_info_url = self.config['api']['videos'].format(
             video_id=video_id)
@@ -191,6 +194,7 @@ class Viki(Service):
                                 'path': lang_folder_path,
                                 'url': sub['src']
                             })
+
                 get_all_languages(available_languages=available_languages,
                                   subtitle_language=self.subtitle_language, locale_=self.locale)
             elif media_info['video']['hardsubs']:
