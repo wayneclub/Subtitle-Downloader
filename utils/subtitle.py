@@ -60,6 +60,33 @@ def is_subtitle(file_path, file_format=''):
         return True
 
 
+def set_ass_style(subs):
+    """
+    Set .ass style
+    """
+    style = subs.styles["Default"].copy()
+    style.fontname = 'Lucida Grande'
+    style.fontsize = 28
+    style.backcolor = pysubs2.Color(0, 0, 0, 80)
+    style.bold = 0
+    style.outline = 0.8
+    style.shadow = 0.5
+
+    subs.styles['Default'] = style
+
+    comment_name = 'Comment'
+    comment = style.copy()
+    subs.styles[comment_name] = comment
+
+    for sub in subs:
+        text = sub.text
+        text = re.sub(r"\n", r"\\N", text)
+        if '{\\an8}' in text:
+            sub.name = comment_name
+        sub.text = text.strip()
+    return subs
+
+
 def convert_subtitle(folder_path="", platform="", subtitle_format="", locale=""):
     """
     Convert subtitle to .srt or .ass
@@ -89,6 +116,8 @@ def convert_subtitle(folder_path="", platform="", subtitle_format="", locale="")
                     if '.zh-Hant' in subtitle_name:
                         subs = format_zh_subtitle(subs)
                     subs = format_subtitle(subs)
+                    if subtitle_format == '.ass':
+                        subs = set_ass_style(subs)
                     subs.save(subtitle_name)
                     logger.info(os.path.basename(subtitle_name))
                     os.remove(subtitle)
@@ -105,6 +134,8 @@ def convert_subtitle(folder_path="", platform="", subtitle_format="", locale="")
             if '.zh-Hant' in subtitle_name:
                 subs = format_zh_subtitle(subs)
             subs = format_subtitle(subs)
+            if subtitle_format == '.ass':
+                subs = set_ass_style(subs)
             subs.save(subtitle_name)
             os.remove(folder_path)
             logger.info(os.path.basename(subtitle_name))
@@ -218,6 +249,8 @@ def merge_subtitle_fragments(folder_path="", file_name="", subtitle_format="", l
         subs = format_subtitle(subs)
         extenison = Path(file_path).suffix.lower()
         file_path = file_path.replace(extenison, subtitle_format)
+        if subtitle_format == '.ass':
+            subs = set_ass_style(subs)
         subs.save(file_path)
         logger.info(os.path.basename(file_path))
         if os.path.exists(folder_path):
