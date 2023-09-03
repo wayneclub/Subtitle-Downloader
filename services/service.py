@@ -108,21 +108,20 @@ class Service(object):
 
     def validate_config(self, service_config):
         """ Validate service config """
-        if service_config.get('credentials') == 'cookies':
+
+        if 'cookies' in service_config.get('credentials'):
             if credentials[self.platform].get('cookies'):
                 self.cookies = self.get_cookie_jar(
                     service_config.get('required'))
             else:
-                self.logger.error(
-                    '\nNot set %s\'s cookies in %s', self.platform, filenames.root_config)
+                self.logger.error('\n%s\'s cookies isn\'t set in %s',
+                                  self.platform, filenames.root_config)
                 sys.exit(1)
-        elif service_config.get('credentials') == 'email':
+
+        if 'email' in service_config.get('credentials'):
             if not credentials[self.platform].get('email') and not credentials[self.platform].get('password'):
                 credentials[self.platform]['email'] = input("Email: ").strip()
                 credentials[self.platform]['password'] = pwinput().strip()
-        else:
-            self.logger.error('\nMissing %s\'s config', self.platform)
-            sys.exit(1)
 
         return service_config
 
