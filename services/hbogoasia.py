@@ -15,7 +15,7 @@ from pathlib import Path
 from urllib.parse import urlparse
 from configs.config import credentials
 from utils.io import rename_filename, download_files
-from utils.helper import get_language_code, get_locale
+from utils.helper import get_language_code, get_locale, get_all_languages
 from utils.subtitle import convert_subtitle
 from services.service import Service
 
@@ -36,7 +36,7 @@ class HBOGOAsia(Service):
         self._ = get_locale(__name__, self.locale)
 
         self.device_id = str(uuid.uuid4())
-        self.origin = ""
+        self.origin = f"https://{urlparse(self.url).netloc}"
         self.territory = ""
         self.channel_partner_id = ""
         self.session_token = ""
@@ -91,10 +91,13 @@ class HBOGOAsia(Service):
             self.logger.info(
                 self._("\nSuccessfully logged in. Welcome %s!"), user_name.strip())
         else:
-            self.logger.error(res.text)
+            error = res.json()
+            self.logger.error("Error: %s %s", error['code'], error['message'])
             sys.exit(1)
 
     def remove_device(self):
+        """HBOGO limit to 5 devices"""
+
         delete_url = self.config['api']['device']
         payload = {
             "sessionToken": self.session_token,
@@ -106,27 +109,6 @@ class HBOGOAsia(Service):
             self.logger.debug(res.json())
         else:
             self.logger.error(res.text)
-
-    def get_all_languages(self, data):
-        """Get all subtitles language"""
-
-        available_languages = tuple([get_language_code(
-            media['lang']) for media in data['materials'] if media['type'] == 'subtitle'])
-
-        if 'all' in self.subtitle_language:
-            self.subtitle_language = available_languages
-
-        intersect = set(self.subtitle_language).intersection(
-            set(available_languages))
-
-        if not intersect:
-            self.logger.error(
-                self._("\nUnsupport %s subtitle, available languages: %s"), ", ".join(self.subtitle_language), ", ".join(available_languages))
-            sys.exit(0)
-
-        if len(intersect) != len(self.subtitle_language):
-            self.logger.error(
-                self._("\nUnsupport %s subtitle, available languages: %s"), ", ".join(set(self.subtitle_language).symmetric_difference(intersect)), ", ".join(available_languages))
 
     def movie_subtitle(self, movie_url, content_id):
         res = self.session.get(url=movie_url, timeout=5)
@@ -223,7 +205,7 @@ class HBOGOAsia(Service):
     def get_subtitle(self, content_id, data, folder_path, filename):
         playback_url = self.config['api']['playback'].format(territory=self.territory, content_id=content_id,
                                                              session_token=self.session_token, channel_partner_id=self.channel_partner_id)
-        self.logger.debug(playback_url)
+        self.logger.debug("playback_url: %s", playback_url)
         res = self.session.get(url=playback_url, timeout=5)
 
         if res.ok:
@@ -231,7 +213,11 @@ class HBOGOAsia(Service):
 
             category = data['metadata']['categories'][0]
 
-            self.get_all_languages(data)
+            available_languages = tuple([get_language_code(
+                media['lang']) for media in data['materials'] if media['type'] == 'subtitle'])
+
+            get_all_languages(available_languages=available_languages,
+                              subtitle_language=self.subtitle_language, locale_=self.locale)
 
             lang_paths = set()
             subtitles = []
@@ -269,7 +255,9 @@ class HBOGOAsia(Service):
                         subtitles.append(subtitle)
             return subtitles, lang_paths
         else:
-            self.logger.error(res.text)
+            error = res.json()
+            self.logger.error("Error: %s %s", error['code'], error['message'])
+            self.remove_device()
             sys.exit(1)
 
     def download_subtitle(self, subtitles, folder_path, languages=None):
@@ -283,7 +271,6 @@ class HBOGOAsia(Service):
                              platform=self.platform, subtitle_format=self.subtitle_format, locale=self.locale)
 
     def main(self):
-        self.origin = f"https://{urlparse(self.url).netloc}"
         self.get_territory()
 
         # nowe
@@ -318,6 +305,7 @@ class HBOGOAsia(Service):
                 self.series_subtitle(series_url)
             else:
                 self.logger.error(self._("\nSeries not found!"))
+                self.remove_device()
                 sys.exit(1)
         else:
             content_id = os.path.basename(self.url)
