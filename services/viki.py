@@ -38,6 +38,11 @@ class Viki(Service):
 
         self.logger.info("\n%s (%s)", title, release_year)
 
+        if data['blocked'] is True:
+            self.logger.error(self._(
+                "\nPlease check your subscription plan, and make sure you are able to watch it online!"))
+            sys.exit(0)
+
         title = rename_filename(f'{title}.{release_year}')
         folder_path = os.path.join(self.download_path, title)
         filename = f"{title}.WEB-DL.{self.platform}.vtt"
@@ -91,6 +96,7 @@ class Viki(Service):
         episodes = []
         if res.ok:
             episodes = res.json()['response']
+            self.logger.debug("episodes: %s", episodes)
             if len(episodes) == 0:
                 self.logger.error(res.text)
                 sys.exit(1)
@@ -126,6 +132,12 @@ class Viki(Service):
             if not self.download_season or season_index in self.download_season:
                 if not self.download_episode or episode_index in self.download_episode:
                     filename = f'{name}E{str(episode_index).zfill(2)}.WEB-DL.{self.platform}.vtt'
+
+                    if episode['blocked'] is True:
+                        self.logger.error(self._(
+                            "\nPlease check your subscription plan, and make sure you are able to watch it online!"))
+                        break
+
                     media_info = self.get_media_info(
                         video_id=episode['id'], filename=filename)
                     subs, lang_paths = self.get_subtitle(
@@ -194,7 +206,7 @@ class Viki(Service):
                                 'path': lang_folder_path,
                                 'url': sub['src']
                             })
-                print(os.path.basename(filename))
+
                 get_all_languages(available_languages=available_languages,
                                   subtitle_language=self.subtitle_language, locale_=self.locale)
             elif media_info['video']['hardsubs']:
@@ -220,8 +232,6 @@ class Viki(Service):
         res = self.session.get(url=self.url, timeout=5)
 
         if res.ok:
-            # match = re.search(r'(\{"@context":.+\}\})', res.text)
-            # data = orjson.loads(match.group(1))
             match = re.search(r'({\"props\":{.*})', res.text)
             data = orjson.loads(match.group(1))['props']['pageProps']
             self.token = data['userInfo']['token']

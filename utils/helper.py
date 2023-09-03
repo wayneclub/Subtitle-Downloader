@@ -121,10 +121,12 @@ def get_all_languages(available_languages, subtitle_language, locale_):
     if not intersect:
         logger.error(
             _("\nUnsupport %s subtitle, available languages: %s"), ", ".join(subtitle_language), ", ".join(available_languages))
+        return False
 
     if len(intersect) != len(subtitle_language):
         logger.error(
             _("\nUnsupport %s subtitle, available languages: %s"), ", ".join(set(subtitle_language).symmetric_difference(intersect)), ", ".join(available_languages))
+        return False
 
 
 def check_url_exist(url, headers=None):
