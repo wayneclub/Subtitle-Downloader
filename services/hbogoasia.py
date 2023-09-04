@@ -59,6 +59,7 @@ class HBOGOAsia(Service):
             self.logger.error(res.text)
 
     def login(self):
+        """Login and get sessionToken"""
 
         headers = {
             'origin': self.origin,
@@ -66,8 +67,8 @@ class HBOGOAsia(Service):
         }
 
         payload = {
-            'contactPassword': credentials[self.platform]['password'].strip(),
             'contactUserName': credentials[self.platform]['email'].strip(),
+            'contactPassword': credentials[self.platform]['password'].strip(),
             'deviceDetails': {
                 'deviceName': platform.system(),
                 'deviceType': "COMP",

@@ -15,8 +15,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #: subtitle_downloader.py:22
-msgid "Support downloading subtitles from multiple streaming services, such as Disney+, HBOGO Asia, KKTV, LineTV, friDay Video, MyVideo, CatchPlay, iq.com, Viu (support HK and SG without vpn), WeTV, NowE, Now Player, AppleTV+, iTunes and etc."
-msgstr "支持從各大串流平台下載字幕，例如：Disney+、HBOGO Asia、KKTV、LineTV、friDay影音、MyVideo、CatchPlay、iq.com（愛奇藝）、Viu、WeTV、NowE、Now Player、AppleTV+、iTunes等等。"
+msgid "Support downloading subtitles from multiple streaming services, such as {} ,and etc."
+msgstr "支持從各大串流平台下載字幕，例如：{} 等等。"
 
 #: subtitle_downloader.py:24
 msgid "series's/movie's url"
@@ -84,5 +84,6 @@ msgstr "\n輸入網址有誤，請檢查網址是否正確！"
 
 #: subtitle_Downloader.py:136
 msgid ""
-"Only support downloading subtitles from %s"
-msgstr "目前僅支持從 %s下載字幕，請確認網站網址無誤"
+"\n"
+"Only support downloading subtitles from %s ,and etc."
+msgstr "\n目前僅支持從 %s 下載字幕，請確認電影、影集網址無誤"

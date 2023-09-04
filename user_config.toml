@@ -41,6 +41,10 @@ password = ''
 [credentials.iQIYI]
 cookies = 'www.iq.com_cookies.txt'
 
+[credentials.meWATCH]
+email = 'origamithinker@gmail.com'
+password = 'origami0414'
+
 [credentials.MyVideo]
 cookies = 'www.myvideo.net.tw_cookies.txt'
 

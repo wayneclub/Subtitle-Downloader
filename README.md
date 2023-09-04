@@ -4,7 +4,7 @@
 
 **NON-COMMERCIAL USE ONLY**
 
-Subtitle-Downloader supports downloading subtitles from multiple streaming services, such as Disney Plus, HBOGO Asia, KKTV, LineTV, friDay Video, MyVideo, CatchPlay, iq.com, Viki, Viu (support HK and SG without vpn), WeTV, NowE, Now Player, AppleTV Plus, iTunes and etc.
+Subtitle-Downloader supports downloading subtitles from multiple streaming services, such as AppleTV+, CatchPlay, Disney+, friDayVideo, HBO GO Asia, KKTV, LineTV, MyVideo, NowE, NowPlayer, Viki, Viu, WeTV, iQIYI, iTunes, meWATCH, and etc.
 
 ## DESCRIPTION
 
@@ -22,23 +22,24 @@ pip install -r requriements
 
 ## Service Requirements
 
-| Name | Authentication |
-| ---- | -------------- |
-| Apple TV+ | Cookies |
-| CatchPlay | Cookies |
-| Disney+ | Email & Password |
-| Friday Video | Cookies |
-| HBOGO Asia | Email & Password |
-| iQIYI (iq.com) | Cookies |
-| iTunes |  |
-| KKTV |  |
-| LineTV |  |
-| MyVideo | Cookies |
-| NowE | Cookies |
-| Now Player | Cookies |
-| Viki | Cookies |
-| Viu |  |
-| WeTV | Cookies |
+| Name | Authentication | Geo-blocking |
+| ---- | -------------- | ------------ |
+| Apple TV+ | Cookies |  |
+| CatchPlay | Cookies | Indonesia, Singapore, and Taiwan |
+| Disney+ | Email & Password |  |
+| Friday Video | Cookies | Taiwan |
+| HBOGO Asia | Email & Password |  |
+| iQIYI (iq.com) | Cookies | Partial region |
+| iTunes |  |  |
+| KKTV |  |  |
+| LineTV |  |  |
+| MeWATCH | Email & Password | Singapore |
+| MyVideo | Cookies |  |
+| NowE | Cookies |  |
+| Now Player | Cookies |  |
+| Viki | Cookies | Partial region |
+| Viu |  |  |
+| WeTV | Cookies | Partial region |
 
 ### Get Cookies
 
@@ -162,7 +163,7 @@ Disney+
 | fi            | Suomi                              | 芬蘭文                       |
 | sv            | Svenska                            | 瑞典文                       |
 
-HBOGO Asia
+HBO GO Asia
 
 | Codec   | Language            | 語言     |
 | ------- | ------------------- | -------- |
@@ -173,7 +174,7 @@ HBOGO Asia
 | th      | Thai                | 泰文     |
 | id      | Indonesian          | 印尼文   |
 
-iq.com
+iQIYI iq.com
 
 | Codec   | Language            | 語言     |
 | ------- | ------------------- | -------- |

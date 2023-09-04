@@ -17,7 +17,7 @@ from time import time
 from urllib.parse import urlencode
 import orjson
 from cn2an import cn2an
-from utils.helper import get_locale, get_language_code
+from utils.helper import get_locale, get_language_code, get_all_languages
 from utils.io import download_files, rename_filename
 from utils.subtitle import convert_subtitle
 from services.service import Service
@@ -33,32 +33,6 @@ class IQIYI(Service):
     def __init__(self, args):
         super().__init__(args)
         self._ = get_locale(__name__, self.locale)
-
-    def get_all_languages(self, data):
-        """Get all subtitles language"""
-
-        if not 'stl' in data:
-            self.logger.error(
-                self._("\nSorry, there's no embedded subtitles in this video!"))
-            sys.exit(0)
-
-        available_languages = tuple(
-            [get_language_code(sub['_name']) for sub in data['stl']])
-
-        if 'all' in self.subtitle_language:
-            self.subtitle_language = available_languages
-
-        intersect = set(self.subtitle_language).intersection(
-            set(available_languages))
-
-        if not intersect:
-            self.logger.error(
-                self._("\nUnsupport %s subtitle, available languages: %s"), ", ".join(self.subtitle_language), ", ".join(available_languages))
-            sys.exit(0)
-
-        if len(intersect) != len(self.subtitle_language):
-            self.logger.error(
-                self._("\nUnsupport %s subtitle, available languages: %s"), ", ".join(set(self.subtitle_language).symmetric_difference(intersect)), ", ".join(available_languages))
 
     def get_vid(self, play_url):
         vid = ''
@@ -115,9 +89,6 @@ class IQIYI(Service):
             subtitles = []
             if 'program' in movie_data:
                 movie_data = movie_data['program']
-
-                self.get_all_languages(movie_data)
-
                 subs, lang_paths = self.get_subtitle(
                     movie_data, folder_path, filename)
                 subtitles += subs
@@ -230,9 +201,6 @@ class IQIYI(Service):
                             if 'program' in episode_data:
                                 episode_data = episode_data['program']
 
-                                self.get_all_languages(
-                                    episode_data)
-
                                 subs, lang_paths = self.get_subtitle(
                                     episode_data, folder_path, filename)
                                 subtitles += subs
@@ -303,36 +271,46 @@ class IQIYI(Service):
 
         lang_paths = set()
         subtitles = []
-        for sub in data['stl']:
-            self.logger.debug(sub)
-            sub_lang = get_language_code(sub['_name'])
-            if sub_lang in self.subtitle_language:
-                if len(self.subtitle_language) > 1:
-                    lang_folder_path = os.path.join(folder_path, sub_lang)
-                else:
-                    lang_folder_path = folder_path
-                lang_paths.add(lang_folder_path)
 
-                if 'webvtt' in sub:
-                    subtitle_link = sub['webvtt']
-                    subtitle_filename = filename.replace(
-                        '.vtt', f'.{sub_lang}.vtt')
-                else:
-                    subtitle_link = sub['xml']
-                    subtitle_filename = filename.replace(
-                        '.vtt', f'.{sub_lang}.xml')
+        if 'stl' in data:
+            available_languages = set()
+            for sub in data['stl']:
+                self.logger.debug('sub: %s', sub)
+                sub_lang = get_language_code(sub['_name'])
+                available_languages.add(sub_lang)
+                if sub_lang in self.subtitle_language:
+                    if len(self.subtitle_language) > 1:
+                        lang_folder_path = os.path.join(folder_path, sub_lang)
+                    else:
+                        lang_folder_path = folder_path
+                    lang_paths.add(lang_folder_path)
 
-                subtitle_link = self.config['api']['meta'] + \
-                    subtitle_link.replace('\\/', '/')
+                    if 'webvtt' in sub:
+                        subtitle_link = sub['webvtt']
+                        subtitle_filename = filename.replace(
+                            '.vtt', f'.{sub_lang}.vtt')
+                    else:
+                        subtitle_link = sub['xml']
+                        subtitle_filename = filename.replace(
+                            '.vtt', f'.{sub_lang}.xml')
 
-                os.makedirs(lang_folder_path,
-                            exist_ok=True)
+                    subtitle_link = self.config['api']['meta'] + \
+                        subtitle_link.replace('\\/', '/')
 
-                subtitle = dict()
-                subtitle['name'] = subtitle_filename
-                subtitle['path'] = lang_folder_path
-                subtitle['url'] = subtitle_link
-                subtitles.append(subtitle)
+                    os.makedirs(lang_folder_path,
+                                exist_ok=True)
+
+                    subtitle = dict()
+                    subtitle['name'] = subtitle_filename
+                    subtitle['path'] = lang_folder_path
+                    subtitle['url'] = subtitle_link
+                    subtitles.append(subtitle)
+
+            get_all_languages(available_languages=available_languages,
+                              subtitle_language=self.subtitle_language, locale_=self.locale)
+        else:
+            self.logger.error(
+                self._("\nSorry, there's no embedded subtitles in this video!"))
         return subtitles, lang_paths
 
     def download_subtitle(self, subtitles, languages, folder_path):

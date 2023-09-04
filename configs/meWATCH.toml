@@ -1,0 +1,12 @@
+credentials = 'email'
+device_id = '555d1165-a831-432e-88b4-667a81fc5b00'
+
+[api]
+token = 'https://www.mewatch.sg/api/authorization/anonymous?ff=idp,ldp,rpt,cd&lang=en'
+login = 'https://www.mewatch.sg/mcs-signin'
+authorization = 'https://www.mewatch.sg/api/authorization/sso/anonymous?ff=idp,ldp,rpt,cd&lang=en'
+
+movies = 'https://cdn.mewatch.sg/api/items/{conetent_id}?expand=all&ff=idp,ldp,rpt,cd&lang=en&segments=all&sub=Registered'
+series = 'https://cdn.mewatch.sg/api/items/{conetent_id}?expand=all&ff=idp,ldp,rpt,cd&lang=en&order=asc&page=1&page_size=100&segments=all&sub=Registered'
+episodes = 'https://cdn.mewatch.sg/api/items/{season_id}/children?ff=idp,ldp,rpt,cd&lang=en&order=asc&page=1&page_size=100&segments=all&sub=Registered'
+videos = 'https://www.mewatch.sg/api/account/items/{video_id}/videos?delivery=stream&ff=idp,ldp,rpt,cd&lang=en&resolution=External&segments=all&sub=Registered'

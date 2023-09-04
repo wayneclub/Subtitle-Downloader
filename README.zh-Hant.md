@@ -4,7 +4,7 @@
 
 **禁止營利使用，只限個人研究和語言學習，字幕版權皆屬原串流平台所有**
 
-Subtitle-Downloader 支持從各大串流平台下載字幕，例如：Disney Plus、HBOGO Asia、KKTV、LineTV、friDay影音、MyVideo、CatchPlay、iq.com（愛奇藝）、Viki、Viu（不需要VPN即可下載香港、新加坡地區的字幕）、WeTV、NowE、Now Player、AppleTV Plus、iTunes等等。
+Subtitle-Downloader 支持從各大串流平台下載字幕，例如：AppleTV+、CatchPlay、Disney+、friDay影音、HBO GO Asia、KKTV、LineTV、MyVideo、NowE、NowPlayer、Viki、Viu、WeTV、愛奇藝、iTunes、meWATCH 等等。
 
 ## 說明
 
@@ -22,23 +22,24 @@ pip install -r requriements
 
 ## 必要驗證資訊
 
-| Name | 驗證方式 |
-| ---- | ------- |
-| Apple TV+ | Cookies |
-| CatchPlay | Cookies |
-| Disney+ | 帳號、密碼 |
-| Friday影音 | Cookies |
-| HBOGO Asia | 帳號、密碼 |
-| 愛奇藝 (iq.com) | Cookies |
-| iTunes |  |
-| KKTV |  |
-| LineTV |  |
-| MyVideo | Cookies |
-| NowE | Cookies |
-| Now Player | Cookies |
-| Viki | Cookies |
-| Viu |  |
-| WeTV | Cookies |
+| 名稱 | 驗證方式 | 區域限制 |
+| ---- | ------- | ------ |
+| Apple TV+ | Cookies |  |
+| CatchPlay | Cookies | 印尼、新加坡、台灣 |
+| Disney+ | 帳號、密碼 |  |
+| Friday影音 | Cookies | 台灣 |
+| HBOGO Asia | 帳號、密碼 |  |
+| 愛奇藝 (iq.com) | Cookies | 部分區域 |
+| iTunes |  |  |
+| KKTV |  |  |
+| LineTV |  |  |
+| MeWATCH | 帳號、密碼 | Singapore |
+| MyVideo | Cookies |  |
+| NowE | Cookies |  |
+| Now Player | Cookies |  |
+| Viki | Cookies | 部分區域 |
+| Viu |  |  |
+| WeTV | Cookies | 部分區域 |
 
 ### 取得Cookies
 
@@ -161,7 +162,7 @@ Disney+
 | fi            | Suomi                              | 芬蘭文                       |
 | sv            | Svenska                            | 瑞典文                       |
 
-HBOGO Asia
+HBO GO Asia
 
 | Codec   | Language            | 語言     |
 | ------- | ------------------- | -------- |
@@ -172,7 +173,7 @@ HBOGO Asia
 | th      | Thai                | 泰文     |
 | id      | Indonesian          | 印尼文   |
 
-iq.com
+愛奇藝 iq.com
 
 | Codec   | Language            | 語言     |
 | ------- | ------------------- | -------- |

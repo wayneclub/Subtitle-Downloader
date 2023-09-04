@@ -2,7 +2,7 @@
 # coding: utf-8
 
 """
-This module is to download subtitle from Friday Video
+This module is to download subtitle from Viki
 """
 
 import os
@@ -21,7 +21,7 @@ from services.service import Service
 
 class Viki(Service):
     """
-    Service code for Vike streaming service (https://www.viki.com/).
+    Service code for Viki streaming service (https://www.viki.com/).
 
     Authorization: Cookies
     """

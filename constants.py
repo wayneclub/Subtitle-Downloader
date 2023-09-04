@@ -20,6 +20,7 @@ class Platform:
     ITUNES = 'iTunes'
     KKTV = 'KKTV'
     LINETV = 'LineTV'
+    MEWATCH = 'meWATCH'
     MYVIDEO = 'MyVideo'
     NOWE = 'NowE'
     NOWPLAYER = 'NowPlayer'

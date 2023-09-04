@@ -21,9 +21,12 @@ from utils.io import load_toml
 def main() -> None:
     _ = get_locale('main')
 
+    support_services = ', '.join(sorted([v for k, v in Platform.__dict__.items()
+                                         if not k.startswith("__")]))
+
     parser = argparse.ArgumentParser(
-        description=_(
-            "Support downloading subtitles from multiple streaming services, such as Disney+, HBOGO Asia, KKTV, LineTV, friDay Video, MyVideo, CatchPlay, iq.com, Viu (support HK and SG without vpn), WeTV, NowE, Now Player, AppleTV+, iTunes and etc."),
+        description=_("Support downloading subtitles from multiple streaming services, such as {} ,and etc.").format(
+            support_services),
         add_help=False)
     parser.add_argument('url',
                         help=_("series's/movie's url"))
@@ -142,8 +145,7 @@ def main() -> None:
         service['class'](args).main()
     else:
         logging.warning(
-            _("\nOnly support downloading subtitles from %s"), ', '.join(sorted([v for k, v in Platform.__dict__.items()
-                                                                                 if not k.startswith("__")])))
+            _("\nOnly support downloading subtitles from %s ,and etc."), support_services)
         sys.exit(1)
 
     logging.info("\n%s took %s seconds", app_name,

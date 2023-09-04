@@ -11,6 +11,7 @@ from services.linetv import LineTV
 from services.fridayvideo import FridayVideo
 from services.catchplay import CatchPlay
 from services.iqiyi.iqiyi import IQIYI
+from services.mewatch import MeWatch
 from services.myvideo import MyVideo
 from services.nowplayer import NowPlayer
 from services.wetv.wetv import WeTV
@@ -67,6 +68,11 @@ service_map = [
         'name': Platform.LINETV,
         'class': LineTV,
         'keyword': 'linetv.tw'
+    },
+    {
+        'name': Platform.MEWATCH,
+        'class': MeWatch,
+        'keyword': 'mewatch.sg'
     },
     {
         'name': Platform.MYVIDEO,

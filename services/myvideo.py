@@ -8,7 +8,6 @@ This module is to download subtitle from MyVideo
 import base64
 import os
 import re
-import shutil
 import sys
 import time
 from bs4 import BeautifulSoup
