@@ -25,6 +25,8 @@ class NowPlayer(Service):
     Authorization: Cookies
     """
 
+    GEOFENCE = ['hk']
+
     def __init__(self, args):
         super().__init__(args)
         self._ = get_locale(__name__, self.locale)

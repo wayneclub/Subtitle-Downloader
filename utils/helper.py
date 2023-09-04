@@ -141,9 +141,7 @@ def check_url_exist(url, headers=None):
                 url, headers=headers, timeout=10)
             if response.ok:
                 return True
-            else:
-                logger.error(
-                    "Failure - API is accessible but sth is not right. Response codde : %s", response.status_code)
+
         except (requests.exceptions.HTTPError, requests.exceptions.ConnectionError) as error:
             logger.error(
                 "Failure - Unable to establish connection: %s.", error)

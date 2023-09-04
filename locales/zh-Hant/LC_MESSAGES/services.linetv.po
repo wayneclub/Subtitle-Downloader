@@ -49,3 +49,9 @@ msgstr "\n第 %s 季 共有：%s 集\t下載全集\n----------------------------
 #, python-format
 msgid "%s\t...free user will be available on %s"
 msgstr "%s\t...一般用戶於%s開啟"
+
+#: services/linetv.py:234
+msgid ""
+"\n"
+"Sorry, there's no embedded subtitles in this video!"
+msgstr "\n抱歉，此劇只有硬字幕，可去其他串流平台查看"

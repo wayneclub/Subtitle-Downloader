@@ -98,6 +98,10 @@ class LineTV(Service):
                                                     '%Y-%m-%d', localtime(int(episode['free_date'])/1000))
                                                 self.logger.info(
                                                     self._("%s\t...free user will be available on %s"), filename, free_date)
+                                            else:
+                                                self.logger.error(
+                                                    self._("\nSorry, there's no embedded subtitles in this video!"))
+                                                break
 
                                 os.makedirs(folder_path, exist_ok=True)
                                 subtitle = dict()
