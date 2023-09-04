@@ -35,7 +35,7 @@ pip install -r requriements
 | KKTV |  |  |
 | LINE TV |  |  |
 | MeWATCH | Email & Password | Singapore |
-| MyVideo | Cookies |  |
+| MyVideo | Cookies | Taiwan |
 | NowE | Cookies |  |
 | Now Player | Cookies |  |
 | Viki | Cookies | Partial region |

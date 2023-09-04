@@ -86,11 +86,11 @@ class Login(object):
             sys.exit(1)
         else:
             try:
-                self.logger.error("Error: %s", res.json()[
+                self.logger.error("\nError: %s", res.json()[
                                   'errors']['error_description'])
                 sys.exit(0)
             except Exception:
-                self.logger.error("Error: %s", res.text)
+                self.logger.error("\nError: %s", res.text)
                 sys.exit(0)
 
     def login(self, access_token):
@@ -115,10 +115,10 @@ class Login(object):
             return id_token
 
         try:
-            self.logger.error("Error: %s", res.json()['errors'])
+            self.logger.error("\nError: %s", res.json()['errors'])
             sys.exit(0)
         except Exception:
-            self.logger.error("Error: %s", res.text)
+            self.logger.error("\nError: %s", res.text)
             sys.exit(0)
 
     def grant(self, id_token, access_token):
@@ -171,10 +171,10 @@ class Login(object):
             # return access_token
             return access_token, refresh_token
         try:
-            self.logger.error("Error: %s", res.json()['errors'])
+            self.logger.error("\nError: %s", res.json()['errors'])
             sys.exit(0)
         except Exception:
-            self.logger.error("Error: %s", res.text)
+            self.logger.error("\nError: %s", res.text)
             sys.exit(0)
 
     def get_profile_name(self, client_id, token):

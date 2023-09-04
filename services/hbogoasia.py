@@ -93,7 +93,8 @@ class HBOGOAsia(Service):
                 self._("\nSuccessfully logged in. Welcome %s!"), user_name.strip())
         else:
             error = res.json()
-            self.logger.error("Error: %s %s", error['code'], error['message'])
+            self.logger.error("\nError: %s %s",
+                              error['code'], error['message'])
             sys.exit(1)
 
     def remove_device(self):
@@ -257,7 +258,8 @@ class HBOGOAsia(Service):
             return subtitles, lang_paths
         else:
             error = res.json()
-            self.logger.error("Error: %s %s", error['code'], error['message'])
+            self.logger.error("\nError: %s %s",
+                              error['code'], error['message'])
             self.remove_device()
             sys.exit(1)
 

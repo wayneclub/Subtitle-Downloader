@@ -161,7 +161,7 @@ class CatchPlay(Service):
                     Path(config.directories['cookies']) / credentials[self.platform]['cookies'])
             else:
                 self.logger.error(
-                    "Error: %s", error_msg)
+                    "\nError: %s", error_msg)
 
             return None
 

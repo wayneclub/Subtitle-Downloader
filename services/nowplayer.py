@@ -156,7 +156,7 @@ class NowPlayer(Service):
                         Path(config.directories['cookies']) / credentials[self.platform]['cookies'])
                     sys.exit(1)
                 else:
-                    self.logger.error("Error: %s", data.get('responseCode'))
+                    self.logger.error("\nError: %s", data.get('responseCode'))
                     sys.exit(1)
         else:
             self.logger.error(self._("Failed to get tracks: %s"), res.text)

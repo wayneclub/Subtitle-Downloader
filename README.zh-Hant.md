@@ -34,7 +34,7 @@ pip install -r requriements
 | KKTV |  |  |
 | LINE TV |  |  |
 | MeWATCH | 帳號、密碼 | Singapore |
-| MyVideo | Cookies |  |
+| MyVideo | Cookies | 台灣 |
 | NowE | Cookies |  |
 | Now Player | Cookies |  |
 | Viki | Cookies | 部分區域 |

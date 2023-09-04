@@ -194,7 +194,7 @@ class NowE(Service):
                     self.logger.error(
                         self._("\nPlease check your subscription plan, and make sure you are able to watch it online!"))
                 else:
-                    self.logger.error("Error: %s", data['responseCode'])
+                    self.logger.error("\nError: %s", data['responseCode'])
                 sys.exit(1)
 
             self.logger.debug("media_info: %s", data)

@@ -25,6 +25,7 @@ class MyVideo(Service):
 
     Authorization: Cookies
     """
+    GEOFENCE = ['tw']
 
     def __init__(self, args):
         super().__init__(args)

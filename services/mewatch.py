@@ -238,6 +238,7 @@ class MeWatch(Service):
         if res.ok:
             data = res.json()
             self.logger.debug(data)
+            self.logger.info(self._("\nSuccessfully logged in. Welcome!"))
             return data['token']
         else:
             self.logger.error(res.text)

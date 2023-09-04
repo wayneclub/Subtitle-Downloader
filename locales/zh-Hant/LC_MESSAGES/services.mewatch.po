@@ -56,3 +56,10 @@ msgid ""
 "\n"
 "Unsupport %s subtitle, available languages: %s"
 msgstr "\n未提供%s的字幕，支援語言：%s"
+
+#: services/disneyplus/mewatch.py:212
+#, python-format
+msgid ""
+"\n"
+"Successfully logged in. Welcome!"
+msgstr "\n登入成功，歡迎！"
