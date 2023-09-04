@@ -288,3 +288,8 @@ python subtitle_downloader.py URL -s 1 -sf .ass
 
 - 下載字幕過程中若出現任何問題，請上傳截圖和日誌文件（請提供下載的連結、平台和是否使用vpn跨區下載）。
 - 回報問題前，請先確保影片有外掛字幕（字幕可關閉）並且可以在您所在的地區正常播放。
+
+# 附錄
+
+- Netflix: [Netflix subtitle downloader](https://greasyfork.org/en/scripts/26654-netflix-subtitle-downloader)
+- Amazon (Prime Video): [Amazon subtitle downloader](https://greasyfork.org/en/scripts/34885-amazon-video-subtitle-downloader/feedback)

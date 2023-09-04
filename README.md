@@ -290,3 +290,9 @@ python subtitle_downloader.py URL -s 1 -sf .ass
 
 - Any issue during downloading subtitles, upload the screenshot and log file (Please provide title, platform and region).
 - Make sure the video contains embedded subtitles (subtitles able to turn on-off) and it is playable in your region.
+
+
+# Appendix
+
+- Netflix: [Netflix subtitle downloader](https://greasyfork.org/en/scripts/26654-netflix-subtitle-downloader)
+- Amazon (Prime Video): [Amazon subtitle downloader](https://greasyfork.org/en/scripts/34885-amazon-video-subtitle-downloader/feedback)
