@@ -4,7 +4,8 @@
 
 **NON-COMMERCIAL USE ONLY**
 
-Subtitle-Downloader supports downloading subtitles from multiple streaming services, such as AppleTV+, CatchPlay, Disney+, friDayVideo, HBO GO Asia, KKTV, LineTV, MyVideo, NowE, NowPlayer, Viki, Viu, WeTV, iQIYI, iTunes, meWATCH, and etc.
+Subtitle-Downloader supports downloading subtitles from multiple streaming services, such as Apple TV+, CatchPlay, Disney+, FridayVideo, HBO GO Asia, iQIYI, iTunes, KKTV, LINE TV,
+meWATCH, MyVideo, NowE, NowPlayer, Viki, Viu, WeTV, and etc.
 
 ## DESCRIPTION
 
@@ -28,11 +29,11 @@ pip install -r requriements
 | CatchPlay | Cookies | Indonesia, Singapore, and Taiwan |
 | Disney+ | Email & Password |  |
 | Friday Video | Cookies | Taiwan |
-| HBOGO Asia | Email & Password |  |
+| HBO GO Asia | Email & Password |  |
 | iQIYI (iq.com) | Cookies | Partial region |
 | iTunes |  |  |
 | KKTV |  |  |
-| LineTV |  |  |
+| LINE TV |  |  |
 | MeWATCH | Email & Password | Singapore |
 | MyVideo | Cookies |  |
 | NowE | Cookies |  |

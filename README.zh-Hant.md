@@ -4,7 +4,7 @@
 
 **禁止營利使用，只限個人研究和語言學習，字幕版權皆屬原串流平台所有**
 
-Subtitle-Downloader 支持從各大串流平台下載字幕，例如：AppleTV+、CatchPlay、Disney+、friDay影音、HBO GO Asia、KKTV、LineTV、MyVideo、NowE、NowPlayer、Viki、Viu、WeTV、愛奇藝、iTunes、meWATCH 等等。
+Subtitle-Downloader 支持從各大串流平台下載字幕，例如：Apple TV+、CatchPlay、Disney+、friDay影音、HBO GO Asia、愛奇藝、iTunes、KKTV、LINE TV、meWATCH、MyVideo、NowE、NowPlayer、Viki、Viu、WeTV 等等。
 
 ## 說明
 
@@ -27,12 +27,12 @@ pip install -r requriements
 | Apple TV+ | Cookies |  |
 | CatchPlay | Cookies | 印尼、新加坡、台灣 |
 | Disney+ | 帳號、密碼 |  |
-| Friday影音 | Cookies | 台灣 |
-| HBOGO Asia | 帳號、密碼 |  |
+| friDay影音 | Cookies | 台灣 |
+| HBO GO Asia | 帳號、密碼 |  |
 | 愛奇藝 (iq.com) | Cookies | 部分區域 |
 | iTunes |  |  |
 | KKTV |  |  |
-| LineTV |  |  |
+| LINE TV |  |  |
 | MeWATCH | 帳號、密碼 | Singapore |
 | MyVideo | Cookies |  |
 | NowE | Cookies |  |

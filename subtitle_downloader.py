@@ -22,7 +22,7 @@ def main() -> None:
     _ = get_locale('main')
 
     support_services = ', '.join(sorted([v for k, v in Platform.__dict__.items()
-                                         if not k.startswith("__")]))
+                                         if not k.startswith("__")], key=str.lower))
 
     parser = argparse.ArgumentParser(
         description=_("Support downloading subtitles from multiple streaming services, such as {} ,and etc.").format(
