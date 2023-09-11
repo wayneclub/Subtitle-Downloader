@@ -326,7 +326,13 @@ class FridayVideo(Service):
         self.fet_monitor(self.monitor_url)
 
         if res.ok:
-            try:
+            if '/pkmslogout' in res.text:
+                    self.logger.info(
+                        "\nCookies is expired!\nPlease log out (https://video.friday.tw/logout), login, and re-download cookies!")
+                    os.remove(
+                        Path(config.directories['cookies']) / credentials[self.platform]['cookies'])
+                    sys.exit(1)
+            else:
                 data = res.json()
                 if data.get('data'):
                     data = data['data']['content']
@@ -338,12 +344,5 @@ class FridayVideo(Service):
                     self.movie_metadata(data)
                 else:
                     self.series_metadata(data)
-            except JSONDecodeError:
-                if '/pkmslogout' in res.text:
-                    self.logger.info(
-                        "\nCookies is expired!\nPlease log out (https://video.friday.tw/logout), login, and re-download cookies!")
-                    os.remove(
-                        Path(config.directories['cookies']) / credentials[self.platform]['cookies'])
-                    sys.exit(1)
         else:
             self.logger.error(res.text)

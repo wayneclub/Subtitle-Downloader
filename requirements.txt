@@ -8,13 +8,13 @@ pysubs2
 requests
 tqdm
 selenium
-chromedriver-autoinstaller
 cn2an
 tmdbv3api
 opencc
 rtoml
 validators
 pwinput
+yt-dlp
 
 # XstreamDL_CLI
 
