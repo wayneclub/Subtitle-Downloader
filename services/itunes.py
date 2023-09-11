@@ -15,10 +15,10 @@ from configs.config import user_agent
 from utils.io import rename_filename, download_files
 from utils.helper import get_locale
 from utils.subtitle import convert_subtitle, merge_subtitle_fragments
-from services.service import Service
+from services.baseservice import BaseService
 
 
-class iTunes(Service):
+class iTunes(BaseService):
     """
     Service code for iTunes streaming service (https://itunes.apple.com/).
 

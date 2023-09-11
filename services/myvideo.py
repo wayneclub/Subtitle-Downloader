@@ -16,10 +16,10 @@ import orjson
 from utils.io import rename_filename, download_files
 from utils.helper import get_locale, get_language_code
 from utils.subtitle import convert_subtitle
-from services.service import Service
+from services.baseservice import BaseService
 
 
-class MyVideo(Service):
+class MyVideo(BaseService):
     """
     Service code for MyVideo streaming service (https://www.myvideo.net.tw/).
 

@@ -16,10 +16,10 @@ from cn2an import cn2an
 from utils.io import rename_filename, download_files
 from utils.helper import get_locale, check_url_exist
 from utils.subtitle import convert_subtitle
-from services.service import Service
+from services.baseservice import BaseService
 
 
-class LineTV(Service):
+class LineTV(BaseService):
     """
     Service code for Line TV streaming service (https://www.linetv.tw/).
 

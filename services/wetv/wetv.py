@@ -19,11 +19,11 @@ from configs.config import user_agent
 from utils.io import rename_filename, download_files
 from utils.helper import get_locale, get_language_code, get_all_languages
 from utils.subtitle import convert_subtitle
-from services.service import Service
+from services.baseservice import BaseService
 from services.wetv.ckey import CKey
 
 
-class WeTV(Service):
+class WeTV(BaseService):
     """
     Service code for WeTV streaming service (https://wetv.vip/).
 

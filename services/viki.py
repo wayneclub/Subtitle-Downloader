@@ -16,10 +16,10 @@ from configs.config import config, credentials, user_agent
 from utils.io import rename_filename, download_files
 from utils.helper import get_all_languages, get_locale, get_language_code
 from utils.subtitle import convert_subtitle
-from services.service import Service
+from services.baseservice import BaseService
 
 
-class Viki(Service):
+class Viki(BaseService):
     """
     Service code for Viki streaming service (https://www.viki.com/).
 

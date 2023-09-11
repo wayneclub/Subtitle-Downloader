@@ -12,7 +12,7 @@ import os
 import sys
 import validators
 from configs.config import config, app_name, __version__, filenames
-from constants import Platform
+from constants import Service
 from services import service_map
 from utils.helper import get_locale
 from utils.io import load_toml
@@ -21,7 +21,7 @@ from utils.io import load_toml
 def main() -> None:
     _ = get_locale('main')
 
-    support_services = ', '.join(sorted([v for k, v in Platform.__dict__.items()
+    support_services = ', '.join(sorted([v for k, v in Service.__dict__.items()
                                          if not k.startswith("__")], key=str.lower))
 
     parser = argparse.ArgumentParser(

@@ -15,10 +15,10 @@ from configs.config import user_agent
 from utils.io import rename_filename, download_files
 from utils.helper import get_all_languages, get_locale, get_language_code
 from utils.subtitle import convert_subtitle, merge_subtitle_fragments
-from services.service import Service
+from services.baseservice import BaseService
 
 
-class Viu(Service):
+class Viu(BaseService):
     """
     Service code for Viu streaming service (https://www.viu.com/).
 

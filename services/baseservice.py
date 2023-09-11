@@ -2,7 +2,7 @@
 # coding: utf-8
 
 """
-This module is default service
+This module is base service
 """
 from __future__ import annotations
 import html
@@ -26,7 +26,7 @@ from utils.helper import EpisodesNumbersHandler
 urllib3.disable_warnings()
 
 
-class Service(object):
+class BaseService(object):
     """
     BaseService
     """
@@ -109,7 +109,7 @@ class Service(object):
     def validate_config(self, service_config):
         """ Validate service config """
 
-        if 'cookies' in service_config.get('credentials'):
+        if service_config and 'cookies' in service_config.get('credentials'):
             if credentials[self.platform].get('cookies'):
                 self.cookies = self.get_cookie_jar(
                     service_config.get('required'))
@@ -118,7 +118,7 @@ class Service(object):
                                   self.platform, filenames.root_config)
                 sys.exit(1)
 
-        if 'email' in service_config.get('credentials'):
+        if service_config and 'email' in service_config.get('credentials'):
             if not credentials[self.platform].get('email') and not credentials[self.platform].get('password'):
                 credentials[self.platform]['email'] = input("Email: ").strip()
                 credentials[self.platform]['password'] = pwinput().strip()

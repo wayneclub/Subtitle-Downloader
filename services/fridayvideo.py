@@ -15,10 +15,10 @@ from configs.config import config, credentials, user_agent
 from utils.io import rename_filename, download_files
 from utils.helper import get_locale, get_language_code
 from utils.subtitle import convert_subtitle
-from services.service import Service
+from services.baseservice import BaseService
 
 
-class FridayVideo(Service):
+class FridayVideo(BaseService):
     """
     Service code for Friday Video streaming service (https://video.friday.tw).
 
@@ -327,11 +327,11 @@ class FridayVideo(Service):
 
         if res.ok:
             if '/pkmslogout' in res.text:
-                    self.logger.info(
-                        "\nCookies is expired!\nPlease log out (https://video.friday.tw/logout), login, and re-download cookies!")
-                    os.remove(
-                        Path(config.directories['cookies']) / credentials[self.platform]['cookies'])
-                    sys.exit(1)
+                self.logger.info(
+                    "\nCookies is expired!\nPlease log out (https://video.friday.tw/logout), login, and re-download cookies!")
+                os.remove(
+                    Path(config.directories['cookies']) / credentials[self.platform]['cookies'])
+                sys.exit(1)
             else:
                 data = res.json()
                 if data.get('data'):

@@ -16,5 +16,4 @@ cookies/*_cookies.txt
 *.html
 test.py
 .vscode/
-raw.json
-test.json
+*.json

@@ -17,10 +17,10 @@ from configs.config import config, credentials, user_agent
 from utils.helper import get_locale
 from utils.io import rename_filename
 from utils.subtitle import convert_subtitle
-from services.service import Service
+from services.baseservice import BaseService
 
 
-class NowE(Service):
+class NowE(BaseService):
     """
     Service code for Now E streaming service (https://www.nowe.com/).
 

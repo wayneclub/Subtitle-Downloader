@@ -20,10 +20,10 @@ from cn2an import cn2an
 from utils.helper import get_locale, get_language_code, get_all_languages
 from utils.io import download_files, rename_filename
 from utils.subtitle import convert_subtitle
-from services.service import Service
+from services.baseservice import BaseService
 
 
-class IQIYI(Service):
+class IQIYI(BaseService):
     """
     Service code for iQIYI streaming service (https://www.iq.com/).
 

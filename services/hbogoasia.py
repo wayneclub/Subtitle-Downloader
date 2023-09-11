@@ -17,14 +17,14 @@ from configs.config import credentials
 from utils.io import rename_filename, download_files
 from utils.helper import get_language_code, get_locale, get_all_languages
 from utils.subtitle import convert_subtitle
-from services.service import Service
+from services.baseservice import BaseService
 
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 
 
-class HBOGOAsia(Service):
+class HBOGOAsia(BaseService):
     """
     Service code for HBOGO Asia streaming service (https://www.hbogoasia.xx).
 

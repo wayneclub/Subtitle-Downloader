@@ -20,3 +20,4 @@ Subtitle-Downloader:
 	msgfmt -o locales/zh-Hant/LC_MESSAGES/services.nowplayer.mo locales/zh-Hant/LC_MESSAGES/services.nowplayer
 	msgfmt -o locales/zh-Hant/LC_MESSAGES/services.viki.mo locales/zh-Hant/LC_MESSAGES/services.viki
 	msgfmt -o locales/zh-Hant/LC_MESSAGES/services.mewatch.mo locales/zh-Hant/LC_MESSAGES/services.mewatch
+	msgfmt -o locales/zh-Hant/LC_MESSAGES/services.youtube.mo locales/zh-Hant/LC_MESSAGES/services.youtube

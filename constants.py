@@ -6,7 +6,7 @@ This module is for constants
 """
 
 
-class Platform:
+class Service:
     """
     Define all streaming services name
     """
@@ -27,6 +27,7 @@ class Platform:
     VIKI = 'Viki'
     VIU = 'Viu'
     WETV = 'WeTV'
+    YOUTUBE = 'YouTube'
 
 
 SUBTITLE_FORMAT = ['.srt', '.ass', '.ssa', '.vtt', '.xml']

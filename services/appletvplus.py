@@ -19,10 +19,10 @@ from configs.config import user_agent
 from utils.io import rename_filename, download_files
 from utils.helper import get_all_languages, get_language_code, get_locale
 from utils.subtitle import convert_subtitle, merge_subtitle_fragments
-from services.service import Service
+from services.baseservice import BaseService
 
 
-class AppleTVPlus(Service):
+class AppleTVPlus(BaseService):
     """
     Service code for Apple's TV Plus streaming service (https://tv.apple.com).
 

@@ -5,7 +5,7 @@
 **NON-COMMERCIAL USE ONLY**
 
 Subtitle-Downloader supports downloading subtitles from multiple streaming services, such as Apple TV+, CatchPlay, Disney+, FridayVideo, HBO GO Asia, iQIYI, iTunes, KKTV, LINE TV,
-meWATCH, MyVideo, NowE, NowPlayer, Viki, Viu, WeTV, and etc.
+meWATCH, MyVideo, NowE, NowPlayer, Viki, Viu, WeTV, YouTube, and etc.
 
 ## DESCRIPTION
 
@@ -41,6 +41,7 @@ pip install -r requriements
 | Viki | Cookies | Partial region |
 | Viu |  |  |
 | WeTV | Cookies | Partial region |
+| YouTube | Cookies (Subscribe channel) |  |
 
 ### Get Cookies
 

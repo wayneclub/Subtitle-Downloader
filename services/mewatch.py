@@ -12,10 +12,10 @@ from configs.config import credentials, user_agent
 from utils.io import rename_filename, download_files
 from utils.helper import get_all_languages, get_locale, get_language_code
 from utils.subtitle import convert_subtitle
-from services.service import Service
+from services.baseservice import BaseService
 
 
-class MeWatch(Service):
+class MeWatch(BaseService):
     """
     Service code for meWATCH streaming service (https://www.mewatch.sg/).
 

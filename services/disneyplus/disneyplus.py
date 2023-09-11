@@ -16,10 +16,10 @@ from utils.helper import get_all_languages, get_locale
 from utils.io import rename_filename, download_files, download_audio
 from utils.subtitle import convert_subtitle, merge_subtitle_fragments
 from services.disneyplus.disneyplus_login import Login
-from services.service import Service
+from services.baseservice import BaseService
 
 
-class DisneyPlus(Service):
+class DisneyPlus(BaseService):
     """
     Service code for DisneyPlus streaming service (https://www.disneyplus.com).
 

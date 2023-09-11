@@ -4,7 +4,7 @@
 
 **禁止營利使用，只限個人研究和語言學習，字幕版權皆屬原串流平台所有**
 
-Subtitle-Downloader 支持從各大串流平台下載字幕，例如：Apple TV+、CatchPlay、Disney+、friDay影音、HBO GO Asia、愛奇藝、iTunes、KKTV、LINE TV、meWATCH、MyVideo、NowE、NowPlayer、Viki、Viu、WeTV 等等。
+Subtitle-Downloader 支持從各大串流平台下載字幕，例如：Apple TV+、CatchPlay、Disney+、friDay影音、HBO GO Asia、愛奇藝、iTunes、KKTV、LINE TV、meWATCH、MyVideo、NowE、NowPlayer、Viki、Viu、WeTV、YouTube 等等。
 
 ## 說明
 
@@ -40,6 +40,7 @@ pip install -r requriements
 | Viki | Cookies | 部分區域 |
 | Viu |  |  |
 | WeTV | Cookies | 部分區域 |
+| YouTube | Cookies（訂閱頻道） |  |
 
 ### 取得Cookies
 
