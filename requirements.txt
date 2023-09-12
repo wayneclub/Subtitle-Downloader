@@ -7,7 +7,6 @@ orjson
 pysubs2
 requests
 tqdm
-selenium
 cn2an
 tmdbv3api
 opencc

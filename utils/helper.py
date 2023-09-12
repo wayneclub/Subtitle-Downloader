@@ -12,8 +12,6 @@ import re
 import sys
 from natsort import natsorted
 import requests
-from selenium import webdriver
-import chromedriver_autoinstaller
 import validators
 from configs.config import user_agent
 from constants import ISO_6391
@@ -149,65 +147,6 @@ def check_url_exist(url, headers=None):
             logger.error("Failure - Unknown error occurred: %s.", error)
 
     return False
-
-
-def driver_init(headless=True):
-    """Initial selenium"""
-
-    kill_process()
-    options = webdriver.ChromeOptions()
-    if headless:
-        options.add_argument('--headless')
-    options.add_argument('window-size=1280,800')
-    options.add_argument('--no-sandbox')
-    options.add_argument('--disable-dev-shm-usage')
-    options.add_argument('--disable-gpu')
-    options.add_argument('--log-level=3')
-    options.add_argument("--mute-audio")
-    options.add_argument('--autoplay-policy=no-user-gesture-required')
-    options.add_argument('--lang=zh-TW')
-    options.add_argument('--blink-settings=imagesEnabled=false')
-    options.add_argument("disable-infobars")
-    options.add_argument("--disable-extensions")
-    prefs = {'intl.accept_languages': 'zh,zh_TW',
-             'credentials_enable_service': False, 'profile.password_manager_enabled': False,
-             'profile.default_content_setting_values': {'images': 2, 'plugins': 2, 'popups': 2, 'geolocation': 2, 'notifications': 2}}
-    options.add_experimental_option('prefs', prefs)
-    options.add_experimental_option(
-        'excludeSwitches', ['enable-automation'])
-    chromedriver_autoinstaller.install()
-    driver = webdriver.Chrome('chromedriver', options=options)
-    driver.execute_cdp_cmd('Network.setUserAgentOverride', {
-                           "userAgent": user_agent})
-    # driver.set_page_load_timeout(3000)
-    return driver
-
-
-def get_network_url(driver, search_url, lang=""):
-    """Get url from network"""
-
-    _ = get_locale(__name__, lang)
-    url = ''
-    delay = 0
-    logs = tuple()
-    while not url:
-        logs += tuple(driver.execute_script(
-            "return window.performance.getEntries();"))
-
-        url = next((log['name'] for log in logs
-                    if re.search(search_url, log['name'])), None)
-        delay += 1
-
-        if delay > 60:
-            logger.error(_("\nTimeout, please retry."))
-            sys.exit(1)
-    return url
-
-
-def kill_process():
-    """Kill process"""
-
-    os.system('killall chromedriver > /dev/null 2>&1')
 
 
 if __name__:

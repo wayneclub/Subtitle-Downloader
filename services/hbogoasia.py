@@ -19,10 +19,6 @@ from utils.helper import get_language_code, get_locale, get_all_languages
 from utils.subtitle import convert_subtitle
 from services.baseservice import BaseService
 
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.common.by import By
-
 
 class HBOGOAsia(BaseService):
     """
@@ -275,27 +271,6 @@ class HBOGOAsia(BaseService):
 
     def main(self):
         self.get_territory()
-
-        # nowe
-        # driver = driver_init(False)
-        # nowe_login = 'https://signin.nowe.com/ottidform/landing?lang=zh&template=HBO&redirect=https%3A%2F%2Fsaml.nowe.com%2Fidp_hbo%2Fgenerateresponseprepareforlogin%3Frequest_id%3DbKj2m8rsSyTAvkvjI5kUUGAw39nHhdv4sswc%21KjMADv9OtAMTtAapFss9qcjIcnn%26request_issuer%3DkOtAqX%21uHX0PC%212zarYbeWxtT4E-XWJzM90VvcgjJ3qTVvCv65FB2nEAVkP7Bg69%26request_issuerTime%3DoK1CXyT-lKroIfEUjA5EOg..%26RelayState%3DW-dZed54pHrrTr9jXdq6Fni6z6MVm9vZwEmEmXeDJsw.'
-        # driver.get(nowe_login)
-        # email = self.username
-        # password = self.password
-
-        # wait = WebDriverWait(driver, 10)
-        # wait.until(EC.visibility_of_element_located(
-        #     (By.ID, "psdInput"))).send_keys(email)
-
-        # wait.until(EC.element_to_be_clickable(
-        #     (By.ID, "confirmBtn"))).click()
-
-        # wait.until(EC.visibility_of_element_located(
-        #     (By.ID, "psdInput"))).send_keys(password)
-
-        # wait.until(EC.element_to_be_clickable(
-        #     (By.ID, "confirmBtn"))).click()
-        # driver.quit()
 
         self.login()
         if '/sr' in self.url:
