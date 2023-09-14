@@ -292,6 +292,11 @@ python subtitle_downloader.py URL -s 1 -sf .ass
 - Any issue during downloading subtitles, upload the screenshot and log file (Please provide title, platform and region).
 - Make sure the video contains embedded subtitles (subtitles able to turn on-off) and it is playable in your region.
 
+## Support & Contributions
+- Please ⭐️ this repository if this project helped you!
+- Contributions of any kind welcome!
+
+ <a href="https://www.buymeacoffee.com/wayneclub" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/black_img.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
 
 ## Appendix
 
