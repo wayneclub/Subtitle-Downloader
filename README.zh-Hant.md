@@ -290,6 +290,13 @@ python subtitle_downloader.py URL -s 1 -sf .ass
 - 下載字幕過程中若出現任何問題，請上傳截圖和日誌文件（請提供下載的連結、平台和是否使用vpn跨區下載）。
 - 回報問題前，請先確保影片有外掛字幕（字幕可關閉）並且可以在您所在的地區正常播放。
 
+## 支持與貢獻
+
+- 如果這個專案對您有幫助，請給我個⭐️！
+- 歡迎任何形式的貢獻！
+
+ <a href="https://www.buymeacoffee.com/wayneclub" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/black_img.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
+
 ## 附錄
 
 - Netflix: [Netflix subtitle downloader](https://greasyfork.org/en/scripts/26654-netflix-subtitle-downloader)
