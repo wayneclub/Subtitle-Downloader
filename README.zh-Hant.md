@@ -1,14 +1,14 @@
-# Subtitle Downloader
+# 字幕下載器
 
 [![en](https://img.shields.io/badge/lang-English-blue)](https://github.com/wayneclub/Subtitle-Downloader/blob/main/README.md) [![python](https://img.shields.io/badge/python-3.8-blue)](https://www.python.org/downloads/)
 
 **禁止營利使用，只限個人研究和語言學習，字幕版權皆屬原串流平台所有**
 
-Subtitle-Downloader 支持從各大串流平台下載字幕，例如：Apple TV+、CatchPlay、Disney+、friDay影音、HBO GO Asia、愛奇藝、iTunes、KKTV、LINE TV、meWATCH、MyVideo、NowE、NowPlayer、Viki、Viu、WeTV、YouTube 等等。
+字幕下載器支持從各大串流平台下載字幕，例如：Apple TV+、CatchPlay、Disney+、friDay影音、HBO GO Asia、愛奇藝、iTunes、KKTV、LINE TV、meWATCH、MyVideo、NowE、NowPlayer、Viki、Viu、WeTV、YouTube 等等。
 
 ## 說明
 
-Subtitle-Downloader 是一個方便您從各大串流平台上下載字幕的程式。需要安裝 [Python 3.8](https://www.python.org/downloads/)以上的版本和 [NodeJS](https://nodejs.org/en/download)，可以在 Linux、Windows 或 macOS 上執行。
+字幕下載器是一個方便您從各大串流平台上下載字幕的程式。需要安裝 [Python 3.8](https://www.python.org/downloads/)以上的版本和 [NodeJS](https://nodejs.org/en/download)，可以在 Linux、Windows 或 macOS 上執行。
 
 ## 安裝方式
 
