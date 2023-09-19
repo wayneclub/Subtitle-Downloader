@@ -9,7 +9,7 @@ meWATCH, MyVideo, NowE, NowPlayer, Viki, Viu, WeTV, YouTube, and etc.
 
 ## DESCRIPTION
 
-Subtitle-Downloader is a command-line program to download subtitles from the most popular streaming platform. It requires [Python 3.8+](https://www.python.org/downloads/), and [NodeJS](https://nodejs.org/en/download). It should work on Linux, on Windows or on macOS. This project is only for personal research and language learning.
+Subtitle-Downloader is a command-line program to download subtitles from the most popular streaming platform. It requires **[Python 3.8+](https://www.python.org/downloads/)**, and **[NodeJS](https://nodejs.org/en/download)**. It should work on Linux, on Windows or on macOS. This project is only for personal research and language learning.
 
 ## INSTALLATION
 
@@ -132,88 +132,88 @@ pip install -r requriements
 
 Disney+
 
-| Codec         | Language                           | 語言                         |
-| ------------- | ---------------------------------- | ---------------------------- |
-| en            | English [CC]                       | 英文                         |
-| zh-Hant       | Chinese (Traditional)              | 台繁                         |
-| zh-Hans       | Chinese (Simplified)               | 簡中                         |
-| zh-HK         | Cantonese                          | 港繁                         |
-| da            | Dansk                              | 丹麥文                       |
-| de            | Deutsch                            | 德文                         |
-| de-forced     | Deutsch [forced]                   | 德文 [強制軌]                |
-| es-ES         | Español                            | 西班牙文                     |
-| es-ES-forced  | Español [forced]                   | 西班牙文 [強制軌]            |
-| es-419        | Español (Latinoamericano)          | 西班牙文（拉丁美洲）         |
-| es-419-forced | Español (Latinoamericano) [forced] | 西班牙文（拉丁美洲）[強制軌] |
-| fr-FR         | Français                           | 法文                         |
-| fr-FR-forced  | Français [forced]                  | 法文 [強制軌]                |
-| fr-CA         | Français (Canadien)                | 法文（加拿大）               |
-| fr-CA-forced  | Français (Canadien) [forced]       | 法文（加拿大）[強制軌]       |
-| it            | Italiano                           | 義大利文                     |
-| it-forced     | Italiano [forced]                  | 義大利文 [強制軌]            |
-| ja            | Japanese                           | 日文                         |
-| ja-forced     | Japanese [forced]                  | 日文 [強制軌]                |
-| ko            | Korean                             | 韓文                         |
-| ko-forced     | Korean [forced]                    | 韓文 [強制軌]                |
-| nl            | Nederlands                         | 荷蘭文                       |
-| no            | Norsk                              | 挪威文                       |
-| pl            | Polski                             | 波蘭文                       |
-| pl-forced     | Polski [forced]                    | 波蘭文 [強制軌]              |
-| pt-PT         | Português                          | 葡萄牙文                     |
-| pt-BR         | Português (Brasil)                 | 葡萄牙文（巴西）             |
-| pt-BR-forced  | Português (Brasil) [forced]        | 葡萄牙文（巴西）[強制軌]     |
-| fi            | Suomi                              | 芬蘭文                       |
-| sv            | Svenska                            | 瑞典文                       |
+| Codec         | Language                           |
+| ------------- | ---------------------------------- |
+| en            | English [CC]                       |
+| zh-Hant       | Chinese (Traditional)              |
+| zh-Hans       | Chinese (Simplified)               |
+| zh-HK         | Cantonese                          |
+| da            | Dansk                              |
+| de            | Deutsch                            |
+| de-forced     | Deutsch [forced]                   |
+| es-ES         | Español                            |
+| es-ES-forced  | Español [forced]                   |
+| es-419        | Español (Latinoamericano)          |
+| es-419-forced | Español (Latinoamericano) [forced] |
+| fr-FR         | Français                           |
+| fr-FR-forced  | Français [forced]                  |
+| fr-CA         | Français (Canadien)                |
+| fr-CA-forced  | Français (Canadien) [forced]       |
+| it            | Italiano                           |
+| it-forced     | Italiano [forced]                  |
+| ja            | Japanese                           |
+| ja-forced     | Japanese [forced]                  |
+| ko            | Korean                             |
+| ko-forced     | Korean [forced]                    |
+| nl            | Nederlands                         |
+| no            | Norsk                              |
+| pl            | Polski                             |
+| pl-forced     | Polski [forced]                    |
+| pt-PT         | Português                          |
+| pt-BR         | Português (Brasil)                 |
+| pt-BR-forced  | Português (Brasil) [forced]        |
+| fi            | Suomi                              |
+| sv            | Svenska                            |
 
 HBO GO Asia
 
-| Codec   | Language            | 語言     |
-| ------- | ------------------- | -------- |
-| en      | English             | 英文     |
-| zh-Hant | Traditional Chinese | 繁體中文 |
-| zh-Hans | Simplified Chinese  | 簡體中文 |
-| ms      | Malay               | 馬來文   |
-| th      | Thai                | 泰文     |
-| id      | Indonesian          | 印尼文   |
+| Codec   | Language            |
+| ------- | ------------------- |
+| en      | English             |
+| zh-Hant | Traditional Chinese |
+| zh-Hans | Simplified Chinese  |
+| ms      | Malay               |
+| th      | Thai                |
+| id      | Indonesian          |
 
 iQIYI iq.com
 
-| Codec   | Language            | 語言     |
-| ------- | ------------------- | -------- |
-| en      | English             | 英文     |
-| zh-Hant | Traditional Chinese | 繁體中文 |
-| zh-Hans | Simplified Chinese  | 簡體中文 |
-| ms      | Malay               | 馬來文   |
-| vi      | Vietnamese          | 越南文   |
-| th      | Thai                | 泰文     |
-| id      | Indonesian          | 印尼文   |
-| es      | Spanish             | 西班牙文 |
-| ko      | Korean              | 韓文     |
-| ar      | Arabic              | 阿拉伯文 |
+| Codec   | Language            |
+| ------- | ------------------- |
+| en      | English             |
+| zh-Hant | Traditional Chinese |
+| zh-Hans | Simplified Chinese  |
+| ms      | Malay               |
+| vi      | Vietnamese          |
+| th      | Thai                |
+| id      | Indonesian          |
+| es      | Spanish             |
+| ko      | Korean              |
+| ar      | Arabic              |
 
 Viu
-| Codec | Language | 語言 |
-| --- | --- | --- |
-| en | English | 英文 |
-| zh-Hant | Traditional Chinese | 繁體中文 |
-| zh-Hans | Simplified Chinese | 簡體中文 |
-| ms | Malay | 馬來文 |
-| th | Thai | 泰文 |
-| id | Indonesian | 印尼文 |
-| my | Burmese | 緬甸文 |
+| Codec | Language |
+| --- | --- |
+| en | English |
+| zh-Hant | Traditional Chinese |
+| zh-Hans | Simplified Chinese |
+| ms | Malay |
+| th | Thai |
+| id | Indonesian |
+| my | Burmese |
 
 WeTV
-| Codec | Language | 語言 |
-| --- | --- | --- |
-| en | English | 英文 |
-| zh-Hant | Traditional Chinese | 繁體中文 |
-| zh-Hans | Simplified Chinese | 簡體中文 |
-| ms | Malay | 馬來文 |
-| th | Thai | 泰文 |
-| id | Indonesian | 印尼文 |
-| pt | Português | 葡萄牙文 |
-| es | Spanish | 西班牙文 |
-| ko | Korean | 韓文 |
+| Codec | Language |
+| --- | --- |
+| en | English |
+| zh-Hant | Traditional Chinese |
+| zh-Hans | Simplified Chinese |
+| ms |
+| th | Thai |
+| id | Indonesian |
+| pt | Português |
+| es | Spanish |
+| ko | Korean |
 
 ## Now E, Now Player
 

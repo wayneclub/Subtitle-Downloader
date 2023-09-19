@@ -8,7 +8,7 @@
 
 ## 說明
 
-字幕下載器是一個方便您從各大串流平台上下載字幕的程式。需要安裝 [Python 3.8](https://www.python.org/downloads/)以上的版本和 [NodeJS](https://nodejs.org/en/download)，可以在 Linux、Windows 或 macOS 上執行。
+字幕下載器是一個方便您從各大串流平台上下載字幕的程式。需要安裝 **[Python 3.8](https://www.python.org/downloads/)** 以上的版本和 **[NodeJS](https://nodejs.org/en/download)**，可以在 Linux、Windows 或 macOS 上執行。
 
 ## 安裝方式
 
@@ -56,10 +56,11 @@ pip install -r requriements
 
 ### 線上執行 **_(Colab環境在美國，如果部分串流被限制，請在本機執行)_**
 
-1. 連結 Colab
-2. 環境設定，安裝必要程式 (執行第ㄧ個按鈕)
-3. 依照不同平台填入各項必要資料 (執行其他按鈕)
-4. 下載的字幕檔案會在左邊側邊欄，可以直接存入Google雲端硬碟或下載到本機
+1. 複製一份到自己的雲端
+2. 連結 Colab
+3. 環境設定，安裝必要程式（執行第ㄧ個按鈕）
+4. 依照不同平台填入各項必要資料，填完後按下執行（若需要Cookies，點選左邊側邊欄上傳cookies.txt）
+5. 下載的字幕檔案會在左邊側邊欄，可以直接存入Google雲端硬碟或下載到本機
 
   <a href="https://colab.research.google.com/drive/1ZaGad1httJDw6rut1xmH140UCTlwlBnR?usp=sharing" target="_blank"><img src="https://colab.research.google.com/assets/colab-badge.svg" title="Open this file in Google Colab" alt="Colab"/></a>
 
