@@ -1,4 +1,4 @@
-lxml==4.9.2
+lxml
 beautifulsoup4
 chardet
 m3u8
