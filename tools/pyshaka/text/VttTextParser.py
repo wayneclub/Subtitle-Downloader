@@ -1,7 +1,7 @@
 import re
 from typing import Dict, List, Union
 from xml.dom.minidom import parseString, Node, Element, Text
-from xml.sax.saxutils import escape
+
 from tools.pyshaka.text.Cue import Cue, defaultTextColor, fontStyle, fontWeight, textDecoration
 from tools.pyshaka.log import log
 
@@ -21,15 +21,8 @@ class VttTextParser:
     def parseCueStyles(payload: str, rootCue: Cue, styles: Dict[str, Cue]):
         if len(styles) == 0:
             VttTextParser.addDefaultTextColor_(styles)
-        # payload = VttTextParser.replaceColorPayload_(payload)
-        tmp = ''
-        for text in payload.split('\n'):
-            if '<i>' in text and '</i>' not in text:
-                tmp += text + '</i>\n'
-            else:
-                tmp += text + '\n'
-        payload = tmp.strip()
-        xmlPayload = '<span>' + escape(payload) + '</span>'
+        payload = VttTextParser.replaceColorPayload_(payload)
+        xmlPayload = '<span>' + payload + '</span>'
         elements = parseString(xmlPayload).getElementsByTagName(
             'span')  # type: List[Element]
         if len(elements) > 0 and elements[0]:
@@ -42,8 +35,6 @@ class VttTextParser:
                     rootCue.payload = payload
                     return
             for childNode in childNodes:
-                if childNode.nodeValue and childNode.nodeValue.startswith('i>'):
-                    continue
                 VttTextParser.generateCueFromElement_(
                     childNode, rootCue, cues, styles)
             rootCue.nestedCues = cues
@@ -98,6 +89,9 @@ class VttTextParser:
         newPayload = ''
         for i in range(len(payload)):
             if payload[i] == '/':
+                if '>' not in payload:
+                    continue
+
                 end = payload.index('>', i)
                 if end <= i:
                     return payload

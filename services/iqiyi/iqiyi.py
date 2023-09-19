@@ -261,7 +261,11 @@ class IQIYI(BaseService):
         url = "/dash?" + urlencode(params)
         cmdx5js = os.path.join(os.path.dirname(
             __file__).replace('\\', '/'), 'cmd5x.js')
-        process = subprocess.run(f"node {cmdx5js} {quote(url)}",
+
+        executable = shutil.which('node')
+        if not executable:
+            raise EnvironmentError("Nodejs not found...")
+        process = subprocess.run([executable, cmdx5js, quote(url)],
                                  shell=True, stdout=subprocess.PIPE, check=False)
         vf = process.stdout.decode("utf-8").strip()
         self.logger.debug("vf: %s", vf)
