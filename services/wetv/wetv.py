@@ -227,8 +227,8 @@ class WeTV(BaseService):
                 self.logger.debug('sub: %s', sub)
                 sub_lang = get_language_code(sub['lang'])
                 available_languages.add(sub_lang)
-                if sub_lang in self.subtitle_language:
-                    if len(self.subtitle_language) > 1:
+                if sub_lang in self.subtitle_language or 'all' in self.subtitle_language:
+                    if len(self.subtitle_language) > 1 or 'all' in self.subtitle_language:
                         lang_folder_path = os.path.join(folder_path, sub_lang)
                     else:
                         lang_folder_path = folder_path

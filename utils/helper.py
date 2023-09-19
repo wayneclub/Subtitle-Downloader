@@ -126,6 +126,8 @@ def get_all_languages(available_languages, subtitle_language, locale_):
             _("\nUnsupport %s subtitle, available languages: %s"), ", ".join(set(subtitle_language).symmetric_difference(intersect)), ", ".join(available_languages))
         return False
 
+    return subtitle_language
+
 
 def check_url_exist(url, headers=None):
     """Validate url exist"""

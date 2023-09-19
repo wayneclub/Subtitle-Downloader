@@ -264,7 +264,7 @@ class DisneyPlus(BaseService):
 
         subtitle_list = []
         for sub in sub_url_list:
-            if sub['lang'] in self.subtitle_language:
+            if sub['lang'] in self.subtitle_language or 'all' in self.subtitle_language:
                 subtitle = {}
                 subtitle['lang'] = sub['lang']
                 subtitle['urls'] = []
@@ -283,7 +283,7 @@ class DisneyPlus(BaseService):
         for sub in subtitle_list:
             filename = sub_name.replace('.vtt', f".{sub['lang']}.vtt")
 
-            if program_type == 'movie' or len(self.subtitle_language) == 1:
+            if program_type == 'movie' or (len(self.subtitle_language) == 1 and 'all' not in self.subtitle_language):
                 lang_folder_path = os.path.join(
                     folder_path, f"tmp_{filename.replace('.vtt', '.srt')}")
             else:

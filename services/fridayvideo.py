@@ -277,7 +277,7 @@ class FridayVideo(BaseService):
                 if sub_lang == 'deu':
                     sub_lang = 'mul'
 
-                if len(lang_paths) > 1:
+                if len(self.subtitle_language) > 1 or 'all' in self.subtitle_language:
                     lang_folder_path = os.path.join(folder_path, sub_lang)
                 else:
                     lang_folder_path = folder_path

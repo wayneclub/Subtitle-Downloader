@@ -190,8 +190,8 @@ class Viki(BaseService):
                     if sub['percentage'] > 90:
                         sub_lang = get_language_code(sub['srclang'])
                         available_languages.add(sub_lang)
-                        if sub_lang in self.subtitle_language:
-                            if len(lang_paths) > 1:
+                        if sub_lang in self.subtitle_language or 'all' in self.subtitle_language:
+                            if len(self.subtitle_language) > 1 or 'all' in self.subtitle_language:
                                 lang_folder_path = os.path.join(
                                     folder_path, sub_lang)
                             else:

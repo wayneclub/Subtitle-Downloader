@@ -165,7 +165,7 @@ class MyVideo(BaseService):
                 for sub in media_info['subtitleList']:
                     sub_lang = get_language_code(sub['languageCode'])
 
-                    if len(lang_paths) > 1:
+                    if len(self.subtitle_language) > 1 or 'all' in self.subtitle_language:
                         lang_folder_path = os.path.join(folder_path, sub_lang)
                     else:
                         lang_folder_path = folder_path

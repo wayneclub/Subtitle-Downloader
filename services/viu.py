@@ -273,9 +273,9 @@ class Viu(BaseService):
         for sub in data:
             self.logger.debug(sub['code'])
             sub_lang = get_language_code(sub['code'])
-            if sub_lang in self.subtitle_language:
+            if sub_lang in self.subtitle_language or 'all' in self.subtitle_language:
                 subtitle = dict()
-                if len(self.subtitle_language) > 1:
+                if len(self.subtitle_language) > 1 or 'all' in self.subtitle_language:
                     lang_folder_path = os.path.join(folder_path, sub_lang)
                 else:
                     lang_folder_path = folder_path
@@ -321,9 +321,9 @@ class Viu(BaseService):
         for sub in data:
             self.logger.debug(sub['language'])
             sub_lang = get_language_code(sub['language'])
-            if sub_lang in self.subtitle_language and sub['format'] == 'vtt':
+            if (sub_lang in self.subtitle_language or 'all' in self.subtitle_language) and sub['format'] == 'vtt':
                 subtitle = dict()
-                if len(self.subtitle_language) > 1:
+                if len(self.subtitle_language) > 1 or 'all' in self.subtitle_language:
                     lang_folder_path = os.path.join(folder_path, sub_lang)
                 else:
                     lang_folder_path = folder_path

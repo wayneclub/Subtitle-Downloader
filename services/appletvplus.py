@@ -212,7 +212,7 @@ class AppleTVPlus(BaseService):
 
         subtitle_list = []
         for sub in sub_url_list:
-            if sub['lang'] in self.subtitle_language:
+            if sub['lang'] in self.subtitle_language or 'all' in self.subtitle_language:
                 subtitle = {}
                 subtitle['lang'] = sub['lang']
                 subtitle['urls'] = []
