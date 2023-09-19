@@ -9,7 +9,6 @@ from hashlib import md5
 import math
 import re
 import os
-from shlex import quote
 import shutil
 import subprocess
 import sys
@@ -206,6 +205,10 @@ class IQIYI(BaseService):
                                 subtitles += subs
                                 languages = set.union(
                                     languages, lang_paths)
+                            else:
+                                self.logger.error(
+                                    "Invaild dash_url, wrong vf!")
+                                sys.exit(1)
                         else:
                             self.logger.error(episode_res.text)
                             sys.exit(1)
@@ -220,6 +223,8 @@ class IQIYI(BaseService):
         return md.hexdigest()
 
     def get_dash_url(self, vid, tvid):
+        """Get vf and return dash url"""
+
         params = {
             "tvid": tvid,
             "bid": "",
@@ -265,8 +270,8 @@ class IQIYI(BaseService):
         executable = shutil.which('node')
         if not executable:
             raise EnvironmentError("Nodejs not found...")
-        process = subprocess.run([executable, cmdx5js, quote(url)],
-                                 shell=True, stdout=subprocess.PIPE, check=False)
+        process = subprocess.run(
+            [executable, cmdx5js, url], stdout=subprocess.PIPE, check=False)
         vf = process.stdout.decode("utf-8").strip()
         self.logger.debug("vf: %s", vf)
         return f"https://cache-video.iq.com{url}&vf={vf}"
