@@ -117,7 +117,6 @@ class AppleTVPlus(BaseService):
         for season in seasons:
             season_id = season['id']
             season_index = data['seasons'][season_id]['seasonNumber']
-
             if not self.download_season or season_index in self.download_season:
                 episodes = list(filter(
                     lambda episode: episode['seasonNumber'] == season_index, episode_list))
@@ -183,8 +182,8 @@ class AppleTVPlus(BaseService):
                         self.get_subtitle(
                             subtitle_list, folder_path, filename)
 
-            convert_subtitle(folder_path=folder_path,
-                             platform=self.platform, subtitle_format=self.subtitle_format, locale=self.locale)
+                convert_subtitle(folder_path=folder_path,
+                                platform=self.platform, subtitle_format=self.subtitle_format, locale=self.locale)
 
     def parse_m3u(self, m3u8_url):
 
