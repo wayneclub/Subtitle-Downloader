@@ -81,6 +81,8 @@ class MyVideo(BaseService):
                                 'index': int(episode_search.group(1)),
                                 'id': os.path.basename(episode['href']),
                             })
+                else:
+                    self.logger.error(res.text)
 
                 episode_num = len(episode_list)
                 name = rename_filename(
@@ -120,6 +122,10 @@ class MyVideo(BaseService):
                     subtitles=subtitles, languages=languages, folder_path=folder_path)
 
     def check_session(self):
+        """
+        Check session
+        """
+
         res = self.session.get(url=self.config['api']['check_session'].format(
             time=int(time.time() * 1000)), timeout=5)
         if res.ok:
