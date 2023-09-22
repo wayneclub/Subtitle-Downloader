@@ -118,13 +118,24 @@ class NowE(BaseService):
         season_index = int(data['seasonNum'])
         if season_index == 0:
             season_search = re.search(
-                r'(.+?)第(.+?)季', data['brandName'])
+                r'(.+?)第(.+?)季', title)
             if season_search:
                 title = season_search.group(1).strip()
                 season_index = int(cn2an(season_search.group(2)))
             else:
-                title = data['brandName'].strip()
-                season_index = 1
+                season_search = re.search(
+                    r'(.+?) (S)*(\d+)$', title)
+                if season_search:
+                    title = season_search.group(1).strip()
+                    season_index = int(season_search.group(3))
+                else:
+                    season_index = 1
+        else:
+            season_search = re.search(
+                r'(.+?) (S)*(\d+)$', title)
+            if season_search:
+                title = season_search.group(1).strip()
+                season_index = int(season_search.group(3))
 
         self.logger.info(self._("\n%s Season %s"), title, season_index)
         name = rename_filename(f'{title}.S{str(season_index).zfill(2)}')
@@ -132,7 +143,7 @@ class NowE(BaseService):
         if os.path.exists(folder_path):
             shutil.rmtree(folder_path)
 
-        episode_list = data['episode']
+        episode_list = [episode for episode in data['episode'] if int(episode['episodeNum'])>0]
 
         episode_num = len(episode_list)
 
