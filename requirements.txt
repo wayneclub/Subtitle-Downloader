@@ -8,7 +8,6 @@ pysubs2
 requests
 tqdm
 cn2an
-tmdbv3api
 opencc
 rtoml
 validators

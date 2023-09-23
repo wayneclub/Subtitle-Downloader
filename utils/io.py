@@ -8,15 +8,18 @@ This module is for I/O.
 from __future__ import annotations
 import logging
 import multiprocessing
-from operator import itemgetter
 import os
-from typing import Union
-from pathlib import Path
 import re
+import sys
+from operator import itemgetter
+from pathlib import Path
+from typing import Union
+from urllib.parse import quote
+
 from tqdm import tqdm
 import requests
 import rtoml
-from configs.config import user_agent
+from configs.config import user_agent, credentials
 from utils.helper import check_url_exist, get_locale
 
 
@@ -52,6 +55,31 @@ def rename_filename(filename):
                       "", filename[:255], flags=re.IGNORECASE)
 
     return filename
+
+
+def get_tmdb_info(title: str, release_year: str = "", is_movie: bool = False) -> dict:
+    """Get tmdb information."""
+    api_key = credentials['TMDB']['api_key']
+
+    if not api_key:
+        logger.error(
+            "Please get tmdb api key and set in video_downloader.toml!")
+        sys.exit(1)
+
+    url = f"https://api.themoviedb.org/3/search/{'movie' if is_movie else 'tv'}?query={quote(title)}"
+
+    if release_year:
+        url += f"&{'primary_release_year' if is_movie else 'first_air_date_year'}={release_year}"
+
+    url += f"&api_key={api_key}"
+
+    res = requests.get(
+        url, headers={'User-Agent': user_agent}, timeout=1)
+    if res.ok:
+        return res.json()
+    else:
+        logger.error(res.text)
+        sys.exit(1)
 
 
 def download_file(url, output_path, headers=None):

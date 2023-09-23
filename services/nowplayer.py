@@ -57,7 +57,7 @@ class NowPlayer(BaseService):
 
             release_year = ''
             movie_info = self.get_title_info(
-                title=chinese_title, title_aliases=[title])
+                title=chinese_title, title_aliases=[title], is_movie=True)
             if movie_info:
                 release_year = movie_info['release_date'][:4]
 

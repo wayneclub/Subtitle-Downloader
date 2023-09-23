@@ -127,7 +127,7 @@ def main() -> None:
         sys.exit(0)
 
     service = next((service for service in service_map
-                   if service['keyword'] in args.url), None)
+                   if service['domain'] in args.url), None)
 
     if service:
         log = logging.getLogger(service['class'].__module__)
@@ -141,7 +141,7 @@ def main() -> None:
 
         args.log = log
         args.config = service_config
-        args.platform = service['name']
+        args.service = service
         service['class'](args).main()
     else:
         logging.warning(

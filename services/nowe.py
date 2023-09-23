@@ -34,10 +34,11 @@ class NowE(BaseService):
         self._ = get_locale(__name__, self.locale)
 
     def generate_caller_reference_no(self):
+        """Generate caller reference_no"""
         return f"W{int(time.time() * 1000)}{math.floor((1 + random.random()) * 900) + 100}"
 
     def update_session(self):
-
+        """Update session"""
         session_id = self.cookies.get('OTTSESSIONID')
         device_id = self.cookies.get('NMAF_uuid')
 
@@ -68,6 +69,7 @@ class NowE(BaseService):
             self.logger.error(res.text)
 
     def get_metadata(self, content_id):
+        """Get metadata"""
         payload = {
             'lang': 'zh',
             'productIdList': [content_id],
@@ -91,7 +93,7 @@ class NowE(BaseService):
 
         release_year = ''
         movie_info = self.get_title_info(
-            title=title, title_aliases=[title])
+            title=title, title_aliases=[title], is_movie=True)
         if movie_info:
             release_year = movie_info['release_date'][:4]
 
@@ -143,7 +145,8 @@ class NowE(BaseService):
         if os.path.exists(folder_path):
             shutil.rmtree(folder_path)
 
-        episode_list = [episode for episode in data['episode'] if int(episode['episodeNum'])>0]
+        episode_list = [episode for episode in data['episode']
+                        if int(episode['episodeNum']) > 0]
 
         episode_num = len(episode_list)
 

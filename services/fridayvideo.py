@@ -10,7 +10,6 @@ from pathlib import Path
 import re
 import sys
 import time
-from orjson import JSONDecodeError
 from configs.config import config, credentials, user_agent
 from utils.io import rename_filename, download_files
 from utils.helper import get_locale, get_language_code
@@ -34,7 +33,8 @@ class FridayVideo(BaseService):
         self._ = get_locale(__name__, self.locale)
         self.monitor_url = ''
 
-    def get_content_type(self, content_type):
+    def get_content_type(self, content_type) -> int:
+        """Get media content type"""
         program = {
             'movie': 1,
             'drama': 2,
@@ -81,7 +81,8 @@ class FridayVideo(BaseService):
         self.download_subtitle(
             subtitles=subtitles, languages=languages, folder_path=folder_path)
 
-    def filter_episode_list(self, data):
+    def filter_episode_list(self, data) -> tuple[list, list]:
+        """Restrcut episode list"""
 
         episode_list = []
         season_list = []
@@ -211,10 +212,10 @@ class FridayVideo(BaseService):
             self.logger.error(res.text)
             sys.exit(1)
 
-    def get_media_info(self, media_info, filename):
+    def get_media_info(self, media_info, filename) -> dict:
+        """Get mediainfo"""
 
         client_id = self.cookies['uid']
-        login_access_token = self.cookies['login_accessToken']
         media_info_url = self.config['api']['media_info'].format(streaming_id=media_info['streaming_id'],
                                                                  streaming_type=media_info['streaming_type'],
                                                                  content_type=media_info['content_type'],
@@ -308,6 +309,9 @@ class FridayVideo(BaseService):
 
     def main(self):
         """Download subtitle from friDay"""
+        self.cookies['JSESSIONID'] = ''
+        self.cookies['login_accessToken'] = ''
+        self.session.cookies.update(self.cookies)
 
         content_search = re.search(
             r'(https:\/\/video\.friday\.tw\/(drama|anime|movie|show)\/detail\/(\d+))', self.url)

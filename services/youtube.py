@@ -37,7 +37,7 @@ class YouTube(BaseService):
 
         release_year = ''
         movie_info = self.get_title_info(
-            title=title, title_aliases=[title])
+            title=title, title_aliases=[title], is_movie=True)
         if movie_info:
             release_year = movie_info['release_date'][:4]
 

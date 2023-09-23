@@ -12,18 +12,16 @@ import sys
 from http.cookiejar import MozillaCookieJar
 from typing import Optional
 from pathlib import Path
-import urllib3
 import requests
-import opencc
+from opencc import OpenCC
 from pwinput import pwinput
-from tmdbv3api import TMDb, TV, Movie
+
 from configs.config import config, credentials, filenames, user_agent
 from constants import SUBTITLE_FORMAT
 from utils.ripprocess import RipProcess
 from utils.proxy import get_ip_info, get_proxy
 from utils.helper import EpisodesNumbersHandler
-
-urllib3.disable_warnings()
+from utils.io import get_tmdb_info
 
 
 class BaseService(object):
@@ -37,8 +35,16 @@ class BaseService(object):
     def __init__(self, args):
         self.logger = args.log
         self.url = args.url.strip()
-        self.platform = args.platform
+        self.service = args.service
+        self.platform = self.service['name']
+        self.locale = args.locale
+
         self.cookies = {}
+        self.session = requests.Session()
+        self.session.mount('https://', TLSAdapter())
+        self.session.headers = {
+            'user-agent': user_agent
+        }
         self.config = self.validate_config(args.config)
         self.movie = False
 
@@ -61,13 +67,6 @@ class BaseService(object):
 
         self.last_episode = args.last_episode
 
-        self.locale = args.locale
-
-        self.session = requests.Session()
-        self.session.mount('https://', TLSAdapter())
-        self.session.headers = {
-            'user-agent': user_agent
-        }
         self.session.cookies.update(self.cookies)
         self.cookies = self.session.cookies.get_dict()
 
@@ -103,9 +102,6 @@ class BaseService(object):
         self.subtitle_language = self.get_language_list(args.subtitle_language)
         self.subtitle_format = self.get_subtitle_format(args.subtitle_format)
 
-        tmdb = TMDb()
-        tmdb.api_key = credentials['TMDB']['api_key']
-
     def validate_config(self, service_config):
         """ Validate service config """
 
@@ -126,7 +122,7 @@ class BaseService(object):
         return service_config
 
     def get_cookie_jar(self, required) -> Optional[MozillaCookieJar]:
-        """Get Profile's Cookies as Mozilla Cookie Jar if available."""
+        """ Get profile's cookies as Mozilla Cookie Jar if available. """
 
         cookie_file = Path(
             config.directories['cookies']) / credentials[self.platform]['cookies']
@@ -166,30 +162,39 @@ class BaseService(object):
             subtitle_format = config.subtitles['default-format']
         return subtitle_format
 
-    def get_title_info(self, title="", title_aliases=None, is_movie=True):
-        """ Get title info from TMDB """
-
+    def get_title_info(self, title="", release_year="", title_aliases=None, is_movie=False):
+        """
+        Get title info from TMDB
+        """
         title_info = {}
-        title_aliases.append(opencc.OpenCC('t2s.json').convert(title))
-        if is_movie:
-            movie = Movie()
-            results = movie.search(title.strip())
-        else:
-            tv_series = TV()
-            results = tv_series.search(title.strip())
+        if not title_aliases:
+            title_aliases = []
+
+        title_aliases.append(OpenCC('t2s.json').convert(title))
+
+        results = get_tmdb_info(
+            title=title, release_year=release_year, is_movie=is_movie)
 
         if results.get('results'):
             title_info = results.get('results')[0]
         else:
             for alias in title_aliases:
-                if is_movie:
-                    results = movie.search(alias.strip())
-                else:
-                    results = tv_series.search(alias.strip())
-                    if results.get('results'):
-                        title_info = results.get('results')[0]
+                get_tmdb_info(title=alias.strip(),
+                              release_year=release_year, is_movie=is_movie)
+                if results.get('results'):
+                    title_info = results.get('results')[0]
+                    break
+
         if title_info:
-            return title_info
+            if title_info.get('name'):
+                title_info['title'] = title_info['name']
+            if title_info.get('release_date'):
+                title_info['release_year'] = title_info['release_date'][:4]
+            if title_info.get('first_air_date'):
+                title_info['release_year'] = title_info['first_air_date'][:4]
+
+        self.logger.debug('tmdb: ', title_info)
+        return title_info
 
 
 class TLSAdapter(requests.adapters.HTTPAdapter):
