@@ -19,7 +19,7 @@ def get_ip_info(session: Optional[requests.Session] = None) -> dict:
     return (session or requests.Session()).get('https://ipinfo.io/json', timeout=5).json()
 
 
-def get_proxy(region: str, ip_info: dict, geofence: list, platform: str) -> Optional[str]:
+def get_proxy(region: str, geofence: list, platform: str) -> Optional[str]:
     """Get proxy"""
 
     if not region:
@@ -29,7 +29,7 @@ def get_proxy(region: str, ip_info: dict, geofence: list, platform: str) -> Opti
 
     logger.info('Obtaining a proxy to "%s"', region)
 
-    if ip_info['country'].lower() == ''.join(i for i in region if not i.isdigit()):
+    if get_ip_info()['country'].lower() == ''.join(i for i in region if not i.isdigit()):
         return None  # no proxy necessary
 
     if config.proxies.get(region):

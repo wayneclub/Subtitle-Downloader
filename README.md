@@ -117,8 +117,6 @@ pip install -r requriements
 
   -sf, --subtitle-format        subtitles format: .srt or .ass
 
-  -region, --region             streaming service's region
-
   -locale, --locale             interface language
 
   -p, --proxy                   proxy

@@ -11,6 +11,7 @@ import json
 import sys
 from configs.config import user_agent
 from utils.helper import get_locale
+from utils.proxy import get_ip_info
 
 
 class Login(object):
@@ -18,7 +19,7 @@ class Login(object):
     DisneyPlus login authentication, retrieve access_token
     """
 
-    def __init__(self, email, password, ip_info, locale, config, session):
+    def __init__(self, email, password, locale, config, session):
         self.logger = logging.getLogger(__name__)
         self._ = get_locale(__name__, locale)
 
@@ -26,7 +27,7 @@ class Login(object):
         self.password = password.strip()
         self.config = config
 
-        location = ip_info['loc'].split(',')
+        location = get_ip_info()['loc'].split(',')
         self.latitude = location[0]
         self.longitude = location[1]
         self.session = session

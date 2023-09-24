@@ -328,14 +328,11 @@ class DisneyPlus(BaseService):
     def main(self):
         user = Login(email=credentials[self.platform]['email'],
                      password=credentials[self.platform]['password'],
-                     ip_info=self.ip_info,
                      locale=self.locale,
                      config=self.config,
                      session=self.session)
         self.profile, self.access_token = user.get_auth_token()
         # self.profile['language'] = 'en'
-        if self.region:
-            self.profile['region'] = self.region
 
         if '/series' in self.url:
             self.series_subtitle()

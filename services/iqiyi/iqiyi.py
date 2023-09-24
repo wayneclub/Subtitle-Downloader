@@ -19,6 +19,7 @@ from cn2an import cn2an
 from utils.helper import get_locale, get_language_code, get_all_languages
 from utils.io import download_files, rename_filename
 from utils.subtitle import convert_subtitle
+from utils.proxy import get_ip_info
 from services.baseservice import BaseService
 
 
@@ -356,11 +357,13 @@ class IQIYI(BaseService):
             data = data['initialState']['album']['videoAlbumInfo']
 
             allow_regions = data['regionsAllowed'].split(',')
-            if not self.region.lower() in allow_regions:
-                self.logger.info(
-                    self._("\nThis video is only allows in:\n%s"), ', '.join(allow_regions))
-                sys.exit(0)
-
+            self.GEOFENCE = allow_regions
+            if not get_ip_info()['country'].lower() in allow_regions:
+                self.set_proxy(allow_regions[0])
+                if not get_ip_info(self.session)['country'].lower() in allow_regions:
+                    self.logger.error(
+                        self._("\nThis video is only allows in:\n%s"), ', '.join(allow_regions))
+                    sys.exit(1)
             if data['videoType'] != 'singleVideo':
                 self.series_subtitle(
                     data=data, mode_code=mode_code, lang_code=lang_code)

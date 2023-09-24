@@ -116,8 +116,6 @@ pip install -r requriements
 
   -sf, --subtitle-format        字幕格式：.srt 或 .ass
 
-  -region, --region             串流平台地區
-
   -locale, --locale             界面語言
 
   -p, --proxy                   代理

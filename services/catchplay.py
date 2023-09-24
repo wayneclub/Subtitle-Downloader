@@ -29,9 +29,10 @@ class CatchPlay(BaseService):
     def __init__(self, args):
         super().__init__(args)
         self._ = get_locale(__name__, self.locale)
-        self.access_token = self.get_access_token()
+        self.access_token = ''
 
     def get_access_token(self):
+        """ Get access token """
 
         res = self.session.get(url=self.config['api']['auth'], timeout=5)
         if res.ok:
@@ -129,7 +130,7 @@ class CatchPlay(BaseService):
     def get_vcms_access_token(self, video_id):
         headers = {
             'content-type': 'application/json;charset=UTF-8',
-            'authorization': f'Bearer {self.access_token}',
+            'authorization': f'Bearer {self.get_access_token()}',
             'user-agent': user_agent,
         }
 
@@ -214,13 +215,23 @@ class CatchPlay(BaseService):
             self.logger.error(res.text)
 
     def main(self):
+
+        program_id = re.search(r'\/([^\/]+)\/video\/([^\/]+)', self.url)
+        if program_id:
+            region = program_id.group(1).split('-')[0]
+            program_id = program_id.group(2)
+        else:
+            self.logger.error("Invalid url, program id not found!")
+            sys.exit(1)
+
+        self.set_proxy(region)
+
         res = self.session.get(url=self.url, timeout=5)
         if res.ok:
             match = re.search(
                 r'<script id=\"__NEXT_DATA__" type=\"application/json\">(.+?)<\/script>', res.text)
             if match:
                 data = orjson.loads(match.group(1).strip())['props']
-                program_id = os.path.basename(self.url)
                 if data['apolloState'][f'Program:{program_id}']['type'] == 'MOVIE':
                     self.movie_subtitle(data, program_id)
                 else:

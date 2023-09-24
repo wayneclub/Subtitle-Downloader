@@ -60,12 +60,6 @@ def main() -> None:
                         dest='subtitle_format',
                         help=_("subtitles format: .srt or .ass"))
     parser.add_argument(
-        '-region',
-        '--region',
-        dest='region',
-        help=_("streaming service's region"),
-    )
-    parser.add_argument(
         '-locale',
         '--locale',
         dest='locale',

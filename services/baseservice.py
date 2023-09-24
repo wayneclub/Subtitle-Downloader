@@ -70,32 +70,9 @@ class BaseService(object):
         self.session.cookies.update(self.cookies)
         self.cookies = self.session.cookies.get_dict()
 
-        self.ip_info = get_ip_info()
-        self.logger.info(
-            'ip: %s (%s)', self.ip_info['ip'], self.ip_info['country'])
-
         proxy = args.proxy or next(iter(self.GEOFENCE), None)
         if proxy:
-            if len("".join(i for i in proxy if not i.isdigit())) == 2:  # e.g. ie, ie12, us1356
-                proxy = get_proxy(region=proxy, ip_info=self.ip_info,
-                                  geofence=self.GEOFENCE, platform=self.platform)
-
-            self.logger.debug('proxy: %s', proxy)
-            if proxy:
-                if "://" not in proxy:
-                    # assume a https proxy port
-                    proxy = f"https://{proxy}"
-                self.proxy = proxy
-                self.session.proxies.update({"all": proxy})
-                self.logger.info(" + Set Proxy")
-            else:
-                self.logger.info(
-                    " + Proxy was skipped as current region matches")
-
-        if args.region:
-            self.region = args.region.upper()
-        else:
-            self.region = self.ip_info['country']
+            self.set_proxy(proxy)
 
         self.ripprocess = RipProcess()
 
@@ -145,6 +122,22 @@ class BaseService(object):
             self.logger.error(
                 f"\nPlease put {os.path.basename(cookie_file)} in {Path(config.directories['cookies'])}")
             sys.exit(1)
+
+    def set_proxy(self, proxy):
+        """Set proxy: support dynamic proxy in each service"""
+
+        if len("".join(i for i in proxy if not i.isdigit())) == 2:  # e.g. ie, ie12, us1356
+            proxy = get_proxy(
+                region=proxy, geofence=self.GEOFENCE, platform=self.platform)
+
+        if proxy:
+            if "://" not in proxy:
+                # assume a https proxy port
+                proxy = f"https://{proxy}"
+            self.session.proxies.update({"all": proxy})
+            self.logger.info(" + Set Proxy")
+        else:
+            self.logger.info(" + Proxy was skipped as current region matches")
 
     def get_language_list(self, subtitle_language):
         """ Get language list """

@@ -56,6 +56,7 @@ class Viu(BaseService):
         return region, area_id, language_flag_id
 
     def get_token(self):
+        """Get token"""
         headers = {
             'accept': 'application/json; charset=utf-8',
             'content-type': 'application/json; charset=UTF-8',
