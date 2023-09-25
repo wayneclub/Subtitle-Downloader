@@ -101,7 +101,7 @@ class KKTV(BaseService):
                             episode_index = int(episode_index[0])
                         else:
                             episode_index = int(
-                                episode['id'].replace(episode['seriesId'], ''))
+                                episode['id'].replace(episode['series_id'], ''))
 
                         if not self.download_episode or episode_index in self.download_episode:
                             filename = f"{name}E{str(episode_index).zfill(fill_num)}.WEB-DL.{self.platform}.zh-Hant.vtt"
