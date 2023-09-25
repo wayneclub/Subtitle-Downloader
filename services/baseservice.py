@@ -172,8 +172,8 @@ class BaseService(object):
             title_info = results.get('results')[0]
         else:
             for alias in title_aliases:
-                get_tmdb_info(title=alias.strip(),
-                              release_year=release_year, is_movie=is_movie)
+                results = get_tmdb_info(title=alias.strip(),
+                                        release_year=release_year, is_movie=is_movie)
                 if results.get('results'):
                     title_info = results.get('results')[0]
                     break
