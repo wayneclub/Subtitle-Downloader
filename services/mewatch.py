@@ -8,6 +8,9 @@ This module is to download subtitle from meWATCH
 import os
 import platform
 import sys
+from base64 import b64encode, b64decode
+
+from bs4 import BeautifulSoup
 from configs.config import credentials, user_agent
 from utils.io import rename_filename, download_files
 from utils.helper import get_all_languages, get_locale, get_language_code
@@ -119,7 +122,7 @@ class MeWatch(BaseService):
 
         self.session.headers = {
             'user-agent': user_agent,
-            'x-authorization': f'Bearer {self.access_token}',
+            # 'x-authorization': f'Bearer {self.access_token}',
         }
         media_info_url = self.config['api']['videos'].format(
             video_id=video_id)
@@ -211,30 +214,50 @@ class MeWatch(BaseService):
             self.logger.error(res.text)
             sys.exit(1)
 
-    def login(self):
+    def get_device(self):
         """Login and get user token"""
+        print()
+
+    def login(self, token: str):
+        """Login and get user token"""
+
+        cookies = {
+            'lang': 'en',
+            # 'AMCVS_B464317853A9C8390A490D4E%40AdobeOrg': '1',
+            # 'ab.storage.deviceId.01d06460-c507-4a14-9be0-cada09002c45': '%7B%22g%22%3A%22aac94842-d06c-0b2c-5750-cc5ba97c4e5c%22%2C%22c%22%3A1696719094567%2C%22l%22%3A1696719716139%7D',
+            # 'ab.storage.userId.01d06460-c507-4a14-9be0-cada09002c45': '%7B%22g%22%3A%22555d1165-a831-432e-88b4-667a81fc5b00%22%2C%22c%22%3A1696719716137%2C%22l%22%3A1696719716139%7D',
+            # 'ab.storage.sessionId.01d06460-c507-4a14-9be0-cada09002c45': '%7B%22g%22%3A%229916ccff-f36b-1718-b107-2db6441f740c%22%2C%22e%22%3A1696721516145%2C%22c%22%3A1696719716138%2C%22l%22%3A1696719716145%7D',
+            # 'ss': '1',
+            # 'AMCV_B464317853A9C8390A490D4E%40AdobeOrg': '-1124106680%7CMCIDTS%7C19638%7CMCMID%7C90333747353049229492137118398699740485%7CMCOPTOUT-1696729592s%7CNONE%7CvVersion%7C5.2.0',
+            # 'mp_32231f8971e8246b52f0a566df2bbe20_mixpanel': '%7B%22distinct_id%22%3A%20%22mewatch-555d1165-a831-432e-88b4-667a81fc5b00%22%2C%22%24device_id%22%3A%20%2218b0c569bf71212-02abc1882e7d87-18525634-117414-18b0c569bf82821%22%2C%22%24search_engine%22%3A%20%22google%22%2C%22%24initial_referrer%22%3A%20%22https%3A%2F%2Fwww.google.com%2F%22%2C%22%24initial_referring_domain%22%3A%20%22www.google.com%22%2C%22logged_in%22%3A%20false%2C%22sso_id%22%3A%20%22555d1165-a831-432e-88b4-667a81fc5b00%22%2C%22unique_userid%22%3A%20%22mewatch-555d1165-a831-432e-88b4-667a81fc5b00%22%2C%22%24user_id%22%3A%20%22mewatch-555d1165-a831-432e-88b4-667a81fc5b00%22%2C%22__alias%22%3A%20%22mewatch-555d1165-a831-432e-88b4-667a81fc5b00%22%7D',
+            # 'sso_id': 'undefined',
+        }
 
         headers = {
             'content-type': 'application/json',
             'authority': 'www.mewatch.sg',
             'user-agent': user_agent,
             'referer': 'https://www.mewatch.sg/signin',
+            'x-authorization': token
         }
 
         payload = {
             'username': credentials[self.platform]['email'].strip(),
             'password': credentials[self.platform]['password'].strip(),
-            'id': self.config['device_id'],
-            'os': platform.system(),
+            'id': '7bb6358e-42d2-4c6c-ac68-dbd63685b058',
+            'os': 'MacIntel',
             'browser': 'Chrome'
         }
 
-        cookies = {
-            'UID': self.config['device_id'],
+        encode_str = b64encode(str(payload).replace(
+            ' ', '').replace("'", '"').encode()).decode()
+
+        payload = {
+            'body': encode_str
         }
 
         res = self.session.post(
-            url=self.config['api']['login'], headers=headers, json=payload, cookies=cookies, timeout=5)
+            url=self.config['api']['login'], headers=headers, cookies=cookies, json=payload, timeout=5)
         if res.ok:
             data = res.json()
             self.logger.debug(data)
@@ -278,12 +301,6 @@ class MeWatch(BaseService):
             sys.exit(1)
 
     def main(self):
-        token = self.get_token()
-        user_token = self.login()
-        token_list = self.get_access_token(token=token, user_token=user_token)
-        self.access_token = next((token['value'] for token in token_list
-                                  if token['refreshable'] is True and token['type'] == 'UserProfile'), None)
-
         conetent_id = os.path.basename(self.url).split('-')[-1]
 
         if '/movie' in self.url:
