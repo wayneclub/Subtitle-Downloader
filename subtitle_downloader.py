@@ -4,6 +4,7 @@
 """
 This module is to download subtitle from stream services.
 """
+from __future__ import annotations
 import argparse
 import logging
 from logging import INFO, DEBUG
@@ -11,7 +12,7 @@ from datetime import datetime
 import os
 import sys
 import validators
-from configs.config import config, app_name, __version__, filenames
+from configs.config import app_name, __version__, directories, filenames
 from constants import Service
 from services import service_map
 from utils.helper import get_locale
@@ -94,7 +95,7 @@ def main() -> None:
     args = parser.parse_args()
 
     if args.debug:
-        os.makedirs(config.directories['logs'], exist_ok=True)
+        os.makedirs(directories['logs'], exist_ok=True)
         log_time = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
         log_file_path = str(filenames.log).format(
             app_name=app_name, log_time=log_time)

@@ -7,6 +7,7 @@ This module is base service
 from __future__ import annotations
 import html
 import os
+import re
 import ssl
 import sys
 from http.cookiejar import MozillaCookieJar
@@ -14,6 +15,7 @@ from typing import Optional
 from pathlib import Path
 import requests
 from opencc import OpenCC
+from cn2an import cn2an
 from pwinput import pwinput
 
 from configs.config import config, credentials, filenames, user_agent
@@ -188,6 +190,55 @@ class BaseService(object):
 
         self.logger.debug('tmdb: ', title_info)
         return title_info
+
+    def get_title_and_season_index(self, title: str) -> tuple(str, int):
+        """
+        Get title and season_index
+        """
+        title = title.replace(
+            '（', '').replace(
+            '）', '').replace(
+            '《', '').replace('》', '').replace('(', '').replace(')', '').replace('【', '').replace('】', '').replace('18+', '')
+
+        if re.search(r'[\u4E00-\u9FFF]', title):
+            title = title.translate(str.maketrans(
+                '０１２３４５６７８９', '0123456789'))
+            if '特別篇' in title:
+                title = re.search(r'(.+?)(：)*特別篇', title).group(1)
+                season_index = 0
+            else:
+                season_search = re.search(
+                    r'(.+?)第(.+?)[季|彈]', title)
+                if season_search:
+                    title = season_search.group(1)
+                    season_index = int(season_search.group(2)) if season_search.group(
+                        2).isdigit else int(cn2an(season_search.group(2)))
+                else:
+                    season_index = re.search(r'(.+?)( )*(\d+)$', title)
+                    if season_index:
+                        title = season_index.group(1)
+                        season_index = int(season_index.group(3))
+        else:
+            if 'season' in title.lower():
+                season_index = re.search(r'(.+?)[s|S]eason( )*(\d+)', title)
+                if season_index:
+                    title = season_index.group(1)
+                    season_index = int(season_index.group(3))
+            else:
+                season_index = re.search(r'(.+?)[s|S](\d+)', title)
+                if season_index:
+                    title = season_index.group(1)
+                    season_index = int(season_index.group(2))
+                else:
+                    season_index = re.search(r'(.+?)( )*(\d+)$', title)
+                    if season_index:
+                        title = season_index.group(1)
+                        season_index = int(season_index.group(3))
+
+        if not isinstance(season_index, int):
+            season_index = 1
+
+        return title.strip(), season_index
 
 
 class TLSAdapter(requests.adapters.HTTPAdapter):

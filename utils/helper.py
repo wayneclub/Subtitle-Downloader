@@ -92,7 +92,7 @@ def get_locale(name, lang=""):
         return gettext.gettext
 
 
-def get_language_code(lang=''):
+def get_language_code(lang: str):
     """Convert subtitle language code to ISO_6391 format"""
 
     uniform = lang.lower().replace('_', '-')

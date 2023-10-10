@@ -10,7 +10,6 @@ import os
 import shutil
 import sys
 import orjson
-from cn2an import cn2an
 from configs.config import user_agent
 from utils.io import rename_filename, download_files
 from utils.helper import get_all_languages, get_locale, get_language_code
@@ -30,30 +29,9 @@ class Viu(BaseService):
         self._ = get_locale(__name__, self.locale)
 
         self.token = ""
-
-    def get_region(self):
-        region = ''
-        area_id = ''
-        language_flag_id = ''
-        region_search = re.search(r'\/ott\/(.+?)\/(.+?)\/', self.url)
-        if region_search:
-            region = region_search.group(1)
-            language = region_search.group(2)
-            if region == 'sg':
-                area_id = 2
-                language_flag_id = ''
-                if 'zh' in language:
-                    language_flag_id = '2'
-                else:
-                    language_flag_id = '3'
-            else:
-                region = 'hk'
-                area_id = 1
-                if 'zh' in language:
-                    language_flag_id = '1'
-                else:
-                    language_flag_id = '3'
-        return region, area_id, language_flag_id
+        self.area_id: str
+        self.country_code: str
+        self.language_flag_id: str
 
     def get_token(self):
         """Get token"""
@@ -72,111 +50,82 @@ class Viu(BaseService):
         if res.ok:
             self.token = res.json()['token']
 
-    def series_metadata(self, product_id):
-        res = self.session.get(url=self.url, timeout=5)
+    def series_metadata(self, data, country_code, language):
+        title = data['series']['name'].strip()
+        title, season_index = self.get_title_and_season_index(title)
+
+        self.logger.info(self._("\n%s Season %s"),
+                         title, season_index)
+
+        name = rename_filename(
+            f'{title}.S{str(season_index).zfill(2)}')
+        folder_path = os.path.join(self.download_path, name)
+        if os.path.exists(folder_path):
+            shutil.rmtree(folder_path)
+
+        episode_num = data['series']['product_total']
+        current_eps = data['current_product']['released_product_total']
+
+        params = {
+            'platform_flag_label': 'web',
+            'area_id': self.area_id,
+            'language_flag_id': self.language_flag_id,
+            'platformFlagLabel': 'web',
+            'areaId': self.area_id,
+            'languageFlagId': self.language_flag_id,
+            'countryCode': self.country_code,
+            'r': '/vod/product-list',
+            'os_flag_id': '1',
+            'series_id': data['series']['series_id'],
+            'size': '-1',
+            'sort': 'asc',
+        }
+
+        res = self.session.get(
+            self.config['api']['titles'], params=params, timeout=10)
         if res.ok:
-            match = re.search(
-                r'href=\"\/ott\/(.+)\/index\.php\?r=campaign\/connectwithus\&language_flag_id=(\d+)\&area_id=(\d+)\"', res.text)
-            if match:
-                region = match.group(1)
-                language_flag_id = match.group(2)
-                area_id = match.group(3)
-            else:
-                region, area_id, language_flag_id = self.get_region()
-            self.logger.debug(
-                "region: %s, area_id: %s, language_flag_id: %s", region, area_id, language_flag_id)
+            episodes = res.json()['data']['product_list']
         else:
-            self.logger.error(res.text)
+            self.logger.error(f" - Failed to get episodes: {res.text}")
             sys.exit(1)
 
-        meta_url = self.config['api']['ott'].format(
-            region=region, area_id=area_id, language_flag_id=language_flag_id, product_id=product_id)
-        self.logger.debug("meta url: %s", meta_url)
-
-        meta_res = self.session.get(url=meta_url, timeout=5)
-
-        if meta_res.ok:
-            data = meta_res.json()['data']
-            self.logger.debug(data)
-
-            title = data['series']['name']
-            season_search = re.search(
-                r'(.+?)第(.+?)季', title)
-            if season_search:
-                title = season_search.group(1).strip()
-                season_name = cn2an(season_search.group(2))
-            elif data['series']['name'].split(' ')[-1].isdecimal():
-                title = title.replace(
-                    data['series']['name'].split(' ')[-1], '').strip()
-                season_name = data['series']['name'].split(
-                    ' ')[-1].zfill(2)
-            else:
-                season_name = '01'
-
-            season_index = int(season_name)
-
-            self.logger.info(self._("\n%s Season %s"),
-                             title, season_index)
-
-            name = rename_filename(
-                f'{title}.S{str(season_index).zfill(2)}')
-            folder_path = os.path.join(self.download_path, name)
-
-            if os.path.exists(folder_path):
-                shutil.rmtree(folder_path)
-
-            episode_num = data['series']['product_total']
-            current_eps = data['current_product']['released_product_total']
-
-            episode_list = reversed(data['series']['product'])
-
-            if self.last_episode:
-                episode_list = [list(episode_list)[-1]]
-                self.logger.info(self._("\nSeason %s total: %s episode(s)\tdownload season %s last episode\n---------------------------------------------------------------"),
-                                 season_index, current_eps, season_index)
-            else:
-                if current_eps != episode_num:
-                    self.logger.info(self._("\nSeason %s total: %s episode(s)\tupdate to episode %s\tdownload all episodes\n---------------------------------------------------------------"),
-                                     season_index, episode_num, current_eps)
-                else:
-                    self.logger.info(self._("\nSeason %s total: %s episode(s)\tdownload all episodes\n---------------------------------------------------------------"),
-                                     season_index, episode_num)
-
-            languages = set()
-            subtitles = []
-            for episode in episode_list:
-                episode_index = int(episode['number'])
-                if not self.download_season or season_index in self.download_season:
-                    if not self.download_episode or episode_index in self.download_episode:
-                        episode_url = re.sub(r'(.+product_id=).+', '\\1',
-                                             meta_url) + episode['product_id']
-
-                        filename = f'{name}E{str(episode_index).zfill(2)}.WEB-DL.{self.platform}.vtt'
-
-                        self.logger.info(self._("Finding %s ..."), filename)
-                        episode_res = self.session.get(
-                            url=episode_url, timeout=5)
-
-                        if episode_res.ok:
-                            episode_data = episode_res.json(
-                            )['data']['current_product']['subtitle']
-
-                            available_languages = tuple(
-                                [get_language_code(sub['code']) for sub in episode_data])
-                            get_all_languages(available_languages=available_languages,
-                                              subtitle_language=self.subtitle_language, locale_=self.locale)
-
-                            subs, lang_paths = self.get_subtitle(
-                                episode_data, folder_path, filename)
-                            subtitles += subs
-                            languages = set.union(languages, lang_paths)
-                        else:
-                            self.logger.error(episode_res.text)
-
-            self.download_subtitle(
-                subtitles=subtitles, languages=languages, folder_path=folder_path)
+        if self.last_episode:
+            episode_list = [list(episode_list)[-1]]
+            self.logger.info(self._("\nSeason %s total: %s episode(s)\tdownload season %s last episode\n---------------------------------------------------------------"),
+                             season_index, current_eps, season_index)
         else:
-            self.logger.error(meta_res.text)
+            if current_eps != episode_num:
+                self.logger.info(self._("\nSeason %s total: %s episode(s)\tupdate to episode %s\tdownload all episodes\n---------------------------------------------------------------"),
+                                 season_index, episode_num, current_eps)
+            else:
+                self.logger.info(self._("\nSeason %s total: %s episode(s)\tdownload all episodes\n---------------------------------------------------------------"),
+                                 season_index, episode_num)
+
+        languages = set()
+        subtitles = []
+        for episode in episodes:
+            episode_index = int(episode['number'])
+            if not self.download_season or season_index in self.download_season:
+                if not self.download_episode or episode_index in self.download_episode:
+                    filename = f'{name}E{str(episode_index).zfill(2)}.WEB-DL.{self.platform}.vtt'
+                    self.logger.info(self._("Finding %s ..."), filename)
+                    episode_id = episode['product_id']
+                    episode_url = f"https://www.viu.com/ott/{country_code}/{language}/vod/{episode_id}/"
+                    episode_data = self.get_metadata(
+                        url=episode_url, content_id=episode_id, text='episode')['current_product']['subtitle']
+
+                    available_languages = tuple(
+                        [get_language_code(sub['code']) for sub in episode_data])
+                    get_all_languages(available_languages=available_languages,
+                                      subtitle_language=self.subtitle_language, locale_=self.locale)
+
+                    subs, lang_paths = self.get_subtitle(
+                        episode_data, folder_path, filename)
+                    subtitles += subs
+                    languages = set.union(languages, lang_paths)
+
+        self.download_subtitle(
+            subtitles=subtitles, languages=languages, folder_path=folder_path)
 
     def series_metadata_playlist(self, playlist_id):
         self.get_token()
@@ -265,6 +214,34 @@ class Viu(BaseService):
                             subtitles=subtitles, languages=languages, folder_path=folder_path)
         else:
             self.logger.error(meta_res.text)
+
+    def get_metadata(self, url: str, content_id: str, text: str, language: str = '') -> dict:
+        """Get title metadata"""
+        res = self.session.get(url=url, timeout=10)
+        if res.ok:
+            if 'no-service' in res.url:
+                self.logger.error("Out of service!")
+                sys.exit(1)
+            match = re.search(
+                r'<script id=\"__NEXT_DATA__" type=\"application/json\">(.+?)<\/script>', res.text)
+            if match:
+                data = orjson.loads(match.group(1).strip())[
+                    'props']['pageProps']['initialProps']['fallback']
+                product_detail = f'@"PRODUCT_DETAIL","{content_id}",0,true,'
+                if product_detail in data:
+                    area = data[product_detail]['server']['area']
+                    self.area_id = area['area_id']
+                    self.country_code = area['country']['code']
+                    if language:
+                        self.language_flag_id = next(
+                            (lang['language_flag_id'] for lang in area['language'] if language in lang['mark']), '3')
+                    return data[product_detail]['data']
+                else:
+                    self.logger.error("Wrong region, check your proxy!")
+            else:
+                self.logger.error(f" - Failed to get {text}: {res.text}")
+        else:
+            self.logger.error(f" - Failed to get {text}: {res.text}")
 
     def get_subtitle(self, data, folder_path, filename):
 
@@ -366,13 +343,31 @@ class Viu(BaseService):
                              platform=self.platform, subtitle_format=self.subtitle_format, locale=self.locale)
 
     def main(self):
-        product_id = re.search(r'vod\/(\d+)\/', self.url)
-        playlist_id = re.search(r'.+playlist-(\d+)', self.url)
-        if product_id:
-            product_id = product_id.group(1)
-            self.series_metadata(product_id=product_id)
-        elif playlist_id:
-            playlist_id = playlist_id.group(1)
-            self.series_metadata_playlist(playlist_id=playlist_id)
+        # product_id = re.search(r'vod\/(\d+)\/', self.url)
+        # playlist_id = re.search(r'.+playlist-(\d+)', self.url)
+        # if product_id:
+        #     product_id = product_id.group(1)
+        #     self.series_metadata(product_id=product_id)
+        # elif playlist_id:
+        #     playlist_id = playlist_id.group(1)
+        #     self.series_metadata_playlist(playlist_id=playlist_id)
+        # else:
+        #     self.logger.error("\nPlease provide valid url!")
+        content_id = re.search(
+            r'\/ott\/([^\/]+)\/([^\/]+)\/vod\/(\d+)', self.url)
+        if content_id:
+            country_code = content_id.group(1)
+            language = content_id.group(2)
+            content_id = content_id.group(3)
         else:
-            self.logger.error("\nPlease provide valid url!")
+            self.logger.error(" - Invalid url, content id not found!")
+            sys.exit(1)
+
+        self.set_proxy(country_code)
+        data = self.get_metadata(
+            url=self.url, content_id=content_id, text='title', language=language)
+
+        if data['current_product']['is_movie'] == 1:
+            self.movie = True
+
+        self.series_metadata(data, country_code, language)

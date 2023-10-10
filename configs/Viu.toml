@@ -1,7 +1,25 @@
 credentials = ''
 required = ''
 
+app_version = '3.10.0'
+
 [api]
-ott = 'https://www.viu.com/ott/{region}/index.php?area_id={area_id}&language_flag_id={language_flag_id}&r=vod/ajax-detail&platform_flag_label=web&area_id={area_id}&language_flag_id={language_flag_id}&product_id={product_id}'
-load = 'https://viu.com/ott/web/api/container/load?ver=1.0&fmt=json&aver=5.0&appver=2.0&appid=viu_desktop&platform=desktop&id=playlist-{playlist_id}&start=0&limit=20&filter=mixed&contentCountry={region}&contentFlavour=all&regionid=all&languageid=en&ccode={region}&geo={geo}&iid=41be67db-a75a-4525-9d25-f41034cc578c'
-token = 'https://um.viuapi.io/user/identity?ver=1.0&fmt=json&aver=5.0&appver=2.0&appid=viu_desktop&platform=desktop&iid=c1757177-ad9e-4cbb-8025-7f11569645d6'
+# ott = 'https://www.viu.com/ott/{region}/index.php?area_id={area_id}&language_flag_id={language_flag_id}&r=vod/ajax-detail&platform_flag_label=web&area_id={area_id}&language_flag_id={language_flag_id}&product_id={product_id}'
+# load = 'https://viu.com/ott/web/api/container/load?ver=1.0&fmt=json&aver=5.0&appver=2.0&appid=viu_desktop&platform=desktop&id=playlist-{playlist_id}&start=0&limit=20&filter=mixed&contentCountry={region}&contentFlavour=all&regionid=all&languageid=en&ccode={region}&geo={geo}&iid=41be67db-a75a-4525-9d25-f41034cc578c'
+# token = 'https://um.viuapi.io/user/identity?ver=1.0&fmt=json&aver=5.0&appver=2.0&appid=viu_desktop&platform=desktop&iid=c1757177-ad9e-4cbb-8025-7f11569645d6'
+titles = 'https://api-gateway-global.viu.com/api/mobile'
+manifest = 'https://api-gateway-global.viu.com/api/playback/distribute'
+token = 'https://api-gateway-global.viu.com/api/auth/token'
+
+[language_flag_id]
+zh_hk = 1
+zh_cn = 2
+en = 3
+th = 4
+ms = 7
+
+[area_id]
+hk = 1
+sg = 2
+th = 4
+my = 1001
