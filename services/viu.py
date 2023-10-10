@@ -94,7 +94,7 @@ class Viu(BaseService):
             self.logger.info(self._("\nSeason %s total: %s episode(s)\tdownload season %s last episode\n---------------------------------------------------------------"),
                              season_index, current_eps, season_index)
         else:
-            if current_eps != episode_num:
+            if current_eps != 0 and current_eps != episode_num:
                 self.logger.info(self._("\nSeason %s total: %s episode(s)\tupdate to episode %s\tdownload all episodes\n---------------------------------------------------------------"),
                                  season_index, episode_num, current_eps)
             else:
