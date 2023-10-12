@@ -55,10 +55,7 @@ class AppleTVPlus(BaseService):
         if data['playables'][playable_id].get('assets'):
             m3u8_url = data['playables'][playable_id]['assets']['hlsUrl']
         elif data['playables'][playable_id].get('itunesMediaApiData'):
-            hd_item = next(item for item in data['playables'][playable_id]['itunesMediaApiData']
-                           ['offers'] if item['kind'] == 'rent' and item['variant'] == 'HD')
-            if hd_item:
-                m3u8_url = hd_item['hlsUrl']
+            m3u8_url = data['playables'][playable_id]['itunesMediaApiData']['offers'][-1]['hlsUrl']
 
         if not m3u8_url:
             self.logger.error(
@@ -183,7 +180,7 @@ class AppleTVPlus(BaseService):
                             subtitle_list, folder_path, filename)
 
                 convert_subtitle(folder_path=folder_path,
-                                platform=self.platform, subtitle_format=self.subtitle_format, locale=self.locale)
+                                 platform=self.platform, subtitle_format=self.subtitle_format, locale=self.locale)
 
     def parse_m3u(self, m3u8_url):
 
