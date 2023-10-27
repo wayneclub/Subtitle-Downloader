@@ -15,7 +15,7 @@
 - Linux、macOS:
 
 ```bash
-pip install -r requriements
+pip install -r requriements.txt
 ```
 
 - Windows：執行`install_requirements.bat`
