@@ -217,8 +217,8 @@ WeTV
 
 1. Login to meWATCH on browser.
 2. Select movie or series you want to download
-3. Open the devtools in the browser (Windows: Ctrl + Shift + I or F12; macOS: ⌘ + ⌥ + I.)
-4. Refresh the page and select network on devtools
+3. Open the `devtools` in the browser (Windows: Ctrl + Shift + I or F12; macOS: ⌘ + ⌥ + I.)
+4. Refresh the page and select `Network` on devtools
 5. Type `https://www.mewatch.sg/api/account/profile` in filter to find profile api
 6. Copy profile token (X-Authorization) from profile api Request Headers (Do not include `Bearer`, the profile token is start with `eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzUxMiJ9.eyJ`) and paste in `Subtitle-Downloader/user_config.toml ([credentials.meWATCH] profile_token='')`.
 
@@ -300,6 +300,7 @@ python subtitle_downloader.py URL -s 1 -sf .ass
 - Make sure the video contains embedded subtitles (subtitles able to turn on-off) and it is playable in your region.
 
 ## Support & Contributions
+
 - Please ⭐️ this repository if this project helped you!
 - Contributions of any kind welcome!
 

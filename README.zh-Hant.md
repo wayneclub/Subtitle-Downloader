@@ -33,7 +33,7 @@ pip install -r requriements.txt
 | iTunes |  |  |
 | KKTV |  |  |
 | LINE TV |  |  |
-| MeWATCH | 帳號、密碼 | Singapore |
+| MeWATCH | Profile Token | Singapore |
 | MyVideo | Cookies | 台灣 |
 | NowE | Cookies |  |
 | Now Player | Cookies |  |
@@ -211,6 +211,15 @@ WeTV
 | pt | Português | 葡萄牙文 |
 | es | Spanish | 西班牙文 |
 | ko | Korean | 韓文 |
+
+## meWATCH
+
+1. 在瀏覽器登錄 meWATCH
+2. 選擇要下載的電影或連續劇
+3. 在瀏覽器中打開`開發人員工具`（Windows：Ctrl + Shift + I 或 F12；macOS：⌘ + ⌥ + I。）
+4. 重新整理網頁，在開發人員工具上選擇`網路`
+5. 在篩選器中輸入 `https://www.mewatch.sg/api/account/profile`，找到profile api
+6. 複製 profile api 中 Request Headers 的 profile token（X-Authorization）（不要包含 `Bearer`，profile token是"eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzUxMiJ9.eyJ"開頭）貼到 `Subtitle-Downloader/user_config.toml ([credentials.meWATCH] profile_token='')`
 
 ## Now E, Now Player
 
