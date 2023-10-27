@@ -34,7 +34,7 @@ pip install -r requriements.txt
 | iTunes |  |  |
 | KKTV |  |  |
 | LINE TV |  |  |
-| MeWATCH | Email & Password | Singapore |
+| MeWATCH | Profile Token | Singapore |
 | MyVideo | Cookies | Taiwan |
 | NowE | Cookies |  |
 | Now Player | Cookies |  |
@@ -212,6 +212,15 @@ WeTV
 | pt | Português |
 | es | Spanish |
 | ko | Korean |
+
+## meWATCH
+
+1. Login to meWATCH on browser.
+2. Select movie or series you want to download
+3. Open the devtools in the browser (Windows: Ctrl + Shift + I or F12; macOS: ⌘ + ⌥ + I.)
+4. Refresh the page and select network on devtools
+5. Type `https://www.mewatch.sg/api/account/profile` in filter to find profile api
+6. Copy profile token (X-Authorization) from profile api Request Headers (Do not include `Bearer`, the profile token is start with `eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzUxMiJ9.eyJ`) and paste in `Subtitle-Downloader/user_config.toml ([credentials.meWATCH] profile_token='')`.
 
 ## Now E, Now Player
 

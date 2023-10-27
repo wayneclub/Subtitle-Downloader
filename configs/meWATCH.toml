@@ -1,4 +1,4 @@
-credentials = 'email'
+credentials = ''
 device_id = '8cda5412-4864-404d-b5c3-59a8dbd8b6f1'
 
 [api]
@@ -10,5 +10,5 @@ authorization = 'https://www.mewatch.sg/api/authorization/sso/anonymous?ff=idp,l
 movies = 'https://cdn.mewatch.sg/api/items/{content_id}?expand=all&ff=idp,ldp,rpt,cd&lang=en&segments=all&sub=Registered'
 series = 'https://cdn.mewatch.sg/api/items/{content_id}?expand=all&ff=idp,ldp,rpt,cd&lang=en&order=asc&page=1&page_size=100&segments=all&sub=Registered'
 episodes = 'https://cdn.mewatch.sg/api/items/{season_id}/children?ff=idp,ldp,rpt,cd&lang=en&order=asc&page=1&page_size=100&segments=all&sub=Registered'
-# videos = 'https://www.mewatch.sg/api/account/items/{video_id}/videos?delivery=stream&ff=idp,ldp,rpt,cd&lang=en&resolution=External&segments=all&sub=Registered'
-videos = 'https://cdn.mewatch.sg/api/items/{video_id}/videos?delivery=stream,progressive&ff=idp,ldp,rpt,cd&lang=en&resolution=External&segments=all'
+videos = 'https://www.mewatch.sg/api/account/items/{video_id}/videos?delivery=stream&ff=idp,ldp,rpt,cd&lang=en&resolution=External&segments=all&sub=Registered'
+# videos = 'https://cdn.mewatch.sg/api/items/{video_id}/videos?delivery=stream,progressive&ff=idp,ldp,rpt,cd&lang=en&resolution=External&segments=all'

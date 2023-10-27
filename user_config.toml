@@ -42,8 +42,7 @@ password = ''
 cookies = 'www.iq.com_cookies.txt'
 
 [credentials.meWATCH]
-email = ''
-password = ''
+profile_token = ''
 
 [credentials.MyVideo]
 cookies = 'www.myvideo.net.tw_cookies.txt'

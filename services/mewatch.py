@@ -122,7 +122,7 @@ class MeWatch(BaseService):
 
         self.session.headers = {
             'user-agent': user_agent,
-            # 'x-authorization': f'Bearer {self.access_token}',
+            'x-authorization': f'Bearer {self.access_token}',
         }
         media_info_url = self.config['api']['videos'].format(
             video_id=video_id)
@@ -301,6 +301,14 @@ class MeWatch(BaseService):
             sys.exit(1)
 
     def main(self):
+        if credentials[self.platform]['profile_token']:
+            self.access_token = credentials[self.platform]['profile_token'].strip(
+            )
+        else:
+            self.logger.error(
+                "Missing profile_token, please follow readme to get the profile token!")
+            sys.exit(1)
+
         content_id = os.path.basename(self.url).split('-')[-1]
 
         if '/movie' in self.url:
