@@ -7,8 +7,8 @@ recaptcha = 'https://www.google.com/recaptcha/api2/anchor?ar=1&k=6LdHwD0kAAAAACN
 login = 'https://www.mewatch.sg/mcs-signin'
 authorization = 'https://www.mewatch.sg/api/authorization/sso/anonymous?ff=idp,ldp,rpt,cd&lang=en'
 
-movies = 'https://cdn.mewatch.sg/api/items/{conetent_id}?expand=all&ff=idp,ldp,rpt,cd&lang=en&segments=all&sub=Registered'
-series = 'https://cdn.mewatch.sg/api/items/{conetent_id}?expand=all&ff=idp,ldp,rpt,cd&lang=en&order=asc&page=1&page_size=100&segments=all&sub=Registered'
+movies = 'https://cdn.mewatch.sg/api/items/{content_id}?expand=all&ff=idp,ldp,rpt,cd&lang=en&segments=all&sub=Registered'
+series = 'https://cdn.mewatch.sg/api/items/{content_id}?expand=all&ff=idp,ldp,rpt,cd&lang=en&order=asc&page=1&page_size=100&segments=all&sub=Registered'
 episodes = 'https://cdn.mewatch.sg/api/items/{season_id}/children?ff=idp,ldp,rpt,cd&lang=en&order=asc&page=1&page_size=100&segments=all&sub=Registered'
 # videos = 'https://www.mewatch.sg/api/account/items/{video_id}/videos?delivery=stream&ff=idp,ldp,rpt,cd&lang=en&resolution=External&segments=all&sub=Registered'
 videos = 'https://cdn.mewatch.sg/api/items/{video_id}/videos?delivery=stream,progressive&ff=idp,ldp,rpt,cd&lang=en&resolution=External&segments=all'

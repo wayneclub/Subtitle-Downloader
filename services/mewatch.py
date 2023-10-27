@@ -301,11 +301,11 @@ class MeWatch(BaseService):
             sys.exit(1)
 
     def main(self):
-        conetent_id = os.path.basename(self.url).split('-')[-1]
+        content_id = os.path.basename(self.url).split('-')[-1]
 
         if '/movie' in self.url:
             title_url = self.config['api']['movies'].format(
-                conetent_id=conetent_id)
+                content_id=content_id)
             res = self.session.get(url=title_url, timeout=5)
             if res.ok:
                 self.movie_metadata(res.json())
@@ -314,7 +314,7 @@ class MeWatch(BaseService):
                 sys.exit(1)
         else:
             episodes_url = self.config['api']['series'].format(
-                conetent_id=conetent_id)
+                content_id=content_id)
             res = self.session.get(url=episodes_url, timeout=5)
             if res.ok:
                 data = res.json()

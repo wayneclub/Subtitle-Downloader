@@ -212,7 +212,7 @@ class BaseService(object):
                 if season_search:
                     title = season_search.group(1)
                     season_index = int(season_search.group(2)) if season_search.group(
-                        2).isdigit else int(cn2an(season_search.group(2)))
+                        2).isdigit() else int(cn2an(season_search.group(2)))
                 else:
                     season_index = re.search(r'(.+?)( )*(\d+)$', title)
                     if season_index:

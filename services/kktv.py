@@ -45,22 +45,15 @@ class KKTV(BaseService):
         sys.exit(0)
 
     def series_metadata(self, data):
+        title = data['title'].replace('(日)', '').replace('(中)', '').strip()
+        title, season_index = self.get_title_and_season_index(title)
 
-        season_index = re.search(r'(.+)S(\d+)', data['title'])
-        if season_index:
-            title = season_index.group(1).strip()
-            season_index = int(season_index.group(2))
-        else:
-            title = data['title'].strip()
-
-        if 'totalSeriesCount' in data:
-            season_num = data['totalSeriesCount']
-
-        self.logger.info(self._("\n%s total: %s season(s)"), title, season_num)
+        self.logger.info(self._("\n%s total: %s season(s)"),
+                         title, len(data['series']))
 
         if 'series' in data:
             for season in data['series']:
-                if not season_index:
+                if len(data['series']) > 1:
                     season_index = int(re.findall(
                         r'第(.+)季', season['title'])[0].strip())
                 if not self.download_season or season_index in self.download_season:
@@ -81,14 +74,14 @@ class KKTV(BaseService):
                                          season_index,
                                          episode_num)
 
-                    last_ep = [ep['title'] for ep in season['episodes']
-                               if re.search(r'第(\d+)[集|話]', ep['title'])][-1]
-                    last_ep = re.findall(r'第(\d+)[集|話]', last_ep)
+                    # last_ep = [ep['title'] for ep in season['episodes']
+                    #            if re.search(r'第(\d+)[集|話]', ep['title'])][-1]
+                    # last_ep = re.findall(r'第(\d+)[集|話]', last_ep)
 
-                    if last_ep:
-                        fill_num = len(str(last_ep[0]))
-                        if fill_num < 2:
-                            fill_num = 2
+                    # if last_ep:
+                    #     fill_num = len(str(last_ep[0]))
+                    #     if fill_num < 2:
+                    #         fill_num = 2
 
                     languages = set()
                     subtitles = []
@@ -104,7 +97,7 @@ class KKTV(BaseService):
                                 episode['id'].replace(episode['series_id'], ''))
 
                         if not self.download_episode or episode_index in self.download_episode:
-                            filename = f"{name}E{str(episode_index).zfill(fill_num)}.WEB-DL.{self.platform}.zh-Hant.vtt"
+                            filename = f"{name}E{str(episode_index).zfill(2)}.WEB-DL.{self.platform}.zh-Hant.vtt"
 
                             if not episode['subtitles']:
                                 self.logger.error(
@@ -189,21 +182,31 @@ class KKTV(BaseService):
                              platform=self.platform, subtitle_format=self.subtitle_format, locale=self.locale)
 
     def main(self):
-        play_url = self.config['api']['play'].format(title_id=self.title_id)
+        # play_url = self.config['api']['play'].format(title_id=self.title_id)
+        # res = self.session.get(url=play_url, timeout=5)
+        # if res.ok:
+        #     match = re.search(r'({\"props\":{.*})', res.text)
+        #     data = orjson.loads(match.group(1))
 
-        res = self.session.get(url=play_url, timeout=5)
+        #     if self.title_id in data['props']['initialState']['titles']['byId']:
+        #         data = data['props']['initialState']['titles']['byId'][self.title_id]
+        #     else:
+        #         self.logger.error(self._("\nSeries not found!"))
+        #         sys.exit(0)
+
+        #     if 'titleType' in data and data['titleType'] == 'film':
+        #         self.movie_metadata(data)
+        #     else:
+        #         self.series_metadata(data)
+        # else:
+        #     self.logger.error(res.text)
+
+        res = self.session.get(url=self.config["api"]["titles"].format(
+            title_id=self.title_id), timeout=10)
         if res.ok:
-            match = re.search(r'({\"props\":{.*})', res.text)
-            data = orjson.loads(match.group(1))
-
-            if self.title_id in data['props']['initialState']['titles']['byId']:
-                data = data['props']['initialState']['titles']['byId'][self.title_id]
-            else:
-                self.logger.error(self._("\nSeries not found!"))
-                sys.exit(0)
-
-            if 'titleType' in data and data['titleType'] == 'film':
-                self.movie_metadata(data)
+            data = res.json()['data']
+            if data.get('title_type') == 'film':
+                self.movie = True
             else:
                 self.series_metadata(data)
         else:
