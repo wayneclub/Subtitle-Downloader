@@ -215,7 +215,7 @@ WeTV
 
 ## meWATCH
 
-1. Login to meWATCH on browser.
+1. Login [meWATCH](https://www.mewatch.sg/) on browser.
 2. Select movie or series you want to download
 3. Open the `devtools` in the browser (Windows: Ctrl + Shift + I or F12; macOS: ⌘ + ⌥ + I.)
 4. Refresh the page and select `Network` on devtools
