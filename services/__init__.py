@@ -10,6 +10,7 @@ from services.kktv import KKTV
 from services.linetv import LineTV
 from services.fridayvideo import FridayVideo
 from services.catchplay import CatchPlay
+from services.crunchyroll import Crunchyroll
 from services.iqiyi.iqiyi import IQIYI
 from services.mewatch import MeWatch
 from services.myvideo import MyVideo
@@ -34,6 +35,11 @@ service_map = [
         'name': Service.CATCHPLAY,
         'class': CatchPlay,
         'domain': 'catchplay.com'
+    },
+    {
+        'name': Service.CRUNCHYROLL,
+        'class': Crunchyroll,
+        'domain': 'crunchyroll.com'
     },
     {
         'name': Service.DISNEYPLUS,

@@ -14,7 +14,7 @@ downloads = ''
 
 # Copy user-agent from login browser (https://www.whatsmyua.info/)
 [headers]
-User-Agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36'
+User-Agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36'
 
 [credentials]
 
@@ -26,6 +26,9 @@ cookies = 'tv.apple.com_cookies.txt'
 
 [credentials.CatchPlay]
 cookies = 'www.catchplay.com_cookies.txt'
+
+[credentials.Crunchyroll]
+cookies = 'www.crunchyroll.com_cookies.txt'
 
 [credentials.DisneyPlus]
 email = ''

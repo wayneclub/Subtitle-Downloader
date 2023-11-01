@@ -1,0 +1,5 @@
+credentials = 'cookies'
+
+[api]
+titles = 'https://www.crunchyroll.com/content/v2/cms/series/{content_id}/seasons'
+token = 'https://www.crunchyroll.com/auth/v1/token'

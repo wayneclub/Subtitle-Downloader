@@ -11,8 +11,10 @@ class Service:
     Define all streaming services name
     """
 
+    AMAZON = 'Amazon'
     APPLETVPLUS = 'AppleTVPlus'
     CATCHPLAY = 'CatchPlay'
+    CRUNCHYROLL = 'Crunchyroll'
     DISNEYPLUS = 'DisneyPlus'
     FRIDAYVIDEO = 'FridayVideo'
     HBOGOASIA = 'HBOGOAsia'
