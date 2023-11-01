@@ -25,23 +25,24 @@ pip install -r requriements.txt
 
 | Name | Authentication | Geo-blocking |
 | ---- | -------------- | ------------ |
-| Apple TV+ | Cookies |  |
+| Apple TV+ | Cookies | |
 | CatchPlay | Cookies | Indonesia, Singapore, and Taiwan |
-| Disney+ | Email & Password |  |
+| Crunchyroll | Cookies | |
+| Disney+ | Email & Password | |
 | Friday Video | Cookies | Taiwan |
-| HBO GO Asia | Email & Password |  |
+| HBO GO Asia | Email & Password | |
 | iQIYI (iq.com) | Cookies | Partial region |
-| iTunes |  |  |
-| KKTV |  |  |
-| LINE TV |  |  |
+| iTunes | | |
+| KKTV | | |
+| LINE TV | | |
 | MeWATCH | Profile Token | Singapore |
 | MyVideo | Cookies | Taiwan |
-| NowE | Cookies |  |
-| Now Player | Cookies |  |
+| NowE | Cookies | |
+| Now Player | Cookies | |
 | Viki | Cookies | Partial region |
-| Viu |  |  |
+| Viu | | |
 | WeTV | Cookies | Partial region |
-| YouTube | Cookies (Subscribe channel) |  |
+| YouTube | Cookies (Subscribe channel) | |
 
 ### Get Cookies
 

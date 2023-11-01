@@ -7,10 +7,8 @@ This module is to download subtitle from Crunchyroll
 
 import os
 from pathlib import Path
-import re
 import shutil
 import sys
-from cn2an import cn2an
 import yt_dlp
 from services.baseservice import BaseService
 from utils.helper import get_all_languages, get_language_code, get_locale

@@ -24,23 +24,24 @@ pip install -r requriements.txt
 
 | 名稱 | 驗證方式 | 區域限制 |
 | ---- | ------- | ------ |
-| Apple TV+ | Cookies |  |
+| Apple TV+ | Cookies | |
 | CatchPlay | Cookies | 印尼、新加坡、台灣 |
-| Disney+ | 帳號、密碼 |  |
+| Crunchyroll | Cookies | |
+| Disney+ | 帳號、密碼 | |
 | friDay影音 | Cookies | 台灣 |
-| HBO GO Asia | 帳號、密碼 |  |
+| HBO GO Asia | 帳號、密碼 | |
 | 愛奇藝 (iq.com) | Cookies | 部分區域 |
-| iTunes |  |  |
-| KKTV |  |  |
-| LINE TV |  |  |
+| iTunes | | |
+| KKTV | | |
+| LINE TV | | |
 | MeWATCH | Profile Token | Singapore |
 | MyVideo | Cookies | 台灣 |
-| NowE | Cookies |  |
-| Now Player | Cookies |  |
+| NowE | Cookies | |
+| Now Player | Cookies | |
 | Viki | Cookies | 部分區域 |
-| Viu |  |  |
+| Viu | | |
 | WeTV | Cookies | 部分區域 |
-| YouTube | Cookies（訂閱頻道） |  |
+| YouTube | Cookies（訂閱頻道） | |
 
 ### 取得Cookies
 
