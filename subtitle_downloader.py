@@ -95,7 +95,7 @@ def main() -> None:
     args = parser.parse_args()
 
     if args.debug:
-        os.makedirs(directories['logs'], exist_ok=True)
+        os.makedirs(directories.logs, exist_ok=True)
         log_time = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
         log_file_path = str(filenames.log).format(
             app_name=app_name, log_time=log_time)

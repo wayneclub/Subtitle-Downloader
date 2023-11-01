@@ -102,7 +102,7 @@ def convert_subtitle(folder_path="", platform="", subtitle_format="", locale="")
             folder = os.listdir(folder_path)
             for file in sorted(folder):
                 extenison = Path(file).suffix.lower()
-                if is_subtitle(os.path.join(folder_path, file), '.vtt'):
+                if is_subtitle(os.path.join(folder_path, file)) and extenison != subtitle_format:
                     if display:
                         logger.info(
                             _("\nConvert %s to %s:\n---------------------------------------------------------------"), extenison, subtitle_format)
