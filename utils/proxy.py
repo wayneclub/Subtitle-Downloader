@@ -94,7 +94,7 @@ def get_nordvpn_server(country: str) -> Optional[str]:
         url="https://nordvpn.com/wp-admin/admin-ajax.php",
         params={
             "action": "servers_recommendations",
-            "filters": orjson.dumps({"country_id": country_id}).decode('utf-8')
+            "filters": orjson.dumps({"country_id": country_id}).decode('utf-8')   # pylint: disable=maybe-no-member
         },
         timeout=5
     ).json()
