@@ -1,6 +1,6 @@
 # 字幕下載器
 
-[![en](https://img.shields.io/badge/lang-English-blue)](https://github.com/wayneclub/Subtitle-Downloader/blob/main/README.md) [![python](https://img.shields.io/badge/python-3.8-blue)](https://www.python.org/downloads/)
+[![en](https://img.shields.io/badge/lang-English-blue)](https://github.com/wayneclub/Subtitle-Downloader/blob/main/README.md) [![python](https://img.shields.io/badge/python-3.11-blue)](https://www.python.org/downloads/)
 
 **禁止營利使用，只限個人研究和語言學習，字幕版權皆屬原串流平台所有**
 
@@ -8,7 +8,7 @@
 
 ## 說明
 
-字幕下載器是一個方便您從各大串流平台上下載字幕的程式。需要安裝 **[Python 3.8](https://www.python.org/downloads/)** 以上的版本和 **[NodeJS](https://nodejs.org/en/download)**，可以在 Linux、Windows 或 macOS 上執行。
+字幕下載器是一個方便您從各大串流平台上下載字幕的程式。需要安裝 **[Python 3.10](https://www.python.org/downloads/)** 以上的版本和 **[NodeJS](https://nodejs.org/en/download)**，可以在 Linux、Windows 或 macOS 上執行。
 
 ## 安裝方式
 
@@ -228,61 +228,61 @@ WeTV
 
 ## 更多範例
 
-- Download all seasons and all episodes
+- 下載 全部字幕
 
 ```bash
 python subtitle_downloader.py URL
 ```
 
-- Download season 1 episode 1
+- 下載 第 1 季 第 1 集的字幕
 
 ```bash
 python subtitle_downloader.py URL -s 1 -e 1
 ```
 
-- Download season 1 episode 1's subtitle with all langugages
+- 下載 第 1 季 第 1 集 所有語言的字幕
 
 ```bash
 python subtitle_downloader.py URL -s 1 -e 1 -slang all
 ```
 
-- Download all episodes subtitles with all langugages: en, zh-Hant
+- 下載 所有英文、繁體中文的字幕
 
 ```bash
 python subtitle_downloader.py https://www.disneyplus.com/series/loki/6pARMvILBGzF -slang en,zh-Hant
 ```
 
-- Download latest episode
+- 下載 最新一集的字幕
 
 ```bash
 python subtitle_downloader.py URL -l
 ```
 
-- Download season 1 episode 1-10
+- 下載 第 1 季 第 1-10 集的字幕
 
 ```bash
 python subtitle_downloader.py URL -s 1 -e 1-10
 ```
 
-- Download season 1 episode 1,3,5
+- 下載 第 1 季 第 1、3、5 集的字幕
 
 ```bash
 python subtitle_downloader.py URL -s 1 -e 1,3,5
 ```
 
-- Download season 1 episodes with NordVPN (region=tw)
+- 使用NordVPN 台灣區域 下載 第 1 季的字幕
 
 ```bash
 python subtitle_downloader.py URL -s 1 -p tw
 ```
 
-- Download season 1 episodes with proxy (Clash)
+- 使用代理 (Clash) 下載 第 1 季的字幕
 
 ```bash
 python subtitle_downloader.py URL -s 1 -p http:127.0.0.1:7890
 ```
 
-- Download season 1 episodes with .ass format subtitle
+- 下載 第 1 季全集字幕為 .ass 格式
 
 ```bash
 python subtitle_downloader.py URL -s 1 -sf .ass

@@ -1,14 +1,14 @@
 # Subtitle Downloader
 
-[![zh](https://img.shields.io/badge/lang-中文-blue)](https://github.com/wayneclub/Subtitle-Downloader/blob/main/README.zh-Hant.md) [![python](https://img.shields.io/badge/python-3.8-blue)](https://www.python.org/downloads/)
+[![zh](https://img.shields.io/badge/lang-中文-blue)](https://github.com/wayneclub/Subtitle-Downloader/blob/main/README.zh-Hant.md) [![python](https://img.shields.io/badge/python-3.11-blue)](https://www.python.org/downloads/)
 
 **NON-COMMERCIAL USE ONLY**
 
-Subtitle-Downloader supports downloading subtitles from multiple streaming services, such as Apple TV+, CatchPlay, Crunchyroll, Disney+, FridayVideo, HBO GO Asia, iQIYI, iTunes, KKTV, LINE TV, meWATCH, MyVideo, NowE, NowPlayer, Viki, Viu, WeTV, YouTube, and etc.
+Subtitle-Downloader supports downloading subtitles from multiple streaming services, such as Apple TV+, CatchPlay, Crunchyroll, Disney+, FridayVideo, HBO GO Asia, iQIYI, iTunes, KKTV, LINE TV, meWATCH, MyVideo, NowE, NowPlayer, Viki, Viu, WeTV, YouTube, etc.
 
 ## DESCRIPTION
 
-Subtitle-Downloader is a command-line program to download subtitles from the most popular streaming platform. It requires **[Python 3.8+](https://www.python.org/downloads/)**, and **[NodeJS](https://nodejs.org/en/download)**. It should work on Linux, on Windows or on macOS. This project is only for personal research and language learning.
+Subtitle-Downloader is a command-line program to download subtitles from the most popular streaming platform. It requires **[Python 3.10+](https://www.python.org/downloads/)**, and **[NodeJS](https://nodejs.org/en/download)**. It should work on Linux, on Windows, or macOS. This project is only for personal research and language learning.
 
 ## INSTALLATION
 
@@ -55,19 +55,19 @@ pip install -r requriements.txt
 
 ## USAGE
 
-### Online **_(Colab environment is in the US, if you want to use in other region please execute on local)_**
+### Online **_(Colab environment is in the US, if you want to use it in another region please execute it locally)_**
 
 1. Save a copy in Drive
 2. Connect Colab
 3. Install the requirements (Click 1st play button)
-4. Depend the download platform and modify the text field  (Cick the play button next to it when modified complete)
-5. Download the subtitles from the left side menu
+4. Depend the download platform and modify the text field  (Click the play button next to it when modified completely)
+5. Download the subtitles from the left-side menu
 
 <a href="https://colab.research.google.com/drive/1WdHOKNatft4J7DNOweP4gE2qtg7cvwEf?usp=sharing" target="_blank"><img src="https://colab.research.google.com/assets/colab-badge.svg" title="Open this file in Google Colab" alt="Colab"/></a>
 
 ### Local
 
-1. Depend on download platform and modify `Subtitle-Downloader/user_config.toml`
+1. Depending on the download platform and modify `Subtitle-Downloader/user_config.toml`
 
     ```toml
     [subtitles]
@@ -89,8 +89,8 @@ pip install -r requriements.txt
     password = ''
     ```
 
-2. Follow each platform requirements and put cookies.txt into `Subtitle-Downloader/cookies`
-3. Execute the program with command line or `Subtitle-Downloader.bat` (Paste title url)
+2. Follow each platform's requirements and put cookies.txt into `Subtitle-Downloader/cookies`
+3. Execute the program with the command line or `Subtitle-Downloader.bat` (Paste the title's URL)
 
     ```bash
     python subtitle_downloader.py URL [OPTIONS]
@@ -215,16 +215,16 @@ WeTV
 
 ## meWATCH
 
-1. Login [meWATCH](https://www.mewatch.sg/) on browser.
-2. Select movie or series you want to download
+1. Login to [meWATCH](https://www.mewatch.sg/) on the browser.
+2. Select a movie or series you want to download
 3. Open the `devtools` in the browser (Windows: Ctrl + Shift + I or F12; macOS: ⌘ + ⌥ + I.)
-4. Refresh the page and select `Network` on devtools
-5. Type `https://www.mewatch.sg/api/account/profile` in filter to find profile api
-6. Copy profile token (X-Authorization) from profile api Request Headers (Do not include `Bearer`, the profile token is start with `eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzUxMiJ9.eyJ`) and paste in `Subtitle-Downloader/user_config.toml ([credentials.meWATCH] profile_token='')`.
+4. Refresh the page and select `Network` on `devtools`
+5. Type `https://www.mewatch.sg/api/account/profile` in the filter to find the profile api
+6. Copy profile token (X-Authorization) from profile API Request Headers (Do not include `Bearer`, the profile token starts with `eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzUxMiJ9.eyJ`) and paste in `Subtitle-Downloader/user_config.toml ([credentials.meWATCH] profile_token='')`.
 
 ## Now E, Now Player
 
-- Copy user-agent from login browser [https://www.whatsmyua.info/](https://www.whatsmyua.info/) and paste it in `Subtitle-Downloader/user_config.toml (User-Agent)`. The user-agent must be same as login browser user-agent.
+- Copy the user-agent from login browser [https://www.whatsmyua.info/](https://www.whatsmyua.info/) and paste it in `Subtitle-Downloader/user_config.toml (User-Agent)`. The user-agent must be the same as login browser user-agent.
 
 ## More Examples
 
@@ -240,19 +240,19 @@ python subtitle_downloader.py URL
 python subtitle_downloader.py URL -s 1 -e 1
 ```
 
-- Download season 1 episode 1's subtitle with all langugages
+- Download season 1 episode 1's subtitle with all languages
 
 ```bash
 python subtitle_downloader.py URL -s 1 -e 1 -slang all
 ```
 
-- Download all episodes subtitles with all langugages: en, zh-Hant
+- Download all episode subtitles in all languages: en, zh-Hant
 
 ```bash
 python subtitle_downloader.py https://www.disneyplus.com/series/loki/6pARMvILBGzF -slang en,zh-Hant
 ```
 
-- Download latest episode
+- Download the latest episode
 
 ```bash
 python subtitle_downloader.py URL -l
@@ -296,13 +296,13 @@ python subtitle_downloader.py URL -s 1 -sf .ass
 
 ## FAQ
 
-- Any issue during downloading subtitles, upload the screenshot and log file (Please provide title, platform and region).
-- Make sure the video contains embedded subtitles (subtitles able to turn on-off) and it is playable in your region.
+- Any issue during downloading subtitles, upload the screenshot and log file (Please provide title, platform, and region).
+- Make sure the video contains embedded subtitles (subtitles able to turn on and off) and it is playable in your region.
 
 ## Support & Contributions
 
 - Please ⭐️ this repository if this project helped you!
-- Contributions of any kind welcome!
+- Contributions of any kind are welcome!
 
  <a href="https://www.buymeacoffee.com/wayneclub" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/black_img.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
 
