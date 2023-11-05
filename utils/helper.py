@@ -4,12 +4,9 @@
 """
 This module is for common tool.
 """
-import os
 import locale
 import logging
 import gettext
-import re
-import sys
 from natsort import natsorted
 import requests
 import validators
@@ -75,8 +72,8 @@ class EpisodesNumbersHandler(object):
 def get_locale(name, lang=""):
     """Get environment locale"""
 
-    if locale.getdefaultlocale():
-        current_locale = locale.getdefaultlocale()[0]
+    if locale.getlocale()[0]:
+        current_locale = locale.getlocale()[0]
     else:
         current_locale = 'en'
 
