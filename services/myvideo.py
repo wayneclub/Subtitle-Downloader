@@ -214,14 +214,11 @@ class MyVideo(BaseService):
                     release_year = meta.text
                     break
 
-            for meta in soup.find_all('script', type='application/ld+json'):
-                if 'VideoObject' not in meta.text:
-                    data = orjson.loads(meta.text)
-                    data['release_year'] = release_year
-                    break
+            data = orjson.loads(soup.find_all(
+            'script', type='application/ld+json')[2].text)
 
             if data:
-                if '/details/0/' in self.url or 'seriesType=0' in self.url:
+                if data.get('@type') == 'Movie':
                     self.movie_metadata(data)
                 else:
                     season_list = []
