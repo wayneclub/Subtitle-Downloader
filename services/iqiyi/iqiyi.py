@@ -209,6 +209,8 @@ class IQIYI(BaseService):
                             else:
                                 self.logger.error(
                                     "Invaild dash_url, wrong vf!")
+                                self.logger.error(
+                                    "Renew your cookies and try again!")
                                 sys.exit(1)
                         else:
                             self.logger.error(episode_res.text)
