@@ -213,26 +213,32 @@ class MyVideo(BaseService):
                 if meta.text.isdigit() and len(meta.text) == 4:
                     release_year = meta.text
                     break
+            json = soup.find_all(
+                'script', type='application/ld+json')
+            data = next(
+                (metadata.text for metadata in json if 'TVSeries' in metadata.text), next(
+                    (metadata.text for metadata in json if 'Movie' in metadata.text), None))
+            if not data:
+                self.logger.error(f" - Failed to get title: {self.url}")
+                sys.exit(1)
 
-            data = orjson.loads(soup.find_all(
-            'script', type='application/ld+json')[2].text)
-
-            if data:
-                if data.get('@type') == 'Movie':
-                    self.movie_metadata(data)
-                else:
-                    season_list = []
-                    for season in soup.find('ul', class_='seasonSelectorList').find_all('a'):
-                        season_search = re.search(r'第(.+?)季', season.text)
-                        if season_search and not '國語版' in season.text:
-                            season_list.append({
-                                'index': int(cn2an(season_search.group(1))),
-                                'url': f"https://www.myvideo.net.tw/{season['href']}",
-                            })
-                    if not season_list:
+            data = orjson.loads(data)
+            data['release_year'] = release_year
+            if data.get('@type') == 'Movie':
+                self.movie_metadata(data)
+            else:
+                season_list = []
+                for season in soup.find('ul', class_='seasonSelectorList').find_all('a'):
+                    season_search = re.search(r'第(.+?)季', season.text)
+                    if season_search and not '國語版' in season.text:
                         season_list.append({
-                            'index': 1,
-                            'url': self.url,
+                            'index': int(cn2an(season_search.group(1))),
+                            'url': f"https://www.myvideo.net.tw/{season['href']}",
                         })
+                if not season_list:
+                    season_list.append({
+                        'index': 1,
+                        'url': self.url,
+                    })
 
-                    self.series_metadata(data, season_list)
+                self.series_metadata(data, season_list)
