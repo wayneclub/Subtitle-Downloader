@@ -10,7 +10,7 @@ import gettext
 from natsort import natsorted
 import requests
 import validators
-from configs.config import user_agent
+from configs.config import config, user_agent
 from constants import ISO_6391
 
 
@@ -79,6 +79,8 @@ def get_locale(name, lang=""):
 
     if lang and 'zh' in lang:
         current_locale = 'zh'
+    elif config.locale and config.locale in ['en', 'zh-Hant']:
+        current_locale = config.locale
 
     if 'zh' in current_locale:
         locale_ = gettext.translation(

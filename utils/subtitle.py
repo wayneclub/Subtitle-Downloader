@@ -14,6 +14,7 @@ import sys
 import pysubs2
 from chardet import detect
 from utils.helper import get_locale
+from configs.config import config
 from constants import SUBTITLE_FORMAT
 
 
@@ -146,6 +147,9 @@ def archive_subtitle(folder_path, platform="", locale=""):
     Archive subtitles
     """
     _ = get_locale(__name__, locale)
+
+    if not config.subtitles['archive']:
+        return
 
     contain_subtitle = False
     for path, dirs, files in os.walk(folder_path):

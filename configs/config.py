@@ -19,12 +19,13 @@ class Config:
     """
 
     def __init__(self, **kwargs: Any):
-        self.subtitles: dict = kwargs.get("subtitles") or {}
-        self.credentials: dict = kwargs.get("credentials") or {}
-        self.directories: dict = kwargs.get("directories") or {}
-        self.headers: dict = kwargs.get("headers") or {}
-        self.nordvpn: dict = kwargs.get("nordvpn") or {}
-        self.proxies: dict = kwargs.get("proxies") or {}
+        self.locale: str = kwargs.get('locale') or ''
+        self.subtitles: dict = kwargs.get('subtitles') or {}
+        self.credentials: dict = kwargs.get('credentials') or {}
+        self.directories: dict = kwargs.get('directories') or {}
+        self.headers: dict = kwargs.get('headers') or {}
+        self.nordvpn: dict = kwargs.get('nordvpn') or {}
+        self.proxies: dict = kwargs.get('proxies') or {}
 
     @classmethod
     def from_toml(cls, path: Path) -> Config:
