@@ -273,6 +273,17 @@ class AppleTVPlus(BaseService):
             self.logger.error(res.text)
             sys.exit(1)
 
+    def get_storefrond_id(self) -> str:
+        """Get storefrond id"""
+
+        res = self.session.get(
+            self.config['api']['storefront'], timeout=5)
+        if res.ok:
+            return res.json()['storeFrontId']
+        else:
+            self.logger.error(res.text)
+            sys.exit(1)
+
     def get_configurations(self) -> Optional[dict]:
         """Get configurations"""
 
@@ -307,6 +318,10 @@ class AppleTVPlus(BaseService):
             'media-user-token': self.cookies['media-user-token'],
             'x-apple-music-user-token': self.cookies['media-user-token']
         })
+
+        storefrond_id = self.get_storefrond_id()
+        if storefrond_id:
+            self.config['device']['sf'] = storefrond_id
 
         configurations = self.get_configurations()
         if configurations:
