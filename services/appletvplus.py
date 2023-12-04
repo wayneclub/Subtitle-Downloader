@@ -242,8 +242,6 @@ class AppleTVPlus(BaseService):
 
             languages.add(lang_folder_path)
 
-            self.logger.debug(filename, len(sub['urls']))
-
             for url in sub['urls']:
                 subtitle = dict()
                 subtitle['name'] = filename
