@@ -160,6 +160,10 @@ class AppleTVPlus(BaseService):
                         if res.ok:
                             episode_data = res.json()['data']
                             playable_id = episode_data['smartPlayables'][-1]['playableId']
+                            if not 'assets' in episode_data['playables'][playable_id]:
+                                self.logger.error(
+                                    self._("Please renew the cookies!"))
+                                sys.exit(1)
                             m3u8_url = episode_data['playables'][playable_id]['assets']['hlsUrl']
                             self.logger.debug("m3u8_url: %s", m3u8_url)
                         else:

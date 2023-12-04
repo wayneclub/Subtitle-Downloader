@@ -71,8 +71,9 @@ pip install -r requriements.txt
 
     ```toml
     [subtitles]
-    default-language = 'en'
-    default-format = '.srt'
+    default-language = 'en'  # all/en/zh-Hant/zh-Hans/zh-HK/ja/ko
+    default-format = '.srt'  # .srt/.ass
+    archive = true           # true/false
 
     [headers]
     User-Agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36'

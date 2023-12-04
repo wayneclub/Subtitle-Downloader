@@ -2,9 +2,9 @@
 locale = '' # en/zh-Hant; default: system locale
 
 [subtitles]
-default-language = 'zh-Hant' # all/en/zh-Hant/zh-Hans/zh-HK
-default-format = '.srt'      # .srt/.ass
-archive = true               # true/false
+default-language = 'all' # all/en/zh-Hant/zh-Hans/zh-HK/ja/ko
+default-format = '.srt'  # .srt/.ass
+archive = true           # true/false
 
 # Default cookies dir: Subtitle-Downloader/cookies
 #         downloads dir: Subtitle-Downloader/downloads
