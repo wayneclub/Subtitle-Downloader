@@ -56,7 +56,7 @@ class AppleTVPlus(BaseService):
             m3u8_url = data['playables'][playable_id]['assets']['hlsUrl']
         elif data['playables'][playable_id].get('itunesMediaApiData'):
             m3u8_url = data['playables'][playable_id]['itunesMediaApiData']['offers'][-1]['hlsUrl']
-
+        print(data['playables'][playable_id])
         if not m3u8_url:
             self.logger.error(
                 self._("\nSorry, you haven't purchased this movie!"))
