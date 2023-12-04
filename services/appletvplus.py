@@ -49,13 +49,13 @@ class AppleTVPlus(BaseService):
             shutil.rmtree(folder_path)
 
         filename = f'{title}.WEB-DL.{self.platform}.vtt'
-        playable_id = data['smartPlayables'][-1]['playableId']
+        playable_id = data['smartPlayables'][0]['playableId']
 
         m3u8_url = ''
         if data['playables'][playable_id].get('assets'):
             m3u8_url = data['playables'][playable_id]['assets']['hlsUrl']
         elif data['playables'][playable_id].get('itunesMediaApiData'):
-            m3u8_url = data['playables'][playable_id]['itunesMediaApiData']['offers'][-1]['hlsUrl']
+            m3u8_url = data['playables'][playable_id]['itunesMediaApiData']['offers'][0]['hlsUrl']
 
         if not m3u8_url:
             self.logger.error(
@@ -78,9 +78,7 @@ class AppleTVPlus(BaseService):
                          platform=self.platform, subtitle_format=self.subtitle_format, locale=self.locale)
 
     def series_subtitle(self, data):
-
         title = data['content']['title']
-
         seasons = data['howToWatch'][0]['seasons']
         season_num = len(seasons)
 
@@ -192,7 +190,7 @@ class AppleTVPlus(BaseService):
         languages = set()
         playlists = m3u8.load(m3u8_url).playlists
         for media in playlists[0].media:
-            if media.type == 'SUBTITLES':
+            if media.type in ['SUBTITLES', 'CLOSED-CAPTION']:
                 if media.language:
                     sub_lang = get_language_code(media.language)
                 if media.forced == 'YES':
@@ -206,6 +204,9 @@ class AppleTVPlus(BaseService):
                 sub['m3u8_url'] = urljoin(media.base_uri, media.uri)
                 languages.add(sub_lang)
                 sub_url_list.append(sub)
+
+        if not sub_url_list:
+            return None
 
         get_all_languages(available_languages=languages,
                           subtitle_language=self.subtitle_language, locale_=self.locale)
@@ -224,7 +225,6 @@ class AppleTVPlus(BaseService):
         return subtitle_list
 
     def get_subtitle(self, subtitle_list, folder_path, sub_name):
-
         languages = set()
         subtitles = []
 
