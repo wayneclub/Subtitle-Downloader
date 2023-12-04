@@ -55,7 +55,7 @@ class AppleTVPlus(BaseService):
         if data['playables'][playable_id].get('assets'):
             m3u8_url = data['playables'][playable_id]['assets']['hlsUrl']
         elif data['playables'][playable_id].get('itunesMediaApiData'):
-            m3u8_url = data['playables'][playable_id]['itunesMediaApiData']['offers'][0]['hlsUrl']
+            m3u8_url = data['playables'][playable_id]['itunesMediaApiData']['offers'][-1]['hlsUrl']
 
         if not m3u8_url:
             self.logger.error(
@@ -157,7 +157,7 @@ class AppleTVPlus(BaseService):
                             id=episode['id']), params=self.config['device'], timeout=5)
                         if res.ok:
                             episode_data = res.json()['data']
-                            playable_id = episode_data['smartPlayables'][-1]['playableId']
+                            playable_id = episode_data['smartPlayables'][0]['playableId']
                             if not 'assets' in episode_data['playables'][playable_id]:
                                 self.logger.error(
                                     self._("Please renew the cookies!"))
