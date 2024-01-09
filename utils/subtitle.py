@@ -119,7 +119,7 @@ def convert_subtitle(folder_path="", platform="", subtitle_format="", locale="")
                     subs = format_subtitle(subs)
                     if subtitle_format == '.ass':
                         subs = set_ass_style(subs)
-                    subs.save(subtitle_name)
+                    subs.save(subtitle_name, keep_ssa_tags=True)
                     logger.info(os.path.basename(subtitle_name))
                     os.remove(subtitle)
                     folder = os.listdir(folder_path)
@@ -137,7 +137,7 @@ def convert_subtitle(folder_path="", platform="", subtitle_format="", locale="")
             subs = format_subtitle(subs)
             if subtitle_format == '.ass':
                 subs = set_ass_style(subs)
-            subs.save(subtitle_name)
+            subs.save(subtitle_name, keep_ssa_tags=True)
             os.remove(folder_path)
             logger.info(os.path.basename(subtitle_name))
 
@@ -255,7 +255,7 @@ def merge_subtitle_fragments(folder_path="", filename="", subtitle_format="", lo
         file_path = file_path.replace(extenison, subtitle_format)
         if subtitle_format == '.ass':
             subs = set_ass_style(subs)
-        subs.save(file_path)
+        subs.save(file_path, keep_ssa_tags=True)
         logger.info(os.path.basename(file_path))
         if os.path.exists(folder_path):
             shutil.rmtree(folder_path)
