@@ -139,13 +139,10 @@ class MyVideo(BaseService):
             sys.exit(1)
 
     def get_media_info(self, content_id, filename):
-
         media_info_url = self.config['api']['media_info'].format(
             content_id=content_id)
-
         res = self.session.get(url=media_info_url, timeout=5)
         self.check_session()
-
         if res.ok:
             data = res.json()
             if data.get('data'):
@@ -163,23 +160,19 @@ class MyVideo(BaseService):
             sys.exit(1)
 
     def get_subtitle(self, media_info, folder_path, filename):
-
         lang_paths = set()
         subtitles = []
         if media_info:
             if 'subtitleList' in media_info:
                 for sub in media_info['subtitleList']:
                     sub_lang = get_language_code(sub['languageCode'])
-
                     if len(self.subtitle_language) > 1 or 'all' in self.subtitle_language:
                         lang_folder_path = os.path.join(folder_path, sub_lang)
                     else:
                         lang_folder_path = folder_path
                     lang_paths.add(lang_folder_path)
-
                     os.makedirs(lang_folder_path,
                                 exist_ok=True)
-
                     subtitles.append({
                         'name': filename,
                         'path': folder_path,

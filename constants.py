@@ -96,6 +96,7 @@ ISO_6391 = {
     'vietnamese': 'vi',
     'bahasa indonesia': 'id',
     'indonesian': 'id',
+    'eng': 'en',
     'english': 'en',
     'korean': 'ko',
     'arabic': 'ar',
