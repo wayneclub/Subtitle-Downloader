@@ -272,8 +272,11 @@ def add_comment(subs):
 
 def format_zh_subtitle(subs):
     """
-    Format subtitle
+    Format Chinese subtitle
     """
+    if not config.subtitles['fix-subtitle']:
+        return subs
+
     for sub in subs:
         text = sub.text
         if re.search(r'[\u4E00-\u9FFF]', text):
