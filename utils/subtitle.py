@@ -119,27 +119,13 @@ def convert_subtitle(folder_path="", platform="", subtitle_format="", locale="")
                     subs = format_subtitle(subs)
                     if subtitle_format == '.ass':
                         subs = set_ass_style(subs)
-                    subs.save(subtitle_name, keep_ssa_tags=True)
+                    subs.save(subtitle_name, keep_unknown_html_tags=True)
                     logger.info(os.path.basename(subtitle_name))
                     os.remove(subtitle)
                     folder = os.listdir(folder_path)
             if platform:
                 archive_subtitle(folder_path=os.path.normpath(
                     folder_path), platform=platform, locale=locale)
-
-        elif is_subtitle(folder_path, '.vtt'):
-            subtitle_name = folder_path.replace(
-                Path(folder_path).suffix, subtitle_format)
-            convert_utf8(folder_path)
-            subs = pysubs2.load(folder_path)
-            if '.zh-Hant' in subtitle_name:
-                subs = format_zh_subtitle(subs)
-            subs = format_subtitle(subs)
-            if subtitle_format == '.ass':
-                subs = set_ass_style(subs)
-            subs.save(subtitle_name, keep_ssa_tags=True)
-            os.remove(folder_path)
-            logger.info(os.path.basename(subtitle_name))
 
 
 def archive_subtitle(folder_path, platform="", locale=""):
@@ -230,6 +216,32 @@ def merge_subtitle_fragments(folder_path="", filename="", subtitle_format="", lo
         if display:
             logger.info(_(
                 "\nMerge segments：\n---------------------------------------------------------------"))
+
+        if subtitle_format == '.vtt':
+            subtitle = ""
+            for index, segment in enumerate(sorted(os.listdir(folder_path))):
+                file_path = os.path.join(folder_path, segment)
+                if is_subtitle(file_path):
+                    with open(file_path, 'r', encoding='utf-8') as file:
+                        text = file.read()
+                        if text.count('\n') <= 6:
+                            continue
+
+                        if index > 0:
+                            text = re.sub(
+                                r'^WEBVTT\nX-TIMESTAMP-MAP.+\n\n', '', text)
+                    subtitle += text
+            file_path = os.path.join(
+                Path(folder_path).parent.absolute(), filename)
+            extenison = Path(file_path).suffix.lower()
+            file_path = file_path.replace(extenison, subtitle_format)
+            with open(file_path.replace(extenison, subtitle_format), 'w', encoding='utf-8') as file:
+                file.write(subtitle)
+            logger.info(os.path.basename(file_path))
+            if os.path.exists(folder_path):
+                shutil.rmtree(folder_path)
+            return
+
         subtitles = []
         for segment in sorted(os.listdir(folder_path)):
             file_path = os.path.join(folder_path, segment)
@@ -255,7 +267,7 @@ def merge_subtitle_fragments(folder_path="", filename="", subtitle_format="", lo
         file_path = file_path.replace(extenison, subtitle_format)
         if subtitle_format == '.ass':
             subs = set_ass_style(subs)
-        subs.save(file_path, keep_ssa_tags=True)
+        subs.save(file_path, keep_unknown_html_tags=True)
         logger.info(os.path.basename(file_path))
         if os.path.exists(folder_path):
             shutil.rmtree(folder_path)
