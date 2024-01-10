@@ -119,7 +119,8 @@ def convert_subtitle(folder_path="", platform="", subtitle_format="", locale="")
                     subs = format_subtitle(subs)
                     if subtitle_format == '.ass':
                         subs = set_ass_style(subs)
-                    subs.save(subtitle_name, keep_unknown_html_tags=True)
+                    subs.save(subtitle_name,
+                              keep_unknown_html_tags=True, keep_ssa_tags=True)
                     logger.info(os.path.basename(subtitle_name))
                     os.remove(subtitle)
                     folder = os.listdir(folder_path)
@@ -219,17 +220,26 @@ def merge_subtitle_fragments(folder_path="", filename="", subtitle_format="", lo
 
         if subtitle_format == '.vtt':
             subtitle = ""
+            skip = False
             for index, segment in enumerate(sorted(os.listdir(folder_path))):
                 file_path = os.path.join(folder_path, segment)
                 if is_subtitle(file_path):
                     with open(file_path, 'r', encoding='utf-8') as file:
                         text = file.read()
                         if text.count('\n') <= 6:
+                            if index == 0:
+                                skip = True
                             continue
 
                         if index > 0:
-                            text = re.sub(
-                                r'^WEBVTT\nX-TIMESTAMP-MAP.+\n\n', '', text)
+                            if not skip:
+                                text = re.sub(
+                                    r'^WEBVTT\n', '', text)
+                                text = re.sub(
+                                    r'X-TIMESTAMP-MAP.+\n\n', '', text)
+                                text = re.sub(
+                                    r'STYLE\n::cue\(\) \{\n((.|\n)*)\}\n\n', '', text)
+                            skip = False
                     subtitle += text
             file_path = os.path.join(
                 Path(folder_path).parent.absolute(), filename)
@@ -267,7 +277,7 @@ def merge_subtitle_fragments(folder_path="", filename="", subtitle_format="", lo
         file_path = file_path.replace(extenison, subtitle_format)
         if subtitle_format == '.ass':
             subs = set_ass_style(subs)
-        subs.save(file_path, keep_unknown_html_tags=True)
+        subs.save(file_path, keep_unknown_html_tags=True, keep_ssa_tags=True)
         logger.info(os.path.basename(file_path))
         if os.path.exists(folder_path):
             shutil.rmtree(folder_path)
@@ -350,6 +360,10 @@ def format_subtitle(subs):
         sub.text = re.sub(r'\ufeff', '', sub.text)
         sub.text = re.sub(r'\xa0', ' ', sub.text)
 
+        sub.text = re.sub(r'{\\b1}', '<b>', sub.text)
+        sub.text = re.sub(r'{\\b0}', '</b>', sub.text)
+        sub.text = re.sub(r'{\\i1}', '<i>', sub.text)
+        sub.text = re.sub(r'{\\i0}', '</i>', sub.text)
         if sub.text == "":
             delete_list.append(i)
 
