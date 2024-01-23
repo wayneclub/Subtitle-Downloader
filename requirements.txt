@@ -9,7 +9,8 @@ requests
 tqdm
 cn2an
 opencc
-rtoml
+pytomlpp
+
 validators
 pwinput
 yt-dlp

@@ -18,7 +18,7 @@ from urllib.parse import quote
 
 from tqdm import tqdm
 import requests
-import rtoml
+import pytomlpp
 from configs.config import user_agent, credentials
 from utils.helper import check_url_exist, get_locale
 
@@ -30,7 +30,7 @@ def load_toml(path: Union[Path, str]) -> dict:
         path = Path(path)
     if not path.is_file():
         return {}
-    return rtoml.load(path)
+    return pytomlpp.load(path)
 
 
 def rename_filename(filename):
