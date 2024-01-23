@@ -139,15 +139,14 @@ class MeWatch(BaseService):
         else:
             error = res.json()
             self.logger.error("\nError: %s", error['message'])
-            sys.exit(1)
 
     def get_subtitle(self, media_info, folder_path, filename):
-
-        subtitle_list = next((channel['subtitlesCollection'] for channel in media_info
-                             if channel.get('subtitlesCollection') and len(channel['subtitlesCollection']) > 0), None)
-
         subtitles = []
         lang_paths = set()
+        subtitle_list = []
+        if media_info:
+            subtitle_list = next((channel['subtitlesCollection'] for channel in media_info
+                                  if channel.get('subtitlesCollection') and len(channel['subtitlesCollection']) > 0), None)
         if subtitle_list:
             available_languages = set()
 
