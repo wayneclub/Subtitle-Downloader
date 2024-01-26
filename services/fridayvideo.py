@@ -63,7 +63,7 @@ class FridayVideo(BaseService):
             'subtitle': False
         }
 
-        filename = f"{title}.WEB-DL.{self.platform}.zh-Hant.vtt"
+        filename = f"{title}.WEB-DL.{self.platform}.vtt"
 
         languages = set()
         subtitles = []
@@ -124,7 +124,7 @@ class FridayVideo(BaseService):
                     season_index = 0
                     episode_index = 1
 
-            filename = f"{title}.S{str(season_index).zfill(2)}E{str(episode_index).zfill(2)}.WEB-DL.{self.platform}.zh-Hant.vtt"
+            filename = f"{title}.S{str(season_index).zfill(2)}E{str(episode_index).zfill(2)}.WEB-DL.{self.platform}.vtt"
 
             episode['season_index'] = season_index
             episode['episode_index'] = episode_index
@@ -275,7 +275,7 @@ class FridayVideo(BaseService):
             for sub in data['subtitleList']:
                 sub_lang = get_language_code(
                     os.path.splitext(os.path.basename(sub['url']))[0].split('.')[-1])
-                if sub_lang == 'deu':
+                if sub_lang == 'de':
                     sub_lang = 'mul'
 
                 if len(self.subtitle_language) > 1 or 'all' in self.subtitle_language:
@@ -288,8 +288,8 @@ class FridayVideo(BaseService):
                             exist_ok=True)
 
                 subtitles.append({
-                    'name': filename,
-                    'path': folder_path,
+                    'name': filename.replace('.vtt', f'.{sub_lang}.vtt'),
+                    'path': lang_folder_path,
                     'url': sub['url'].replace('http:', 'https:')
                 })
 

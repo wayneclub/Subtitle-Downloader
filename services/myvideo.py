@@ -38,7 +38,7 @@ class MyVideo(BaseService):
         title = rename_filename(f'{title}.{release_year}')
         folder_path = os.path.join(self.download_path, title)
 
-        filename = f"{title}.WEB-DL.{self.platform}.zh-Hant.vtt"
+        filename = f"{title}.WEB-DL.{self.platform}.vtt"
         movie_id = os.path.basename(data['url'])
         media_info = self.get_media_info(
             content_id=movie_id, filename=filename)
@@ -61,8 +61,8 @@ class MyVideo(BaseService):
 
     def series_metadata(self, data, season_list):
         """Get series metadata"""
-
-        title = data['name'].strip()
+        title, season_index = self.get_title_and_season_index(
+            data['name'].strip())
         self.logger.info(self._("\n%s total: %s season(s)"),
                          title, len(season_list))
 
@@ -106,7 +106,7 @@ class MyVideo(BaseService):
                 for episode in episode_list:
                     episode_index = episode['index']
                     if not self.download_episode or episode_index in self.download_episode:
-                        filename = f"{name}E{str(episode_index).zfill(2)}.WEB-DL.{self.platform}.zh-Hant.vtt"
+                        filename = f"{name}E{str(episode_index).zfill(2)}.WEB-DL.{self.platform}.vtt"
                         media_info = self.get_media_info(
                             content_id=episode['id'], filename=filename)
                         subs, lang_paths = self.get_subtitle(
@@ -174,14 +174,13 @@ class MyVideo(BaseService):
                     os.makedirs(lang_folder_path,
                                 exist_ok=True)
                     subtitles.append({
-                        'name': filename,
-                        'path': folder_path,
+                        'name': filename.replace('.vtt', f'.{sub_lang}.vtt'),
+                        'path': lang_folder_path,
                         'url': sub['subtitleUrl']
                     })
             else:
                 self.logger.error(
                     self._("\nSorry, there's no embedded subtitles in this video!"))
-
         return subtitles, lang_paths
 
     def download_subtitle(self, subtitles, folder_path, languages=None):
