@@ -152,7 +152,8 @@ class YouTube(BaseService):
         available_languages = set()
         if 'subtitles' in media_info and media_info['subtitles']:
             for sub_lang in media_info['subtitles']:
-                sub_lang = get_language_code(sub_lang)
+                if media_info['subtitles'].get(get_language_code(sub_lang)):
+                    sub_lang = get_language_code(sub_lang)
                 available_languages.add(sub_lang)
                 if sub_lang in self.subtitle_language or 'all' in self.subtitle_language:
                     if len(self.subtitle_language) > 1 or 'all' in self.subtitle_language:
@@ -164,7 +165,6 @@ class YouTube(BaseService):
                     lang_paths.add(lang_folder_path)
 
                     os.makedirs(lang_folder_path, exist_ok=True)
-
                     subtitles.append({
                         'name': filename.replace('.vtt', f'.{sub_lang}.vtt'),
                         'path': lang_folder_path,
