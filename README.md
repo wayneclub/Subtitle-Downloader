@@ -15,7 +15,7 @@ Subtitle-Downloader is a command-line program to download subtitles from the mos
 - Linux, macOS:
 
 ```bash
-pip install -r requriements.txt
+pip install -r requirements.txt
 ```
 
 - Windows: Execute `install_requirements.bat`
