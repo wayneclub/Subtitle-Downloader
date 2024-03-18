@@ -88,8 +88,7 @@ class Viki(BaseService):
             episodes_url += f'&watch_schedule=1&ws_end_time={int(time.time())}'
 
         self.session.headers.update({
-            'Referer': 'https://www.viki.com/',
-            'X-Viki-Device-ID': self.cookies['device_id']
+            'Referer': 'https://www.viki.com/'
         })
         res = self.session.get(url=episodes_url, timeout=5)
 
@@ -160,9 +159,9 @@ class Viki(BaseService):
             video_id=video_id)
 
         res = self.session.get(url=media_info_url, timeout=5)
-
         if res.ok:
             data = res.json()
+            time.sleep(1)  # Avoid http 429 too many request
             if 'video' in data:
                 self.logger.debug("media_info: %s", data)
                 return data
@@ -234,8 +233,11 @@ class Viki(BaseService):
         if res.ok:
             match = re.search(r'({\"props\":{.*})', res.text)
             data = orjson.loads(match.group(1))['props']['pageProps']
-            self.token = data['userInfo']['token']
-            data = data['containerJson']
+            if 'token' not in data['userInfo']:
+                self.token = 'undefined'
+            else:
+                self.token = data['userInfo']['token']
+            data = data['containerApiData']
             if '/movies' in self.url:
                 self.movie_metadata(data)
             else:

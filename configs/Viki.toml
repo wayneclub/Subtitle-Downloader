@@ -6,4 +6,4 @@ episodes = '{url}?token={token}&direction=asc&with_upcoming=true&sort=number&blo
 videos = 'https://www.viki.com/api/videos/{video_id}'
 
 [vmplayer]
-version = '12.2.31' # x-viki-app-ver
+version = '14.10.0' # x-viki-app-ver
