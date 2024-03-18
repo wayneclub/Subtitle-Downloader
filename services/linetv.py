@@ -59,7 +59,7 @@ class LineTV(BaseService):
                                  episode_num,
                                  season_index)
             else:
-                if data['current_eps'] != data['total_eps']:
+                if data['current_eps'] != data['total_eps'] and data['total_eps'] != 0:
                     self.logger.info(self._("\nSeason %s total: %s episode(s)\tupdate to episode %s\tdownload all episodes\n---------------------------------------------------------------"),
                                      season_index,
                                      data['total_eps'],
@@ -79,39 +79,39 @@ class LineTV(BaseService):
                         episode_index = int(episode['number'])
                         if not self.download_season or season_index in self.download_season:
                             if not self.download_episode or episode_index in self.download_episode:
-                                subtitle_link = self.config['api']['sub_1'].format(
-                                    drama_id=drama_id, episode_name=episode_index)
-                                self.logger.debug(subtitle_link)
-
-                                filename = f'{name}E{str(episode_index).zfill(2)}.WEB-DL.{self.platform}.zh-Hant.vtt'
-
-                                if not check_url_exist(subtitle_link):
-                                    if check_url_exist(subtitle_link.replace('tv-aws-media-convert-input-tokyo', 'aws-elastic-transcoder-input-tokyo')):
-                                        subtitle_link = subtitle_link.replace(
-                                            'tv-aws-media-convert-input-tokyo', 'aws-elastic-transcoder-input-tokyo')
-                                    else:
-                                        subtitle_link = self.config['api']['sub_2'].format(
-                                            drama_id=drama_id, drama_name=quote(title.encode('utf8')), episode_name=episode_index)
-                                        if not check_url_exist(subtitle_link):
-                                            if episode['free_date']:
-                                                free_date = strftime(
-                                                    '%Y-%m-%d', localtime(int(episode['free_date'])/1000))
-                                                self.logger.info(
-                                                    self._("%s\t...free user will be available on %s"), filename, free_date)
-                                            else:
-                                                self.logger.error(
-                                                    self._("\nSorry, there's no embedded subtitles in this video!"))
-                                                break
-
-                                os.makedirs(folder_path, exist_ok=True)
-                                subtitle = dict()
-                                subtitle['name'] = filename
-                                subtitle['path'] = folder_path
-                                subtitle['url'] = subtitle_link
-                                subtitles.append(subtitle)
+                                manifest = self.get_manifest(
+                                    drama_id=drama_id, episode_index=episode_index)
+                                if manifest:
+                                    subtitle_link = manifest['subtitle']
+                                    if 'subtitle' not in manifest:
+                                        self.logger.error(
+                                            self._("\nSorry, there's no embedded subtitles in this video!"))
+                                        break
+                                    filename = f'{name}E{str(episode_index).zfill(2)}.WEB-DL.{self.platform}.zh-Hant.vtt'
+                                    os.makedirs(folder_path, exist_ok=True)
+                                    subtitle = dict()
+                                    subtitle['name'] = filename
+                                    subtitle['path'] = folder_path
+                                    subtitle['url'] = subtitle_link
+                                    subtitles.append(subtitle)
 
                 self.download_subtitle(
                     subtitles=subtitles, folder_path=folder_path)
+
+    def get_manifest(self, drama_id: str, episode_index: int) -> dict:
+        """Get manifest"""
+
+        member_id = self.session.cookies.get_dict().get('chocomemberId') or ''
+        access_token = self.session.cookies.get_dict().get('accessToken') or ''
+        app_id = self.config["app_id"]
+        if access_token:
+            self.session.headers.update({'authorization': access_token})
+
+        res = self.session.get(url=self.config["api"]["manifest"].format(
+            drama_id=drama_id, episode_index=episode_index, app_id=app_id, member_id=member_id), timeout=10)
+        if res.ok:
+            return res.json()['epsInfo']['source'][0]['links'][0]
+        self.log.exit(res.json())
 
     def download_subtitle(self, subtitles, folder_path):
         if subtitles:

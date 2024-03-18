@@ -1,6 +1,9 @@
 credentials = ''
 required = ''
 
+app_id = '062097f1b1f34e11e7f82aag22000aee'
+
 [api]
+manifest = 'https://www.linetv.tw/api/part/{drama_id}/eps/{episode_index}/part?appId={app_id}&device=desktop_web&chocomemberId={member_id}&productType=VOD'
 sub_1 = 'https://s3-ap-northeast-1.amazonaws.com/tv-aws-media-convert-input-tokyo/subtitles/{drama_id}/{drama_id}-eps-{episode_name}.vtt'
 sub_2 = 'https://choco-tv.s3.amazonaws.com/subtitle/{drama_id}-{drama_name}/{drama_id}-eps-{episode_name}.vtt'
