@@ -139,17 +139,17 @@ class IQIYI(BaseService):
         if self.last_episode:
             episode_list = [list(episode_list)[-1]]
             self.logger.info(self._("\nSeason %s total: %s episode(s)\tdownload season %s last episode\n---------------------------------------------------------------"),
-                             int(season_name), current_eps, int(season_name))
+                             season_index, current_eps, season_index)
         else:
             if current_eps == episode_num:
                 self.logger.info(self._("\nSeason %s total: %s episode(s)\tdownload all episodes\n---------------------------------------------------------------"),
-                                 int(season_name),
+                                 season_index,
                                  episode_num)
             else:
                 self.logger.info(
                     self._(
                         "\nSeason %s total: %s episode(s)\tupdate to episode %s\tdownload all episodes\n---------------------------------------------------------------"),
-                    int(season_name),
+                    season_index,
                     episode_num,
                     current_eps)
 
