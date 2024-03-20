@@ -15,7 +15,6 @@ import sys
 from time import time
 from urllib.parse import urlencode
 import orjson
-from cn2an import cn2an
 from utils.helper import get_locale, get_language_code, get_all_languages
 from utils.io import download_files, rename_filename
 from utils.subtitle import convert_subtitle
@@ -112,16 +111,7 @@ class IQIYI(BaseService):
         else:
             current_eps = episode_num
 
-        season_search = re.search(r'(.+)第(.+)季', title)
-        if season_search:
-            title = season_search.group(1).strip()
-            season_name = cn2an(
-                season_search.group(2))
-        else:
-            season_name = '01'
-
-        season_index = int(season_name)
-
+        title, season_index = self.get_title_and_season_index(title)
         self.logger.info("\n%s", title)
 
         episode_list = []

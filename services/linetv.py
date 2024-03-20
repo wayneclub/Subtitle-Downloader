@@ -9,12 +9,9 @@ import os
 import re
 import shutil
 import sys
-from urllib.parse import quote
-from time import strftime, localtime
 import orjson
-from cn2an import cn2an
 from utils.io import rename_filename, download_files
-from utils.helper import get_locale, check_url_exist
+from utils.helper import get_locale
 from utils.subtitle import convert_subtitle
 from services.baseservice import BaseService
 
@@ -31,20 +28,9 @@ class LineTV(BaseService):
         self._ = get_locale(__name__, self.locale)
 
     def series_metadata(self, data, drama_id):
-        if 'drama_name' in data:
-            season_search = re.search(
-                r'(.+?)第(.+?)季', data['drama_name'])
-            if season_search:
-                title = season_search.group(1).strip()
-                season_name = cn2an(
-                    season_search.group(2))
-            else:
-                title = data['drama_name'].strip()
-                season_name = '01'
-
-            season_index = int(season_name)
-
-            self.logger.info(self._("\n%s Season %s"), title, season_index)
+        title = data['drama_name']
+        title, season_index = self.get_title_and_season_index(title)
+        self.logger.info(self._("\n%s Season %s"), title, season_index)
 
         if 'current_eps' in data:
             episode_num = data['current_eps']
@@ -111,7 +97,8 @@ class LineTV(BaseService):
             drama_id=drama_id, episode_index=episode_index, app_id=app_id, member_id=member_id), timeout=10)
         if res.ok:
             return res.json()['epsInfo']['source'][0]['links'][0]
-        self.log.exit(res.json())
+        self.logger.error(res.json())
+        sys.exit(1)
 
     def download_subtitle(self, subtitles, folder_path):
         if subtitles:

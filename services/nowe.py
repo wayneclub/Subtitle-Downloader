@@ -12,7 +12,6 @@ import os
 import re
 import shutil
 import time
-from cn2an import cn2an
 from configs.config import config, credentials, user_agent
 from utils.helper import get_locale
 from utils.io import rename_filename
@@ -119,22 +118,9 @@ class NowE(BaseService):
         title = data['brandName']
         season_index = int(data['seasonNum'])
         if season_index == 0:
-            season_search = re.search(
-                r'(.+?)第(.+?)季', title)
-            if season_search:
-                title = season_search.group(1).strip()
-                season_index = int(cn2an(season_search.group(2)))
-            else:
-                season_search = re.search(
-                    r'(.+?) (S)*(\d+)$', title)
-                if season_search:
-                    title = season_search.group(1).strip()
-                    season_index = int(season_search.group(3))
-                else:
-                    season_index = 1
+            title, season_index = self.get_title_and_season_index(title)
         else:
-            season_search = re.search(
-                r'(.+?) (S)*(\d+)$', title)
+            season_search = re.search(r'(.+?) (S)*(\d+)$', title)
             if season_search:
                 title = season_search.group(1).strip()
                 season_index = int(season_search.group(3))

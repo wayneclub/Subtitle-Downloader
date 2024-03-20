@@ -14,7 +14,6 @@ from urllib.parse import urljoin
 from time import time
 import m3u8
 import orjson
-from cn2an import cn2an
 from configs.config import user_agent
 from utils.io import rename_filename, download_files
 from utils.helper import get_locale, get_language_code, get_all_languages
@@ -67,21 +66,7 @@ class WeTV(BaseService):
 
     def series_subtitle(self, data):
         title = data['coverInfo']['title']
-
-        season_search = re.search(r'(.+)第(.+)季', title)
-        season_search_eng = re.search(r'(.+) S(\d+)', title)
-        if season_search:
-            title = season_search.group(1).strip()
-            season_name = cn2an(
-                season_search.group(2))
-        elif season_search_eng:
-            title = season_search_eng.group(1).strip()
-            season_name = season_search_eng.group(2).strip()
-        else:
-            season_name = '01'
-
-        season_index = int(season_name)
-
+        title, season_index = self.get_title_and_season_index(title)
         self.logger.info("\n%s", title)
 
         series_id = data['coverInfo']['cid']

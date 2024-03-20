@@ -334,7 +334,30 @@ class DisneyPlus(BaseService):
         self.profile, self.access_token = user.get_auth_token()
         # self.profile['language'] = 'en'
 
-        if '/series' in self.url:
-            self.series_subtitle()
-        elif '/movies' in self.url:
+        self.session.headers.update({
+            'authorization': self.access_token
+        })
+
+        params = {
+            'disableSmartFocus': 'true',
+            'enhancedContainersLimit': '12',
+            'limit': '24',
+        }
+
+        res = self.session.get(
+            'https://disney.api.edge.bamgrid.com/explore/v1.2/page/entity-f8879d78-6221-4202-b801-eea1c8277bb4',
+            params=params,
+            timeout=10
+        )
+
+        entity_type = ''
+        if res.ok:
+            entity_type = 'series' if 'series' in res.text else 'movie'
+        else:
+            self.logger.error(res.text)
+            sys.exit(1)
+
+        if '/movies' in self.url or entity_type == 'movie':
             self.movie_subtitle()
+        else:
+            self.series_subtitle()
