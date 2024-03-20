@@ -163,7 +163,6 @@ class IQIYI(BaseService):
 
         languages = set()
         subtitles = []
-        print(episode_list)
         for episode in episode_list:
             if 'payMarkFont' in episode and episode['payMarkFont'] == 'Preview':
                 break
