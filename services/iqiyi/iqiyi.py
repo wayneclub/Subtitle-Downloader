@@ -163,12 +163,14 @@ class IQIYI(BaseService):
 
         languages = set()
         subtitles = []
-
+        print(episode_list)
         for episode in episode_list:
             if 'payMarkFont' in episode and episode['payMarkFont'] == 'Preview':
                 break
             if 'order' in episode:
                 episode_index = int(episode['order'])
+                if episode_index == -1:
+                    episode_index = 0
                 if not self.download_season or season_index in self.download_season:
                     if not self.download_episode or episode_index in self.download_episode:
                         filename = f'{name}E{str(episode_index).zfill(2)}.WEB-DL.{self.platform}.vtt'
