@@ -164,8 +164,8 @@ class IQIYI(BaseService):
         languages = set()
         subtitles = []
         for episode in episode_list:
-            if 'payMarkFont' in episode and episode['payMarkFont'] == 'Preview':
-                break
+            if 'episodeType' in episode and episode['episodeType'] == 1:
+                continue
             if 'order' in episode:
                 episode_index = int(episode['order'])
                 if episode_index == -1:
