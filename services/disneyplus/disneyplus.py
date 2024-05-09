@@ -11,6 +11,7 @@ import shutil
 import sys
 from urllib.parse import urljoin
 import m3u8
+import requests
 from configs.config import credentials, user_agent
 from utils.helper import get_all_languages, get_locale
 from utils.io import rename_filename, download_files, download_audio
@@ -353,6 +354,14 @@ class DisneyPlus(BaseService):
         entity_type = ''
         if res.ok:
             entity_type = 'series' if 'series' in res.text else 'movie'
+        else:
+            self.logger.error(res.text)
+            sys.exit(1)
+
+        # Get old url
+        res = requests.get(self.url, timeout=10)
+        if res.ok:
+            self.url = res.url
         else:
             self.logger.error(res.text)
             sys.exit(1)
