@@ -112,10 +112,7 @@ def convert_subtitle(folder_path="", platform="", subtitle_format="", locale="")
                     subtitle = os.path.join(folder_path, file)
                     subtitle_name = subtitle.replace(
                         extenison, subtitle_format)
-                    # convert_utf8(subtitle)
-                    print(subtitle)
-                    f = open(subtitle, "r")
-                    print(f.read())
+                    convert_utf8(subtitle)
                     subs = pysubs2.load(subtitle)
                     if '.zh-Hant' in subtitle_name:
                         subs = format_zh_subtitle(subs)
