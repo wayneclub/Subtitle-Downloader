@@ -12,7 +12,7 @@ import os
 import shutil
 import subprocess
 import sys
-from time import time
+from time import sleep, time
 from urllib.parse import urlencode
 import orjson
 from utils.helper import get_locale, get_language_code, get_all_languages
@@ -35,7 +35,7 @@ class IQIYI(BaseService):
 
     def get_vid(self, play_url):
         vid = ''
-
+        sleep(2)
         res = self.session.get(play_url, timeout=5)
         if res.ok:
             match = re.search(r'({\"props\":{.*})', res.text)
@@ -164,8 +164,10 @@ class IQIYI(BaseService):
         languages = set()
         subtitles = []
         for episode in episode_list:
-            if 'episodeType' in episode and episode['episodeType'] == 1:
-                continue
+            if 'episodeType' in episode:
+                if 'episodeType' in episode:
+                    if episode['episodeType'] == 1 or episode['episodeType'] == 6:
+                        continue
             if 'order' in episode:
                 episode_index = int(episode['order'])
                 if episode_index == -1:
@@ -197,6 +199,9 @@ class IQIYI(BaseService):
                                 subtitles += subs
                                 languages = set.union(
                                     languages, lang_paths)
+                            elif 'boss_ts' in episode_data:
+                                self.logger.error(
+                                    episode_data['boss_ts']['msg'])
                             else:
                                 self.logger.error(
                                     "Invaild dash_url, wrong vf!")
