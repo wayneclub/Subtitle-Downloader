@@ -29,20 +29,34 @@ class KKTV(BaseService):
         self.title_id = os.path.basename(args.url)
 
     def movie_metadata(self, data):
-        title = data['title'].strip()
-        release_year = data['releaseYear']
-
+        title = data['title'].split('(')[0].strip()
+        release_year = data['release_year']
         self.logger.info("\n%s (%s)", title, release_year)
-
         title = rename_filename(f'{title}.{release_year}')
 
         folder_path = os.path.join(self.download_path, title)
-        episode_id = data['series'][0]['episodes'][0]['id']
-        filename = f'{title}.WEB-DL.{self.platform}.zh-Hant.vtt'
-
-        self.logger.warning(
-            self._("\nSorry, there's no embedded subtitles in this video!"))
-        sys.exit(0)
+        os.makedirs(folder_path, exist_ok=True)
+        if 'series' in data:
+            subtitles = []
+            for media in data['series'][0]['episodes']:
+                if not media['subtitles']:
+                    self.logger.warning(
+                        self._("\nSorry, there's no embedded subtitles in this video!"))
+                    sys.exit(0)
+                episode_link_search = re.search(
+                    r'https:\/\/theater\.kktv\.com\.tw([^"]+)_dash\.mpd', media['mezzanines']['dash']['uri'])
+                if episode_link_search:
+                    episode_link = episode_link_search.group(
+                        1)
+                    if media['subtitles']:
+                        for language in media['subtitles']:
+                            subtitle = dict()
+                            subtitle['name'] = f'{title}.WEB-DL.{self.platform}.{language}.vtt'
+                            subtitle['path'] = folder_path
+                            subtitle['url'] = f'https://theater-kktv.cdn.hinet.net{episode_link}_sub/{language}.vtt'
+                            subtitles.append(subtitle)
+            self.download_subtitle(
+                subtitles=subtitles, languages=[folder_path], folder_path=folder_path)
 
     def series_metadata(self, data):
         title = data['title'].replace('(日)', '').replace('(中)', '').strip()
@@ -50,7 +64,6 @@ class KKTV(BaseService):
 
         self.logger.info(self._("\n%s total: %s season(s)"),
                          title, len(data['series']))
-
         if 'series' in data:
             for season in data['series']:
                 if len(data['series']) > 1:
@@ -74,19 +87,8 @@ class KKTV(BaseService):
                                          season_index,
                                          episode_num)
 
-                    # last_ep = [ep['title'] for ep in season['episodes']
-                    #            if re.search(r'第(\d+)[集|話]', ep['title'])][-1]
-                    # last_ep = re.findall(r'第(\d+)[集|話]', last_ep)
-
-                    # if last_ep:
-                    #     fill_num = len(str(last_ep[0]))
-                    #     if fill_num < 2:
-                    #         fill_num = 2
-
                     languages = set()
                     subtitles = []
-                    ja_lang = False
-                    ko_lang = False
                     for episode in season['episodes']:
                         episode_index = re.findall(
                             r'第(\d+)[集|話]', episode['title'])
@@ -97,77 +99,28 @@ class KKTV(BaseService):
                                 episode['id'].replace(episode['series_id'], ''))
 
                         if not self.download_episode or episode_index in self.download_episode:
-                            filename = f"{name}E{str(episode_index).zfill(2)}.WEB-DL.{self.platform}.zh-Hant.vtt"
-
                             if not episode['subtitles']:
                                 self.logger.error(
                                     self._("\nSorry, there's no embedded subtitles in this video!"))
                                 break
 
-                            if 'ja' in episode['subtitles']:
-                                ja_lang = True
-                            if 'ko' in episode['subtitles']:
-                                ko_lang = True
-
-                            episode_uri = episode['mezzanines']['dash']['uri']
-                            if episode_uri:
-                                episode_link_search = re.search(
-                                    r'https:\/\/theater\.kktv\.com\.tw([^"]+)_dash\.mpd', episode_uri)
-                                if episode_link_search:
-                                    episode_link = episode_link_search.group(
-                                        1)
-                                    epsiode_search = re.search(
-                                        self.title_id + '[0-9]{2}([0-9]{4})_', episode_uri)
-                                    if epsiode_search:
-                                        subtitle_link = f'https://theater-kktv.cdn.hinet.net{episode_link}_sub/zh-Hant.vtt'
-
-                                        ja_subtitle_link = subtitle_link.replace(
-                                            'zh-Hant.vtt', 'ja.vtt')
-
-                                        ko_subtitle_link = subtitle_link.replace(
-                                            'zh-Hant.vtt', 'ko.vtt')
-
-                                        ja_filename = filename.replace(
-                                            'zh-Hant.vtt', 'ja.vtt')
-                                        ko_filename = filename.replace(
-                                            'zh-Hant.vtt', 'ko.vtt')
-
-                                        ja_folder_path = os.path.join(
-                                            folder_path, 'ja')
-                                        ko_folder_path = os.path.join(
-                                            folder_path, 'ko')
-
-                                        if check_url_exist(subtitle_link):
-                                            os.makedirs(
-                                                folder_path, exist_ok=True)
-
-                                            languages.add(folder_path)
-
-                                            subtitle = dict()
-                                            subtitle['name'] = filename
-                                            subtitle['path'] = folder_path
-                                            subtitle['url'] = subtitle_link
-                                            subtitles.append(subtitle)
-
-                                        if ja_lang and check_url_exist(ja_subtitle_link):
-                                            os.makedirs(
-                                                ja_folder_path, exist_ok=True)
-                                            languages.add(ja_folder_path)
-                                            subtitle = dict()
-                                            subtitle['name'] = ja_filename
-                                            subtitle['path'] = ja_folder_path
-                                            subtitle['url'] = ja_subtitle_link
-                                            subtitles.append(subtitle)
-
-                                        if ko_lang and check_url_exist(ko_subtitle_link):
-                                            os.makedirs(
-                                                ko_folder_path, exist_ok=True)
-                                            languages.add(ko_folder_path)
-                                            subtitle = dict()
-                                            subtitle['name'] = ko_filename
-                                            subtitle['path'] = ko_folder_path
-                                            subtitle['url'] = ko_subtitle_link
-                                            subtitles.append(subtitle)
+                            episode_link_search = re.search(
+                                r'https:\/\/theater\.kktv\.com\.tw([^"]+)_dash\.mpd', episode['mezzanines']['dash']['uri'])
+                            if episode_link_search:
+                                episode_link = episode_link_search.group(
+                                    1)
+                                if episode['subtitles']:
+                                    for language in episode['subtitles']:
+                                        subtitle = dict()
+                                        subtitle['name'] = f"{name}E{str(episode_index).zfill(2)}.WEB-DL.{self.platform}.{language}.vtt"
+                                        subtitle['path'] = os.path.join(folder_path, language) if len(
+                                            episode['subtitles']) > 1 else folder_path
+                                        os.makedirs(
+                                            subtitle['path'], exist_ok=True)
+                                        languages.add(subtitle['path'])
+                                        subtitle[
+                                            'url'] = f'https://theater-kktv.cdn.hinet.net{episode_link}_sub/{language}.vtt'
+                                        subtitles.append(subtitle)
 
                     self.download_subtitle(
                         subtitles=subtitles, languages=languages, folder_path=folder_path)
@@ -182,31 +135,13 @@ class KKTV(BaseService):
                              platform=self.platform, subtitle_format=self.subtitle_format, locale=self.locale)
 
     def main(self):
-        # play_url = self.config['api']['play'].format(title_id=self.title_id)
-        # res = self.session.get(url=play_url, timeout=5)
-        # if res.ok:
-        #     match = re.search(r'({\"props\":{.*})', res.text)
-        #     data = orjson.loads(match.group(1))
-
-        #     if self.title_id in data['props']['initialState']['titles']['byId']:
-        #         data = data['props']['initialState']['titles']['byId'][self.title_id]
-        #     else:
-        #         self.logger.error(self._("\nSeries not found!"))
-        #         sys.exit(0)
-
-        #     if 'titleType' in data and data['titleType'] == 'film':
-        #         self.movie_metadata(data)
-        #     else:
-        #         self.series_metadata(data)
-        # else:
-        #     self.logger.error(res.text)
-
         res = self.session.get(url=self.config["api"]["titles"].format(
             title_id=self.title_id), timeout=10)
         if res.ok:
             data = res.json()['data']
             if data.get('title_type') == 'film':
                 self.movie = True
+                self.movie_metadata(data)
             else:
                 self.series_metadata(data)
         else:
