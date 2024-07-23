@@ -136,7 +136,8 @@ class Viki(BaseService):
                         self.logger.error(self._(
                             "\nPlease check your subscription plan, and make sure you are able to watch it online!"))
                         break
-
+                    self.logger.info(
+                        f"Getting S{str(season_index).zfill(2)}E{str(episode_index).zfill(2)} subtitle...")
                     media_info = self.get_media_info(
                         video_id=episode['id'], filename=filename)
                     subs, lang_paths = self.get_subtitle(
@@ -150,6 +151,7 @@ class Viki(BaseService):
             subtitles=subtitles, languages=languages, folder_path=folder_path)
 
     def get_media_info(self, video_id, filename):
+        """Get media info"""
         self.session.headers.update({
             'x-viki-app-ver': self.config['vmplayer']['version'],
             'x-client-user-agent': user_agent,
@@ -178,7 +180,6 @@ class Viki(BaseService):
             sys.exit(1)
 
     def get_subtitle(self, media_info, folder_path, filename):
-
         lang_paths = set()
         subtitles = []
         available_languages = set()
@@ -237,7 +238,7 @@ class Viki(BaseService):
                 self.token = 'undefined'
             else:
                 self.token = data['userInfo']['token']
-            data = data['containerApiData']
+            data = data['containerJson']
             if '/movies' in self.url:
                 self.movie_metadata(data)
             else:
