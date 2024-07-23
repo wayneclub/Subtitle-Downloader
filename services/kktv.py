@@ -8,9 +8,8 @@ from __future__ import annotations
 import os
 import re
 import sys
-import orjson
 from utils.io import rename_filename, download_files
-from utils.helper import get_locale, check_url_exist
+from utils.helper import get_locale
 from utils.subtitle import convert_subtitle
 from services.baseservice import BaseService
 
