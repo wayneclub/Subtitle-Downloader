@@ -209,7 +209,6 @@ class FridayVideo(BaseService):
                 subtitles=subtitles, languages=languages, folder_path=folder_path)
 
         else:
-            self.logger.error(res.text)
             sys.exit(1)
 
     def get_media_info(self, media_info, filename) -> dict:
@@ -225,7 +224,7 @@ class FridayVideo(BaseService):
                                                                  time_stamp=int(time.time())*1000)
 
         res = self.session.get(url=media_info_url, timeout=5)
-        self.fet_monitor(self.monitor_url)
+        # self.fet_monitor(self.monitor_url)
 
         if res.ok:
             if 'redirectUri' in res.text:
@@ -327,7 +326,7 @@ class FridayVideo(BaseService):
         title_url = self.config['api']['title'].format(
             content_id=content_id, content_type=content_type)
         res = self.session.post(title_url, timeout=5)
-        self.fet_monitor(self.monitor_url)
+        # self.fet_monitor(self.monitor_url)
 
         if res.ok:
             if '/pkmslogout' in res.text:
