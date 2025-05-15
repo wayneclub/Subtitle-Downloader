@@ -34,10 +34,14 @@ class Login(object):
 
     def client_info(self):
         res = self.session.get(self.config['api']['login_page'], timeout=5)
-        match = re.search('window.server_path = ({.*});', res.text)
+        pattern = re.compile(r'"sdk"\s*:\s*(\{.*?\})(?=\s*,?\s*"\w+":)', re.DOTALL)
+        match = pattern.search(res.text)
+        if not match:
+            raise ValueError(self._("Regular expression did not match. Check login page for changes."))
         data = json.loads(match.group(1))
-        client_id = data['sdk']['clientId']
-        client_apikey = data['sdk']['clientApiKey']
+        client_id = data['clientId']
+        client_apikey = data['clientApiKey']
+        
         self.logger.debug("client_id: %s\nclient_apikey: %s",
                           client_id, client_apikey)
         return client_id, client_apikey
@@ -75,7 +79,6 @@ class Login(object):
 
         res = self.session.post(
             url=self.config['api']['token'], headers=header, data=postdata)
-
         if res.status_code == 200:
             access_token = res.json()['access_token']
             self.logger.debug("access_token: %s", access_token)
