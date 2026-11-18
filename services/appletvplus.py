@@ -12,9 +12,8 @@ import shutil
 import sys
 from datetime import datetime
 from typing import Optional
-from urllib.parse import unquote, urljoin
+from urllib.parse import urljoin
 import m3u8
-import orjson
 from configs.config import user_agent
 from utils.io import rename_filename, download_files
 from utils.helper import get_all_languages, get_language_code, get_locale
@@ -217,9 +216,17 @@ class AppleTVPlus(BaseService):
                 subtitle = {}
                 subtitle['lang'] = sub['lang']
                 subtitle['urls'] = []
-                segments = m3u8.load(sub['m3u8_url'])
-                for uri in segments.files:
-                    subtitle['urls'].append(urljoin(segments.base_uri, uri))
+                playlist = m3u8.load(sub['m3u8_url'])
+                # Episodes are stitched (pre-roll, recap, episode, promos) with timestamps restarting at each
+                # discontinuity; keep only the longest group (the episode) so recap cues don't overlay it.
+                groups = []
+                for segment in playlist.segments:
+                    if segment.discontinuity or not groups:
+                        groups.append([])
+                    groups[-1].append(segment)
+                main = max(groups, key=lambda g: sum(s.duration for s in g))
+                for segment in main:
+                    subtitle['urls'].append(urljoin(playlist.base_uri, segment.uri))
                 subtitle_list.append(subtitle)
 
         return subtitle_list
@@ -253,14 +260,13 @@ class AppleTVPlus(BaseService):
         self.download_subtitle(subtitles, languages)
 
     def get_token(self) -> str:
-        """Loads environment config data from WEB App's <meta> tag."""
+        """Loads the Media API developer token from the WEB App page."""
         res = self.session.get('https://tv.apple.com', timeout=5)
         if res.ok:
-            env = re.search(
-                r'web-tv-app/config/environment"[\s\S]*?content="([^"]+)', res.text)
+            # tv.apple.com dropped the environment <meta>; the token now sits in the page's UtsConfigureIntent JSON
+            env = re.search(r'"developerToken":"([^"]+)"', res.text)
             if env:
-                data = orjson.loads(unquote(env[1]))
-                token = data['MEDIA_API']['token']
+                token = env[1]
                 self.logger.debug("token: %s", token)
                 return token
             else:
